@@ -53,10 +53,11 @@
     .btn-reset {
       width: 100%; padding: 8px; margin-top: 12px;
       border-radius: 6px; border: 1px solid #475569;
-      background: transparent; color: #94a3b8; font-size: 12px; cursor: pointer;
+      background: transparent; color: #38bdf8; font-size: 13px; font-weight: bold; cursor: pointer;
     }
     button:disabled { opacity: 0.5; cursor: not-allowed; }
     .status-connected { color: #34d399; font-weight: bold; margin-top: 12px; text-align: center; }
+    .status-error { color: #f87171; font-weight: bold; margin-top: 12px; text-align: center; }
     .note { font-size: 12px; color: #94a3b8; margin-top: 12px; text-align: center; }
   </style>
 </head>
@@ -103,19 +104,20 @@
     const APP_ID = 1089;
     let ws = null;
     let pingInterval = null;
-    let isConnecting = false;
+    let stopReconnect = false;
 
     function initWebSocket() {
       const token = localStorage.getItem('deriv_token');
 
       if (!token) {
-        document.getElementById('status').innerText = 'Please enter API token.';
+        document.getElementById('status').className = 'status-error';
+        document.getElementById('status').innerText = 'No Token Saved. Click button below to add one.';
         return;
       }
 
-      if (isConnecting || (ws && ws.readyState === WebSocket.OPEN)) return;
-      isConnecting = true;
+      if (stopReconnect) return;
 
+      document.getElementById('status').className = 'note';
       document.getElementById('status').innerText = 'Connecting to Deriv...';
 
       if (ws) {
@@ -125,11 +127,9 @@
       ws = new WebSocket(`wss://ws.binaryws.com/websockets/v3?app_id=${APP_ID}`);
 
       ws.onopen = function () {
-        isConnecting = false;
-        document.getElementById('status').innerText = 'Authorizing...';
+        document.getElementById('status').innerText = 'Authenticating token...';
         ws.send(JSON.stringify({ authorize: token }));
 
-        // Send a ping every 30 seconds to keep connection alive
         if (pingInterval) clearInterval(pingInterval);
         pingInterval = setInterval(() => {
           if (ws && ws.readyState === WebSocket.OPEN) {
@@ -143,7 +143,9 @@
 
         if (data.msg_type === 'authorize') {
           if (data.error) {
-            document.getElementById('status').innerText = 'Auth Error: ' + data.error.message;
+            stopReconnect = true; // Stop infinite reconnect loop on bad token
+            document.getElementById('status').className = 'status-error';
+            document.getElementById('status').innerText = 'Invalid Token: ' + data.error.message;
             return;
           }
           document.getElementById('status').className = 'status-connected';
@@ -164,6 +166,7 @@
 
         if (data.msg_type === 'proposal') {
           if (data.error) {
+            document.getElementById('status').className = 'status-error';
             document.getElementById('status').innerText = 'Trade Error: ' + data.error.message;
             return;
           }
@@ -172,32 +175,31 @@
 
         if (data.msg_type === 'buy') {
           if (data.error) {
+            document.getElementById('status').className = 'status-error';
             document.getElementById('status').innerText = 'Buy Error: ' + data.error.message;
             return;
           }
-          document.getElementById('status').innerText = `Trade Placed! ID: ${data.buy.contract_id}`;
+          document.getElementById('status').className = 'status-connected';
+          document.getElementById('status').innerText = `Trade Active! ID: ${data.buy.contract_id}`;
         }
       };
 
-      ws.onerror = function () {
-        isConnecting = false;
-      };
-
       ws.onclose = function () {
-        isConnecting = false;
         if (pingInterval) clearInterval(pingInterval);
-        document.getElementById('status').className = 'note';
-        document.getElementById('status').innerText = 'Connection lost. Reconnecting...';
         document.getElementById('riseBtn').disabled = true;
         document.getElementById('fallBtn').disabled = true;
-        
-        setTimeout(initWebSocket, 3000);
+
+        if (!stopReconnect) {
+          document.getElementById('status').className = 'note';
+          document.getElementById('status').innerText = 'Connection lost. Retrying in 3s...';
+          setTimeout(initWebSocket, 3000);
+        }
       };
     }
 
     function placeTrade(contractType) {
       if (!ws || ws.readyState !== WebSocket.OPEN) {
-        document.getElementById('status').innerText = 'Socket closed. Reconnecting...';
+        document.getElementById('status').innerText = 'Reconnecting...';
         initWebSocket();
         return;
       }
@@ -206,7 +208,7 @@
       const amount = parseFloat(document.getElementById('amount').value);
       const duration = parseInt(document.getElementById('duration').value);
 
-      document.getElementById('status').innerText = 'Placing trade...';
+      document.getElementById('status').innerText = 'Sending trade...';
 
       ws.send(JSON.stringify({
         proposal: 1,
@@ -221,9 +223,10 @@
     }
 
     function resetToken() {
-      const newToken = prompt("Paste your Deriv API Token:");
+      const newToken = prompt("Paste your fresh Deriv API Token:");
       if (newToken) {
         localStorage.setItem('deriv_token', newToken.trim());
+        stopReconnect = false;
         location.reload();
       }
     }
