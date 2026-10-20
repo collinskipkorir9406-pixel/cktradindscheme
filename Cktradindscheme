@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CK Trading Bot</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #101827;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    .card {
+      max-width: 420px;
+      margin: 30px auto;
+      padding: 24px;
+      background: #1e293b;
+      border-radius: 16px;
+    }
+    h1 { color: #38d9a9; }
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 12px;
+      border: 0;
+      border-radius: 8px;
+      background: #38d9a9;
+      color: #101827;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    input, select {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      border-radius: 8px;
+    }
+    .note { color: #cbd5e1; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>CK Trading Bot</h1>
+    <p class="note">Your Deriv trading interface</p>
+
+    <label>Trade amount (USD)</label>
+    <input id="amount" type="number" min="0.35"
+           step="0.01" value="1">
+
+    <label>Trade duration (ticks)</label>
+    <select id="duration">
+      <option value="1">1 tick</option>
+      <option value="5">5 ticks</option>
+      <option value="10">10 ticks</option>
+    </select>
+
+    <button onclick="connectDeriv()">Connect to Deriv</button>
+    <p id="status" class="note">
+      Not connected. Connect your Deriv account to continue.
+    </p>
+    <p class="note">
+      Demo starter only. No trades are placed by this page.
+    </p>
+  </div>
+
+  <script>
+    function connectDeriv() {
+      document.getElementById("status").textContent =
+        "Connection is not configured yet. The next step is secure Deriv API setup.";
+    }
+  </script>
+</body>
+</html>
