@@ -57,7 +57,7 @@
     }
     button:disabled { opacity: 0.5; cursor: not-allowed; }
     .status-connected { color: #34d399; font-weight: bold; margin-top: 12px; text-align: center; }
-    .note { font-size: 12px; color: #94a3b8; margin-top: 12px; text-align: center; word-break: break-all; }
+    .note { font-size: 12px; color: #94a3b8; margin-top: 12px; text-align: center; }
   </style>
 </head>
 <body>
@@ -100,25 +100,21 @@
   </div>
 
   <script>
-    const APP_ID = 1089; // Standard public test app ID
+    const APP_ID = 1089;
     let ws;
 
     function initWebSocket() {
       const token = localStorage.getItem('deriv_token');
 
       if (!token) {
-        document.getElementById('statusinnerText').innerText = 'Please enter API token.';
+        document.getElementById('status').innerText = 'Please enter API token.';
         return;
       }
 
-      document.getElementById('status').innerText = 'Connecting to socket...';
+      document.getElementById('status').innerText = 'Connecting...';
 
-      try {
-        ws = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`);
-      } catch (e) {
-        document.getElementById('status').innerText = 'Init Error: ' + e.message;
-        return;
-      }
+      // Using the public production binaryws domain optimized for web apps
+      ws = new WebSocket(`wss://ws.binaryws.com/websockets/v3?app_id=${APP_ID}`);
 
       ws.onopen = function () {
         document.getElementById('status').innerText = 'Authorizing...';
@@ -166,20 +162,19 @@
         }
       };
 
-      ws.onerror = function (event) {
-        document.getElementById('status').innerText = 'WebSocket error encountered.';
+      ws.onerror = function () {
+        document.getElementById('status').innerText = 'Connection error.';
       };
 
-      ws.onclose = function (event) {
-        if (!event.wasClean) {
-          document.getElementById('status').innerText = 'Connection lost. Check internet/firewall.';
-        }
+      ws.onclose = function () {
+        document.getElementById('status').innerText = 'Connection lost. Reconnecting...';
+        setTimeout(initWebSocket, 3000);
       };
     }
 
     function placeTrade(contractType) {
       if (!ws || ws.readyState !== WebSocket.OPEN) {
-        document.getElementById('status').innerText = 'Socket not open. Reconnecting...';
+        document.getElementById('status').innerText = 'Reconnecting socket...';
         initWebSocket();
         return;
       }
@@ -188,7 +183,7 @@
       const amount = parseFloat(document.getElementById('amount').value);
       const duration = parseInt(document.getElementById('duration').value);
 
-      document.getElementById('status').innerText = 'Placing trade...';
+      document.getElementById('status').innerText = 'Sending trade...';
 
       ws.send(JSON.stringify({
         proposal: 1,
