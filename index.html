@@ -65,7 +65,6 @@
   <script>
     const APP_ID = "34JjnKJzecylG5kwmjaXm";
 
-    // Check if Deriv redirected back with account token
     function checkAuth() {
       const urlParams = new URLSearchParams(window.location.search);
       const token1 = urlParams.get('token1');
@@ -74,6 +73,8 @@
       if (token1) {
         localStorage.setItem('deriv_token', token1);
         localStorage.setItem('deriv_account', acct1);
+        // Clear tokens from URL bar for security
+        window.history.replaceState({}, document.title, window.location.pathname);
       }
 
       const savedToken = localStorage.getItem('deriv_token');
@@ -88,8 +89,8 @@
     }
 
     function connectDeriv() {
-      const redirectUrl = window.location.origin + window.location.pathname;
-      const authUrl = `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}`;
+      // Direct redirect back to this page
+      const authUrl = `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&l=en`;
       window.location.href = authUrl;
     }
 
