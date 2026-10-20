@@ -100,7 +100,7 @@
   </div>
 
   <script>
-    const APP_ID = "34JjnKJzecylG5kwmjaXm";
+    const APP_ID = "1089"; // Standard public test App ID for seamless token authorization
     let ws;
 
     function initWebSocket() {
@@ -111,8 +111,7 @@
         return;
       }
 
-      // Open WebSocket connection
-      ws = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`);
+      ws = new WebSocket(`wss://ws.binaryws.com/websockets/v3?app_id=${APP_ID}`);
 
       ws.onopen = function () {
         document.getElementById('status').innerText = 'Authenticating token...';
@@ -122,7 +121,6 @@
       ws.onmessage = function (msg) {
         const data = JSON.parse(msg.data);
 
-        // Authorization response
         if (data.msg_type === 'authorize') {
           if (data.error) {
             document.getElementById('status').innerText = 'Token Error: ' + data.error.message;
@@ -135,18 +133,15 @@
           document.getElementById('riseBtn').disabled = false;
           document.getElementById('fallBtn').disabled = false;
 
-          // Subscribe to balance updates
           ws.send(JSON.stringify({ balance: 1, subscribe: 1 }));
         }
 
-        // Live balance update
         if (data.msg_type === 'balance') {
           if (data.balance) {
             document.getElementById('balance').innerText = `${data.balance.balance} ${data.balance.currency}`;
           }
         }
 
-        // Trade proposal response
         if (data.msg_type === 'proposal') {
           if (data.error) {
             document.getElementById('status').innerText = 'Trade Error: ' + data.error.message;
@@ -155,7 +150,6 @@
           ws.send(JSON.stringify({ buy: data.proposal.id, price: data.proposal.ask_price }));
         }
 
-        // Buy confirmation response
         if (data.msg_type === 'buy') {
           if (data.error) {
             document.getElementById('status').innerText = 'Buy Error: ' + data.error.message;
@@ -170,7 +164,6 @@
       };
 
       ws.onclose = function () {
-        // Auto-reconnect after 3 seconds if disconnected
         setTimeout(initWebSocket, 3000);
       };
     }
