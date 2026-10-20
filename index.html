@@ -57,7 +57,7 @@
     }
     button:disabled { opacity: 0.5; cursor: not-allowed; }
     .status-connected { color: #34d399; font-weight: bold; margin-top: 12px; text-align: center; }
-    .note { font-size: 12px; color: #94a3b8; margin-top: 12px; text-align: center; }
+    .note { font-size: 12px; color: #94a3b8; margin-top: 12px; text-align: center; word-break: break-all; }
   </style>
 </head>
 <body>
@@ -100,18 +100,25 @@
   </div>
 
   <script>
-    const APP_ID = 1089;
+    const APP_ID = 1089; // Standard public test app ID
     let ws;
 
     function initWebSocket() {
       const token = localStorage.getItem('deriv_token');
 
       if (!token) {
-        document.getElementById('status').innerText = 'Please enter API token.';
+        document.getElementById('statusinnerText').innerText = 'Please enter API token.';
         return;
       }
 
-      ws = new WebSocket(`wss://ws.binaryws.com/websockets/v3?app_id=${APP_ID}`);
+      document.getElementById('status').innerText = 'Connecting to socket...';
+
+      try {
+        ws = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`);
+      } catch (e) {
+        document.getElementById('status').innerText = 'Init Error: ' + e.message;
+        return;
+      }
 
       ws.onopen = function () {
         document.getElementById('status').innerText = 'Authorizing...';
@@ -159,18 +166,21 @@
         }
       };
 
-      ws.onerror = function () {
-        document.getElementById('status').innerText = 'Connection error.';
+      ws.onerror = function (event) {
+        document.getElementById('status').innerText = 'WebSocket error encountered.';
       };
 
-      ws.onclose = function () {
-        setTimeout(initWebSocket, 3000);
+      ws.onclose = function (event) {
+        if (!event.wasClean) {
+          document.getElementById('status').innerText = 'Connection lost. Check internet/firewall.';
+        }
       };
     }
 
     function placeTrade(contractType) {
       if (!ws || ws.readyState !== WebSocket.OPEN) {
-        document.getElementById('status').innerText = 'Connecting...';
+        document.getElementById('status').innerText = 'Socket not open. Reconnecting...';
+        initWebSocket();
         return;
       }
 
