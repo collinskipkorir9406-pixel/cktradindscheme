@@ -24,20 +24,35 @@
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
     }
     h1 { margin-top: 0; font-size: 20px; color: #38bdf8; }
+    .balance-box {
+      background-color: #0f172a;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .balance-title { font-size: 12px; color: #94a3b8; }
+    .balance-value { font-size: 22px; font-weight: bold; color: #38bdf8; margin-top: 4px; }
     label { display: block; margin-top: 12px; font-size: 14px; color: #94a3b8; }
     input, select {
       width: 100%; padding: 10px; margin-top: 6px;
       border-radius: 6px; border: 1px solid #334155;
       background-color: #0f172a; color: #fff; box-sizing: border-box;
     }
-    button {
-      width: 100%; padding: 12px; margin-top: 20px;
-      border-radius: 6px; border: none; background-color: #10b981;
-      color: #0f172a; font-weight: bold; font-size: 16px; cursor: pointer;
+    .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-rise {
+      flex: 1; padding: 12px; border-radius: 6px; border: none;
+      background-color: #10b981; color: #0f172a; font-weight: bold;
+      font-size: 16px; cursor: pointer;
     }
-    button:hover { background-color: #34d399; }
+    .btn-fall {
+      flex: 1; padding: 12px; border-radius: 6px; border: none;
+      background-color: #ef4444; color: #fff; font-weight: bold;
+      font-size: 16px; cursor: pointer;
+    }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
     .status-connected { color: #34d399; font-weight: bold; margin-top: 12px; }
-    .note { font-size: 12px; color: #94a3b8; margin-top: 12px; }
+    .note { font-size: 12px; color: #94a3b8; margin-top: 12px; text-align: center; }
   </style>
 </head>
 <body>
@@ -45,8 +60,19 @@
   <div class="card">
     <h1>CK Trading Bot</h1>
 
-    <label>Deriv API Token</label>
-    <input id="apiToken" type="password" placeholder="Paste your API Token here">
+    <div class="balance-box">
+      <div class="balance-title">Account Balance</div>
+      <div id="balance" class="balance-value">Loading...</div>
+    </div>
+
+    <label>Market</label>
+    <select id="symbol">
+      <option value="R_100">Volatility 100 Index</option>
+      <option value="R_75">Volatility 75 Index</option>
+      <option value="R_50">Volatility 50 Index</option>
+      <option value="R_25">Volatility 25 Index</option>
+      <option value="R_10">Volatility 10 Index</option>
+    </select>
 
     <label>Trade amount (USD)</label>
     <input id="amount" type="number" value="1" min="0.35" step="0.01">
@@ -58,36 +84,107 @@
       <option value="10">10 ticks</option>
     </select>
 
-    <button id="authBtn" onclick="saveToken()">Connect API Token</button>
+    <div class="btn-group">
+      <button id="riseBtn" class="btn-rise" onclick="placeTrade('CALL')" disabled>Rise ↗</button>
+      <button id="fallBtn" class="btn-fall" onclick="placeTrade('PUT')" disabled>Fall ↘</button>
+    </div>
 
-    <p id="status" class="note">
-      Not connected. Enter API token to proceed.
-    </p>
+    <p id="status" class="note">Connecting to Deriv WebSocket...</p>
   </div>
 
   <script>
-    function checkAuth() {
-      const savedToken = localStorage.getItem('deriv_token');
-      if (savedToken) {
-        document.getElementById('status').className = 'status-connected';
-        document.getElementById('status').innerText = 'Connected & Ready';
-        document.getElementById('authBtn').innerText = 'Connected';
-        document.getElementById('authBtn').style.backgroundColor = '#475569';
-        document.getElementById('apiToken').value = '••••••••••••••••';
+    const APP_ID = "34JjnKJzecylG5kwmjaXm";
+    const token = localStorage.getItem('deriv_token');
+    let ws;
+
+    function initWebSocket() {
+      if (!token) {
+        document.getElementById('status').innerText = 'No API Token found. Please reconnect.';
+        return;
       }
+
+      ws = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`);
+
+      ws.onopen = function () {
+        document.getElementById('status').innerText = 'Authenticating...';
+        ws.send(JSON.stringify({ authorize: token }));
+      };
+
+      ws.onmessage = function (msg) {
+        const data = JSON.parse(msg.data);
+
+        // Authorization response
+        if (data.msg_type === 'authorize') {
+          if (data.error) {
+            document.getElementById('status').innerText = 'Auth Error: ' + data.error.message;
+            return;
+          }
+          document.getElementById('status').className = 'status-connected';
+          document.getElementById('status').innerText = 'Connected & Authorized';
+          document.getElementById('balance').innerText = `${data.authorize.balance} ${data.authorize.currency}`;
+          
+          // Enable trade buttons
+          document.getElementById('riseBtn').disabled = false;
+          document.getElementById('fallBtn').disabled = false;
+
+          // Subscribe to live balance updates
+          ws.send(JSON.stringify({ balance: 1, subscribe: 1 }));
+        }
+
+        // Live balance updates
+        if (data.msg_type === 'balance') {
+          if (data.balance) {
+            document.getElementById('balance').innerText = `${data.balance.balance} ${data.balance.currency}`;
+          }
+        }
+
+        // Proposal response (pricing calculation)
+        if (data.msg_type === 'proposal') {
+          if (data.error) {
+            document.getElementById('status').innerText = 'Trade Error: ' + data.error.message;
+            return;
+          }
+          // Execute purchase once contract proposal is approved
+          ws.send(JSON.stringify({ buy: data.proposal.id, price: data.proposal.ask_price }));
+        }
+
+        // Buy confirmation
+        if (data.msg_type === 'buy') {
+          if (data.error) {
+            document.getElementById('status').innerText = 'Buy Error: ' + data.error.message;
+            return;
+          }
+          document.getElementById('status').innerText = `Trade Placed! Contract ID: ${data.buy.contract_id}`;
+        }
+      };
+
+      ws.onerror = function (err) {
+        document.getElementById('status').innerText = 'Connection error. Retrying...';
+      };
     }
 
-    function saveToken() {
-      const tokenInput = document.getElementById('apiToken').value.trim();
-      if (tokenInput && !tokenInput.includes('•')) {
-        localStorage.setItem('deriv_token', tokenInput);
-        checkAuth();
-      } else if (!tokenInput) {
-        alert('Please enter a valid API token');
-      }
+    function placeTrade(contractType) {
+      const symbol = document.getElementById('symbol').value;
+      const amount = parseFloat(document.getElementById('amount').value);
+      const duration = parseInt(document.getElementById('duration').value);
+
+      document.getElementById('status').innerText = 'Requesting trade contract...';
+
+      const proposalReq = {
+        proposal: 1,
+        amount: amount,
+        basis: 'stake',
+        contract_type: contractType,
+        currency: 'USD',
+        duration: duration,
+        duration_unit: 't',
+        symbol: symbol
+      };
+
+      ws.send(JSON.stringify(proposalReq));
     }
 
-    checkAuth();
+    initWebSocket();
   </script>
 
 </body>
