@@ -95,18 +95,17 @@
       <button id="fallBtn" class="btn-fall" onclick="placeTrade('PUT')" disabled>Fall ↘</button>
     </div>
 
-    <p id="status" class="note">Initializing...</p>
+    <p id="status" class="note">Connecting...</p>
 
     <button class="btn-reset" onclick="resetToken()">Change / Re-enter API Token</button>
   </div>
 
   <script>
-    const appId = "1089";
+    const APP_ID = 1089;
     let ws = null;
-    let pingTimer = null;
-    let isInitialized = false;
+    let reconnectTimeout = null;
 
-    function initConnection() {
+    function initWebSocket() {
       const token = localStorage.getItem('deriv_token');
       if (!token) {
         document.getElementById('status').className = 'status-error';
@@ -119,87 +118,79 @@
       }
 
       document.getElementById('status').className = 'note';
-      document.getElementById('status').innerText = 'Connecting to Deriv WebSocket...';
+      document.getElementById('status').innerText = 'Connecting to ws.derivws.com...';
 
-      ws = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${appId}`);
+      // Updated standard primary endpoint configuration
+      ws = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`);
 
       ws.onopen = function() {
-        document.getElementById('status').innerText = 'Authenticating...';
+        document.getElementById('status').innerText = 'Authorizing token...';
         ws.send(JSON.stringify({ authorize: token }));
-
-        // Keep-alive heartbeat every 30 seconds
-        if (pingTimer) clearInterval(pingTimer);
-        pingTimer = setInterval(() => {
-          if (ws && ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ ping: 1 }));
-          }
-        }, 30000);
       };
 
       ws.onmessage = function(event) {
-        const response = JSON.parse(event.data);
-        const msgType = response.msg_type;
+        const data = JSON.parse(event.data);
 
-        if (msgType === 'authorize') {
-          if (response.error) {
+        if (data.msg_type === 'authorize') {
+          if (data.error) {
             document.getElementById('status').className = 'status-error';
-            document.getElementById('status').innerText = 'Auth Error: ' + response.error.message;
+            document.getElementById('status').innerText = 'Auth Error: ' + data.error.message;
             return;
           }
-          isInitialized = true;
           document.getElementById('status').className = 'status-connected';
           document.getElementById('status').innerText = 'Connected & Ready';
-          document.getElementById('balance').innerText = `${response.authorize.balance} ${response.authorize.currency}`;
+          document.getElementById('balance').innerText = `${data.authorize.balance} ${data.authorize.currency}`;
           
           document.getElementById('riseBtn').disabled = false;
           document.getElementById('fallBtn').disabled = false;
 
-          // Subscribe to live balance updates
           ws.send(JSON.stringify({ balance: 1, subscribe: 1 }));
         }
 
-        if (msgType === 'balance' && response.balance) {
-          document.getElementById('balance').innerText = `${response.balance.balance} ${response.balance.currency}`;
+        if (data.msg_type === 'balance' && data.balance) {
+          document.getElementById('balance').innerText = `${data.balance.balance} ${data.balance.currency}`;
         }
 
-        if (msgType === 'proposal') {
-          if (response.error) {
+        if (data.msg_type === 'proposal') {
+          if (data.error) {
             document.getElementById('status').className = 'status-error';
-            document.getElementById('status').innerText = 'Proposal Error: ' + response.error.message;
+            document.getElementById('status').innerText = 'Proposal Error: ' + data.error.message;
             return;
           }
-          ws.send(JSON.stringify({ buy: response.proposal.id, price: response.proposal.ask_price }));
+          ws.send(JSON.stringify({ buy: data.proposal.id, price: data.proposal.ask_price }));
         }
 
-        if (msgType === 'buy') {
-          if (response.error) {
+        if (data.msg_type === 'buy') {
+          if (data.error) {
             document.getElementById('status').className = 'status-error';
-            document.getElementById('status').innerText = 'Buy Error: ' + response.error.message;
+            document.getElementById('status').innerText = 'Buy Error: ' + data.error.message;
             return;
           }
           document.getElementById('status').className = 'status-connected';
-          document.getElementById('status').innerText = `Trade Success! Contract ID: ${response.buy.contract_id}`;
+          document.getElementById('status').innerText = `Trade Active! ID: ${data.buy.contract_id}`;
         }
       };
 
       ws.onerror = function() {
         document.getElementById('status').className = 'status-error';
-        document.getElementById('status').innerText = 'Network socket error.';
+        document.getElementById('status').innerText = 'WebSocket connection blocked or failed.';
       };
 
       ws.onclose = function() {
-        if (pingTimer) clearInterval(pingTimer);
         document.getElementById('riseBtn').disabled = true;
         document.getElementById('fallBtn').disabled = true;
         document.getElementById('status').className = 'note';
-        document.getElementById('status').innerText = 'Connection lost. Reconnecting in 3s...';
-        setTimeout(initConnection, 3000);
+        document.getElementById('status').innerText = 'Connection lost. Reconnecting...';
+        
+        if (reconnectTimeout) clearTimeout(reconnectTimeout);
+        reconnectTimeout = setTimeout(initWebSocket, 4000);
       };
     }
 
     function placeTrade(contractType) {
-      if (!ws || ws.readyState !== WebSocket.OPEN || !isInitialized) {
-        document.getElementById('status').innerText = 'Socket reloading... Please wait.';
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        document.getElementById('status').innerText = 'Socket offline. Reconnecting...';
+        initWebSocket();
         return;
       }
 
@@ -208,7 +199,7 @@
       const duration = parseInt(document.getElementById('duration').value);
 
       document.getElementById('status').className = 'note';
-      document.getElementById('status').innerText = 'Sending trade proposal...';
+      document.getElementById('status').innerText = 'Placing trade...';
 
       ws.send(JSON.stringify({
         proposal: 1,
@@ -230,7 +221,7 @@
       }
     }
 
-    initConnection();
+    initWebSocket();
   </script>
 </body>
 </html>
