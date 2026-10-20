@@ -101,53 +101,38 @@
   </div>
 
   <script>
-    const APP_ID = 1089;
+    const wsUrl = "wss://ws.binaryws.com/websockets/v3?app_id=1089";
     let ws = null;
-    let pingInterval = null;
-    let stopReconnect = false;
+    let isAuthorized = false;
 
-    function initWebSocket() {
+    function connect() {
       const token = localStorage.getItem('deriv_token');
-
       if (!token) {
         document.getElementById('status').className = 'status-error';
-        document.getElementById('status').innerText = 'No Token Saved. Click button below to add one.';
+        document.getElementById('status').innerText = 'No Token Found. Click button below.';
         return;
       }
-
-      if (stopReconnect) return;
 
       document.getElementById('status').className = 'note';
       document.getElementById('status').innerText = 'Connecting to Deriv...';
 
-      if (ws) {
-        try { ws.close(); } catch(e) {}
-      }
+      ws = new WebSocket(wsUrl);
 
-      ws = new WebSocket(`wss://ws.binaryws.com/websockets/v3?app_id=${APP_ID}`);
-
-      ws.onopen = function () {
-        document.getElementById('status').innerText = 'Authenticating token...';
+      ws.onopen = function() {
+        document.getElementById('status').innerText = 'Authorizing...';
         ws.send(JSON.stringify({ authorize: token }));
-
-        if (pingInterval) clearInterval(pingInterval);
-        pingInterval = setInterval(() => {
-          if (ws && ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ ping: 1 }));
-          }
-        }, 30000);
       };
 
-      ws.onmessage = function (msg) {
-        const data = JSON.parse(msg.data);
+      ws.onmessage = function(event) {
+        const data = JSON.parse(event.data);
 
         if (data.msg_type === 'authorize') {
           if (data.error) {
-            stopReconnect = true; // Stop infinite reconnect loop on bad token
             document.getElementById('status').className = 'status-error';
-            document.getElementById('status').innerText = 'Invalid Token: ' + data.error.message;
+            document.getElementById('status').innerText = 'Auth Error: ' + data.error.message;
             return;
           }
+          isAuthorized = true;
           document.getElementById('status').className = 'status-connected';
           document.getElementById('status').innerText = 'Connected & Ready';
           document.getElementById('balance').innerText = `${data.authorize.balance} ${data.authorize.currency}`;
@@ -155,19 +140,18 @@
           document.getElementById('riseBtn').disabled = false;
           document.getElementById('fallBtn').disabled = false;
 
+          // Subscribe to live balance
           ws.send(JSON.stringify({ balance: 1, subscribe: 1 }));
         }
 
-        if (data.msg_type === 'balance') {
-          if (data.balance) {
-            document.getElementById('balance').innerText = `${data.balance.balance} ${data.balance.currency}`;
-          }
+        if (data.msg_type === 'balance' && data.balance) {
+          document.getElementById('balance').innerText = `${data.balance.balance} ${data.balance.currency}`;
         }
 
         if (data.msg_type === 'proposal') {
           if (data.error) {
             document.getElementById('status').className = 'status-error';
-            document.getElementById('status').innerText = 'Trade Error: ' + data.error.message;
+            document.getElementById('status').innerText = 'Proposal Error: ' + data.error.message;
             return;
           }
           ws.send(JSON.stringify({ buy: data.proposal.id, price: data.proposal.ask_price }));
@@ -180,27 +164,27 @@
             return;
           }
           document.getElementById('status').className = 'status-connected';
-          document.getElementById('status').innerText = `Trade Active! ID: ${data.buy.contract_id}`;
+          document.getElementById('status').innerText = `Trade Placed! ID: ${data.buy.contract_id}`;
         }
       };
 
-      ws.onclose = function () {
-        if (pingInterval) clearInterval(pingInterval);
+      ws.onerror = function() {
+        document.getElementById('status').className = 'status-error';
+        document.getElementById('status').innerText = 'WebSocket error occurred.';
+      };
+
+      ws.onclose = function() {
         document.getElementById('riseBtn').disabled = true;
         document.getElementById('fallBtn').disabled = true;
-
-        if (!stopReconnect) {
-          document.getElementById('status').className = 'note';
-          document.getElementById('status').innerText = 'Connection lost. Retrying in 3s...';
-          setTimeout(initWebSocket, 3000);
-        }
+        document.getElementById('status').className = 'note';
+        document.getElementById('status').innerText = 'Connection lost. Retrying in 3s...';
+        setTimeout(connect, 3000);
       };
     }
 
     function placeTrade(contractType) {
-      if (!ws || ws.readyState !== WebSocket.OPEN) {
-        document.getElementById('status').innerText = 'Reconnecting...';
-        initWebSocket();
+      if (!ws || ws.readyState !== WebSocket.OPEN || !isAuthorized) {
+        document.getElementById('status').innerText = 'Connection not ready.';
         return;
       }
 
@@ -208,7 +192,7 @@
       const amount = parseFloat(document.getElementById('amount').value);
       const duration = parseInt(document.getElementById('duration').value);
 
-      document.getElementById('status').innerText = 'Sending trade...';
+      document.getElementById('status').innerText = 'Requesting trade...';
 
       ws.send(JSON.stringify({
         proposal: 1,
@@ -226,13 +210,11 @@
       const newToken = prompt("Paste your fresh Deriv API Token:");
       if (newToken) {
         localStorage.setItem('deriv_token', newToken.trim());
-        stopReconnect = false;
         location.reload();
       }
     }
 
-    initWebSocket();
+    connect();
   </script>
-
 </body>
 </html>
