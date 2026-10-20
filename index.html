@@ -89,8 +89,8 @@
     }
 
     function connectDeriv() {
-      // Direct redirect back to this page
-      const authUrl = `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&l=en`;
+      const redirectUrl = encodeURIComponent("https://collinskiporir9406-pixel.github.io/cktradindscheme/");
+      const authUrl = `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&redirect_uri=${redirectUrl}&l=en`;
       window.location.href = authUrl;
     }
 
