@@ -101,7 +101,9 @@
 
   <script>
     const APP_ID = 1089;
-    let ws;
+    let ws = null;
+    let pingInterval = null;
+    let isConnecting = false;
 
     function initWebSocket() {
       const token = localStorage.getItem('deriv_token');
@@ -111,14 +113,29 @@
         return;
       }
 
-      document.getElementById('status').innerText = 'Connecting...';
+      if (isConnecting || (ws && ws.readyState === WebSocket.OPEN)) return;
+      isConnecting = true;
 
-      // Using the public production binaryws domain optimized for web apps
+      document.getElementById('status').innerText = 'Connecting to Deriv...';
+
+      if (ws) {
+        try { ws.close(); } catch(e) {}
+      }
+
       ws = new WebSocket(`wss://ws.binaryws.com/websockets/v3?app_id=${APP_ID}`);
 
       ws.onopen = function () {
+        isConnecting = false;
         document.getElementById('status').innerText = 'Authorizing...';
         ws.send(JSON.stringify({ authorize: token }));
+
+        // Send a ping every 30 seconds to keep connection alive
+        if (pingInterval) clearInterval(pingInterval);
+        pingInterval = setInterval(() => {
+          if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ ping: 1 }));
+          }
+        }, 30000);
       };
 
       ws.onmessage = function (msg) {
@@ -163,18 +180,24 @@
       };
 
       ws.onerror = function () {
-        document.getElementById('status').innerText = 'Connection error.';
+        isConnecting = false;
       };
 
       ws.onclose = function () {
+        isConnecting = false;
+        if (pingInterval) clearInterval(pingInterval);
+        document.getElementById('status').className = 'note';
         document.getElementById('status').innerText = 'Connection lost. Reconnecting...';
+        document.getElementById('riseBtn').disabled = true;
+        document.getElementById('fallBtn').disabled = true;
+        
         setTimeout(initWebSocket, 3000);
       };
     }
 
     function placeTrade(contractType) {
       if (!ws || ws.readyState !== WebSocket.OPEN) {
-        document.getElementById('status').innerText = 'Reconnecting socket...';
+        document.getElementById('status').innerText = 'Socket closed. Reconnecting...';
         initWebSocket();
         return;
       }
@@ -183,7 +206,7 @@
       const amount = parseFloat(document.getElementById('amount').value);
       const duration = parseInt(document.getElementById('duration').value);
 
-      document.getElementById('status').innerText = 'Sending trade...';
+      document.getElementById('status').innerText = 'Placing trade...';
 
       ws.send(JSON.stringify({
         proposal: 1,
