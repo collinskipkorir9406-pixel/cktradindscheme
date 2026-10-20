@@ -95,37 +95,33 @@
       <button id="fallBtn" class="btn-fall" onclick="placeTrade('PUT')" disabled>Fall ↘</button>
     </div>
 
-    <p id="status" class="note">Connecting...</p>
+    <p id="status" class="note">Starting connection...</p>
 
     <button class="btn-reset" onclick="resetToken()">Change / Re-enter API Token</button>
   </div>
 
   <script>
-    const APP_ID = 1089;
     let ws = null;
-    let reconnectTimeout = null;
+    let retryCount = 0;
 
-    function initWebSocket() {
+    function startBot() {
       const token = localStorage.getItem('deriv_token');
       if (!token) {
         document.getElementById('status').className = 'status-error';
-        document.getElementById('status').innerText = 'No API Token saved. Click below.';
+        document.getElementById('status').innerText = 'Missing API token. Click button below to add.';
         return;
       }
 
-      if (ws) {
-        try { ws.close(); } catch(e) {}
-      }
-
       document.getElementById('status').className = 'note';
-      document.getElementById('status').innerText = 'Connecting to ws.derivws.com...';
+      document.getElementById('status').innerText = 'Opening secure socket...';
 
-      // Updated standard primary endpoint configuration
-      ws = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`);
+      // Using the global server fallback specifically configured for browser apps
+      ws = new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089');
 
       ws.onopen = function() {
-        document.getElementById('status').innerText = 'Authorizing token...';
-        ws.send(JSON.stringify({ authorize: token }));
+        retryCount = 0;
+        document.getElementById('status').innerText = 'Sending authorization request...';
+        ws.send(JSON.stringify({ authorize: token.trim() }));
       };
 
       ws.onmessage = function(event) {
@@ -134,7 +130,7 @@
         if (data.msg_type === 'authorize') {
           if (data.error) {
             document.getElementById('status').className = 'status-error';
-            document.getElementById('status').innerText = 'Auth Error: ' + data.error.message;
+            document.getElementById('status').innerText = 'Token Rejected: ' + data.error.message;
             return;
           }
           document.getElementById('status').className = 'status-connected';
@@ -144,6 +140,7 @@
           document.getElementById('riseBtn').disabled = false;
           document.getElementById('fallBtn').disabled = false;
 
+          // Keep alive subscription
           ws.send(JSON.stringify({ balance: 1, subscribe: 1 }));
         }
 
@@ -154,7 +151,7 @@
         if (data.msg_type === 'proposal') {
           if (data.error) {
             document.getElementById('status').className = 'status-error';
-            document.getElementById('status').innerText = 'Proposal Error: ' + data.error.message;
+            document.getElementById('status').innerText = 'Trade Error: ' + data.error.message;
             return;
           }
           ws.send(JSON.stringify({ buy: data.proposal.id, price: data.proposal.ask_price }));
@@ -163,34 +160,34 @@
         if (data.msg_type === 'buy') {
           if (data.error) {
             document.getElementById('status').className = 'status-error';
-            document.getElementById('status').innerText = 'Buy Error: ' + data.error.message;
+            document.getElementById('status').innerText = 'Execution Error: ' + data.error.message;
             return;
           }
           document.getElementById('status').className = 'status-connected';
-          document.getElementById('status').innerText = `Trade Active! ID: ${data.buy.contract_id}`;
+          document.getElementById('status').innerText = `Success! Contract ID: ${data.buy.contract_id}`;
         }
       };
 
-      ws.onerror = function() {
+      ws.onerror = function(err) {
         document.getElementById('status').className = 'status-error';
-        document.getElementById('status').innerText = 'WebSocket connection blocked or failed.';
+        document.getElementById('status').innerText = 'WebSocket security or network block detected.';
       };
 
-      ws.onclose = function() {
+      ws.onclose = function(event) {
         document.getElementById('riseBtn').disabled = true;
         document.getElementById('fallBtn').disabled = true;
-        document.getElementById('status').className = 'note';
-        document.getElementById('status').innerText = 'Connection lost. Reconnecting...';
         
-        if (reconnectTimeout) clearTimeout(reconnectTimeout);
-        reconnectTimeout = setTimeout(initWebSocket, 4000);
+        retryCount++;
+        document.getElementById('status').className = 'note';
+        document.getElementById('status').innerText = `Connection dropped (Attempt ${retryCount}). Reconnecting...`;
+        
+        setTimeout(startBot, 3000);
       };
     }
 
     function placeTrade(contractType) {
       if (!ws || ws.readyState !== WebSocket.OPEN) {
-        document.getElementById('status').innerText = 'Socket offline. Reconnecting...';
-        initWebSocket();
+        document.getElementById('status').innerText = 'Socket not active. Reconnecting...';
         return;
       }
 
@@ -221,7 +218,7 @@
       }
     }
 
-    initWebSocket();
+    startBot();
   </script>
 </body>
 </html>
