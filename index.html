@@ -60,6 +60,145 @@
     .status-error { color: #f87171; font-weight: bold; margin-top: 12px; text-align: center; }
     .note { font-size: 12px; color: #94a3b8; margin-top: 12px; text-align: center; }
   </style>
+
+  <!-- Load official Deriv API wrapper via Skypack CDN -->
+  <script type="module">
+    import DerivAPIBasic from 'https://cdn.skypack.dev/@deriv/deriv-api/dist/DerivAPIBasic';
+
+    const appId = 1089;
+    let api;
+    let connection;
+
+    window.initBot = async function() {
+      const token = localStorage.getItem('deriv_token');
+      if (!token) {
+        document.getElementById('status').className = 'status-error';
+        document.getElementById('status').innerText = 'No API Token found. Click below to add.';
+        return;
+      }
+
+      document.getElementById('status').className = 'note';
+      document.getElementById('status').innerText = 'Connecting via Deriv API...';
+
+      try {
+        connection = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${appId}`);
+        api = new DerivAPIBasic({ connection });
+
+        connection.onopen = async () => {
+          document.getElementById('status').innerText = 'Authorizing session...';
+          try {
+            const authResponse = await api.authorize(token.trim());
+            if (authResponse.error) {
+              document.getElementById('status').className = 'status-error';
+              document.getElementById('status').innerText = 'Auth Error: ' + authResponse.error.message;
+              return;
+            }
+
+            document.getElementById('status').className = 'status-connected';
+            document.getElementById('status').innerText = 'Connected & Ready';
+            const acc = authResponse.authorize;
+            document.getElementById('balance').innerText = `${acc.balance} ${acc.currency}`;
+
+            document.getElementById('riseBtn').disabled = false;
+            document.getElementById('fallBtn').disabled = false;
+
+            // Keep connection alive with a ping interval every 30 seconds
+            setInterval(() => {
+              if (connection.readyState === WebSocket.OPEN) {
+                api.ping().catch(() => {});
+              }
+            }, 30000);
+
+            // Subscribe to live balance stream
+            await api.balance({ balance: 1, subscribe: 1 });
+            connection.addEventListener('message', (msg) => {
+              const data = JSON.parse(msg.data);
+              if (data.msg_type === 'balance' && data.balance) {
+                document.getElementById('balance').innerText = `${data.balance.balance} ${data.balance.currency}`;
+              }
+            });
+
+          } catch (err) {
+            document.getElementById('status').className = 'status-error';
+            document.getElementById('status').innerText = 'Authorization failed.';
+          }
+        };
+
+        connection.onclose = () => {
+          document.getElementById('riseBtn').disabled = true;
+          document.getElementById('fallBtn').disabled = true;
+          document.getElementById('status').className = 'note';
+          document.getElementById('status').innerText = 'Connection lost. Reconnecting in 3s...';
+          setTimeout(window.initBot, 3000);
+        };
+
+      } catch (e) {
+        document.getElementById('status').className = 'status-error';
+        document.getElementById('status').innerText = 'Initialization error.';
+      }
+    };
+
+    window.placeTrade = async function(contractType) {
+      if (!api || connection.readyState !== WebSocket.OPEN) {
+        document.getElementById('status').innerText = 'Socket not connected.';
+        return;
+      }
+
+      const symbol = document.getElementById('symbol').value;
+      const amount = parseFloat(document.getElementById('amount').value);
+      const duration = parseInt(document.getElementById('duration').value);
+
+      document.getElementById('status').className = 'note';
+      document.getElementById('status').innerText = 'Submitting trade proposal...';
+
+      try {
+        const proposalReq = {
+          proposal: 1,
+          amount: amount,
+          basis: 'stake',
+          contract_type: contractType,
+          currency: 'USD',
+          duration: duration,
+          duration_unit: 't',
+          symbol: symbol
+        };
+
+        const proposal = await api.proposal(proposalReq);
+        if (proposal.error) {
+          document.getElementById('status').className = 'status-error';
+          document.getElementById('status').innerText = 'Proposal Error: ' + proposal.error.message;
+          return;
+        }
+
+        document.getElementById('status').innerText = 'Executing buy order...';
+        const buyResponse = await api.buy({ buy: proposal.proposal.id, price: proposal.proposal.ask_price });
+
+        if (buyResponse.error) {
+          document.getElementById('status').className = 'status-error';
+          document.getElementById('status').innerText = 'Buy Error: ' + buyResponse.error.message;
+          return;
+        }
+
+        document.getElementById('status').className = 'status-connected';
+        document.getElementById('status').innerText = `Trade Success! ID: ${buyResponse.buy.contract_id}`;
+      } catch (err) {
+        document.getElementById('status').className = 'status-error';
+        document.getElementById('status').innerText = 'Trade transaction failed.';
+      }
+    };
+
+    window.resetToken = function() {
+      const newToken = prompt("Paste your fresh Deriv API Token:");
+      if (newToken) {
+        localStorage.setItem('deriv_token', newToken.trim());
+        location.reload();
+      }
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      window.initBot();
+    });
+  </script>
 </head>
 <body>
 
@@ -91,134 +230,14 @@
     </select>
 
     <div class="btn-group">
-      <button id="riseBtn" class="btn-rise" onclick="placeTrade('CALL')" disabled>Rise ↗</button>
-      <button id="fallBtn" class="btn-fall" onclick="placeTrade('PUT')" disabled>Fall ↘</button>
+      <button id="riseBtn" class="btn-rise" onclick="window.placeTrade('CALL')" disabled>Rise ↗</button>
+      <button id="fallBtn" class="btn-fall" onclick="window.placeTrade('PUT')" disabled>Fall ↘</button>
     </div>
 
-    <p id="status" class="note">Starting connection...</p>
+    <p id="status" class="note">Loading libraries...</p>
 
-    <button class="btn-reset" onclick="resetToken()">Change / Re-enter API Token</button>
+    <button class="btn-reset" onclick="window.resetToken()">Change / Re-enter API Token</button>
   </div>
 
-  <script>
-    let ws = null;
-    let retryCount = 0;
-
-    function startBot() {
-      const token = localStorage.getItem('deriv_token');
-      if (!token) {
-        document.getElementById('status').className = 'status-error';
-        document.getElementById('status').innerText = 'Missing API token. Click button below to add.';
-        return;
-      }
-
-      document.getElementById('status').className = 'note';
-      document.getElementById('status').innerText = 'Opening secure socket...';
-
-      // Using the global server fallback specifically configured for browser apps
-      ws = new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089');
-
-      ws.onopen = function() {
-        retryCount = 0;
-        document.getElementById('status').innerText = 'Sending authorization request...';
-        ws.send(JSON.stringify({ authorize: token.trim() }));
-      };
-
-      ws.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-
-        if (data.msg_type === 'authorize') {
-          if (data.error) {
-            document.getElementById('status').className = 'status-error';
-            document.getElementById('status').innerText = 'Token Rejected: ' + data.error.message;
-            return;
-          }
-          document.getElementById('status').className = 'status-connected';
-          document.getElementById('status').innerText = 'Connected & Ready';
-          document.getElementById('balance').innerText = `${data.authorize.balance} ${data.authorize.currency}`;
-          
-          document.getElementById('riseBtn').disabled = false;
-          document.getElementById('fallBtn').disabled = false;
-
-          // Keep alive subscription
-          ws.send(JSON.stringify({ balance: 1, subscribe: 1 }));
-        }
-
-        if (data.msg_type === 'balance' && data.balance) {
-          document.getElementById('balance').innerText = `${data.balance.balance} ${data.balance.currency}`;
-        }
-
-        if (data.msg_type === 'proposal') {
-          if (data.error) {
-            document.getElementById('status').className = 'status-error';
-            document.getElementById('status').innerText = 'Trade Error: ' + data.error.message;
-            return;
-          }
-          ws.send(JSON.stringify({ buy: data.proposal.id, price: data.proposal.ask_price }));
-        }
-
-        if (data.msg_type === 'buy') {
-          if (data.error) {
-            document.getElementById('status').className = 'status-error';
-            document.getElementById('status').innerText = 'Execution Error: ' + data.error.message;
-            return;
-          }
-          document.getElementById('status').className = 'status-connected';
-          document.getElementById('status').innerText = `Success! Contract ID: ${data.buy.contract_id}`;
-        }
-      };
-
-      ws.onerror = function(err) {
-        document.getElementById('status').className = 'status-error';
-        document.getElementById('status').innerText = 'WebSocket security or network block detected.';
-      };
-
-      ws.onclose = function(event) {
-        document.getElementById('riseBtn').disabled = true;
-        document.getElementById('fallBtn').disabled = true;
-        
-        retryCount++;
-        document.getElementById('status').className = 'note';
-        document.getElementById('status').innerText = `Connection dropped (Attempt ${retryCount}). Reconnecting...`;
-        
-        setTimeout(startBot, 3000);
-      };
-    }
-
-    function placeTrade(contractType) {
-      if (!ws || ws.readyState !== WebSocket.OPEN) {
-        document.getElementById('status').innerText = 'Socket not active. Reconnecting...';
-        return;
-      }
-
-      const symbol = document.getElementById('symbol').value;
-      const amount = parseFloat(document.getElementById('amount').value);
-      const duration = parseInt(document.getElementById('duration').value);
-
-      document.getElementById('status').className = 'note';
-      document.getElementById('status').innerText = 'Placing trade...';
-
-      ws.send(JSON.stringify({
-        proposal: 1,
-        amount: amount,
-        basis: 'stake',
-        contract_type: contractType,
-        currency: 'USD',
-        duration: duration,
-        duration_unit: 't',
-        symbol: symbol
-      }));
-    }
-
-    function resetToken() {
-      const newToken = prompt("Paste your fresh Deriv API Token:");
-      if (newToken) {
-        localStorage.setItem('deriv_token', newToken.trim());
-        location.reload();
-      }
-    }
-
-    startBot();
-  </script>
 </body>
 </html>
