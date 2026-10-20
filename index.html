@@ -36,7 +36,7 @@
       color: #0f172a; font-weight: bold; font-size: 16px; cursor: pointer;
     }
     button:hover { background-color: #34d399; }
-    .status-connected { color: #34d399; font-weight: bold; }
+    .status-connected { color: #34d399; font-weight: bold; margin-top: 12px; }
     .note { font-size: 12px; color: #94a3b8; margin-top: 12px; }
   </style>
 </head>
@@ -44,6 +44,9 @@
 
   <div class="card">
     <h1>CK Trading Bot</h1>
+
+    <label>Deriv API Token</label>
+    <input id="apiToken" type="password" placeholder="Paste your API Token here">
 
     <label>Trade amount (USD)</label>
     <input id="amount" type="number" value="1" min="0.35" step="0.01">
@@ -55,43 +58,33 @@
       <option value="10">10 ticks</option>
     </select>
 
-    <button id="authBtn" onclick="connectDeriv()">Connect to Deriv</button>
+    <button id="authBtn" onclick="saveToken()">Connect API Token</button>
 
     <p id="status" class="note">
-      Not connected. Connect your Deriv account to proceed.
+      Not connected. Enter API token to proceed.
     </p>
   </div>
 
   <script>
-    const APP_ID = "34JjnKJzecylG5kwmjaXm";
-
     function checkAuth() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const token1 = urlParams.get('token1');
-      const acct1 = urlParams.get('acct1');
-
-      if (token1) {
-        localStorage.setItem('deriv_token', token1);
-        localStorage.setItem('deriv_account', acct1);
-        // Clear tokens from URL bar for security
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-
       const savedToken = localStorage.getItem('deriv_token');
-      const savedAccount = localStorage.getItem('deriv_account');
-
       if (savedToken) {
         document.getElementById('status').className = 'status-connected';
-        document.getElementById('status').innerText = `Connected Account: ${savedAccount || 'Active'}`;
+        document.getElementById('status').innerText = 'Connected & Ready';
         document.getElementById('authBtn').innerText = 'Connected';
         document.getElementById('authBtn').style.backgroundColor = '#475569';
+        document.getElementById('apiToken').value = '••••••••••••••••';
       }
     }
 
-    function connectDeriv() {
-      const redirectUrl = encodeURIComponent("https://collinskiporir9406-pixel.github.io/cktradindscheme/");
-      const authUrl = `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&redirect_uri=${redirectUrl}&l=en`;
-      window.location.href = authUrl;
+    function saveToken() {
+      const tokenInput = document.getElementById('apiToken').value.trim();
+      if (tokenInput && !tokenInput.includes('•')) {
+        localStorage.setItem('deriv_token', tokenInput);
+        checkAuth();
+      } else if (!tokenInput) {
+        alert('Please enter a valid API token');
+      }
     }
 
     checkAuth();
