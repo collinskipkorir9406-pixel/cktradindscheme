@@ -71,4 +71,254 @@
     }
 
     .banner-affiliate {
-      background: linear-gradient(135deg, #1e293b 0%,
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid #334155;
+    }
+
+    .modal-overlay {
+      background: rgba(5, 8, 15, 0.85);
+      backdrop-filter: blur(4px);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card-container">
+    
+    <!-- Title -->
+    <h1 class="text-xl font-bold text-center text-cyan-400 mb-5 tracking-wide">
+      CK Trading Bot
+    </h1>
+
+    <!-- Balance Box -->
+    <div class="bg-[#0e1626] border border-[#1e2d42] rounded-xl p-4 text-center mb-5">
+      <div class="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-1">Account Balance</div>
+      <div id="balanceDisplay" class="text-2xl font-bold text-cyan-400">--.--</div>
+      <div class="text-xs text-gray-500 mt-1" id="currencyDisplay">USD</div>
+    </div>
+
+    <!-- Affiliate Call to Action Banner -->
+    <div class="banner-affiliate rounded-xl p-3.5 mb-5 text-center shadow-inner">
+      <p class="text-xs text-gray-300 font-medium mb-2">Don't have a Deriv account yet?</p>
+      <a id="affiliateBtnMain" href="https://t.deriv.link?t=JY62HWTRUYMQ" target="_blank" rel="noopener noreferrer" 
+         class="inline-block w-full py-2.5 px-3 bg-cyan-600 hover:bg-cyan-500 active:bg-cyan-700 text-white font-semibold text-xs sm:text-sm rounded-lg shadow-md transition-all duration-200">
+        <i class="fa-solid font-bold fa-user-plus mr-1.5"></i> Create Deriv Account (Get Started)
+      </a>
+      <p class="text-[10px] text-gray-400 mt-2">Sign up using our link to unlock automated bot access.</p>
+    </div>
+
+    <!-- Market Select -->
+    <div class="mb-4">
+      <label class="block text-xs font-semibold text-gray-300 mb-1.5">Market</label>
+      <select id="marketSelect" class="custom-select">
+        <option value="R_100">Volatility 100 Index</option>
+        <option value="R_75">Volatility 75 Index</option>
+        <option value="R_50">Volatility 50 Index</option>
+        <option value="R_25">Volatility 25 Index</option>
+        <option value="R_10">Volatility 10 Index</option>
+        <option value="1HZ100V">Volatility 100 (1s) Index</option>
+        <option value="1HZ75V">Volatility 75 (1s) Index</option>
+      </select>
+    </div>
+
+    <!-- Stake Amount -->
+    <div class="mb-4">
+      <label class="block text-xs font-semibold text-gray-300 mb-1.5">Trade amount (USD)</label>
+      <div class="relative">
+        <input type="number" id="stakeInput" class="custom-input pr-12" value="1" min="0.35" step="0.5">
+        <span class="absolute right-3 top-2.5 text-xs font-bold text-gray-400">USD</span>
+      </div>
+    </div>
+
+    <!-- Trade Duration -->
+    <div class="mb-5">
+      <label class="block text-xs font-semibold text-gray-300 mb-1.5">Trade duration (ticks)</label>
+      <select id="ticksSelect" class="custom-select">
+        <option value="1">1 tick</option>
+        <option value="2">2 ticks</option>
+        <option value="3">3 ticks</option>
+        <option value="4">4 ticks</option>
+        <option value="5">5 ticks</option>
+      </select>
+    </div>
+
+    <!-- Trade Buttons -->
+    <div class="grid grid-cols-2 gap-3 mb-5">
+      <button id="btnRise" onclick="executeTrade('CALL')" class="btn-rise py-3 rounded-xl flex items-center justify-center space-x-2 shadow-lg">
+        <span>Rise</span>
+        <i class="fa-solid fa-arrow-trend-up"></i>
+      </button>
+
+      <button id="btnFall" onclick="executeTrade('PUT')" class="btn-fall py-3 rounded-xl flex items-center justify-center space-x-2 shadow-lg">
+        <span>Fall</span>
+        <i class="fa-solid fa-arrow-trend-down"></i>
+      </button>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="text-center mb-4">
+      <span id="connectionStatus" class="inline-flex items-center text-xs font-medium text-amber-400">
+        <span class="w-2 h-2 mr-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+        Connecting to Deriv...
+      </span>
+    </div>
+
+    <!-- Change Token Button -->
+    <button onclick="openTokenModal()" class="w-full py-2.5 bg-[#1a2638] hover:bg-[#22334b] border border-[#2c3d54] text-xs font-semibold text-cyan-300 rounded-lg transition-colors">
+      <i class="fa-solid fa-key mr-1.5"></i> Change / Re-enter API Token
+    </button>
+
+  </div>
+
+  <!-- Token Modal -->
+  <div id="tokenModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#162032] border border-[#233248] rounded-2xl p-5 w-full max-w-sm text-left shadow-2xl">
+      <h3 class="text-base font-bold text-cyan-400 mb-2">Connect Deriv API Token</h3>
+      <p class="text-xs text-gray-300 mb-3">Enter your Deriv API token below to authorize automated trading on your account.</p>
+
+      <div class="bg-[#0b0f19] p-3 rounded-lg border border-[#233248] mb-4">
+        <p class="text-[11px] text-gray-400">Need an account or API token?</p>
+        <a id="affiliateBtnModal" href="https://t.deriv.link?t=JY62HWTRUYMQ" target="_blank" class="text-xs text-cyan-400 font-semibold hover:underline block mt-1">
+          1. Create account via our affiliate link &rarr;
+        </a>
+        <p class="text-[11px] text-gray-400 mt-2">2. Go to Deriv &gt; Account Settings &gt; API Token and generate a Read/Trade token.</p>
+      </div>
+
+      <input type="text" id="tokenInput" placeholder="Paste your API token here..." class="custom-input mb-4 text-xs" />
+
+      <div class="flex space-x-2">
+        <button onclick="saveToken()" class="flex-1 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg text-xs">Save & Connect</button>
+        <button onclick="closeTokenModal()" class="px-4 py-2.5 bg-gray-700 hover:bg-gray-600 text-gray-200 text-xs rounded-lg">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DEFAULT_AFFILIATE_URL = "https://t.deriv.link?t=JY62HWTRUYMQ";
+    const APP_ID = 1089;
+    let ws = null;
+    let apiToken = localStorage.getItem("deriv_api_token") || "";
+
+    function updateAffiliateLinks() {
+      const mainBtn = document.getElementById("affiliateBtnMain");
+      const modalBtn = document.getElementById("affiliateBtnModal");
+      if (mainBtn) mainBtn.href = DEFAULT_AFFILIATE_URL;
+      if (modalBtn) modalBtn.href = DEFAULT_AFFILIATE_URL;
+    }
+
+    function connectWebSocket() {
+      const statusEl = document.getElementById("connectionStatus");
+      statusEl.innerHTML = `<span class="w-2 h-2 mr-1.5 rounded-full bg-amber-400 animate-pulse"></span> Connecting to Deriv...`;
+
+      ws = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`);
+
+      ws.onopen = () => {
+        if (apiToken) {
+          statusEl.innerHTML = `<span class="w-2 h-2 mr-1.5 rounded-full bg-blue-400 animate-pulse"></span> Authorizing...`;
+          ws.send(JSON.stringify({ authorize: apiToken }));
+        } else {
+          statusEl.innerHTML = `<span class="w-2 h-2 mr-1.5 rounded-full bg-gray-400"></span> API Token Required`;
+          openTokenModal();
+        }
+      };
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+
+        if (data.msg_type === "authorize") {
+          if (data.error) {
+            statusEl.innerHTML = `<span class="w-2 h-2 mr-1.5 rounded-full bg-red-500"></span> Invalid API Token`;
+            alert("Authorization failed: " + data.error.message);
+            openTokenModal();
+          } else {
+            statusEl.innerHTML = `<span class="w-2 h-2 mr-1.5 rounded-full bg-green-500"></span> Connected (${data.authorize.email})`;
+            ws.send(JSON.stringify({ balance: 1, subscribe: 1 }));
+          }
+        }
+
+        if (data.msg_type === "balance") {
+          if (data.balance) {
+            document.getElementById("balanceDisplay").innerText = parseFloat(data.balance.balance).toFixed(2);
+            document.getElementById("currencyDisplay").innerText = data.balance.currency || "USD";
+          }
+        }
+
+        if (data.msg_type === "buy") {
+          if (data.error) {
+            alert("Trade failed: " + data.error.message);
+          } else {
+            alert(`Trade executed successfully! Contract ID: ${data.buy.contract_id}`);
+          }
+        }
+      };
+
+      ws.onerror = (err) => {
+        statusEl.innerHTML = `<span class="w-2 h-2 mr-1.5 rounded-full bg-red-500"></span> Connection error`;
+      };
+
+      ws.onclose = () => {
+        statusEl.innerHTML = `<span class="w-2 h-2 mr-1.5 rounded-full bg-red-500"></span> Disconnected. Reconnecting...`;
+        setTimeout(connectWebSocket, 4000);
+      };
+    }
+
+    function executeTrade(contractType) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        alert("Bot is not connected to Deriv. Please check your network or API token.");
+        return;
+      }
+      if (!apiToken) {
+        alert("Please set your Deriv API Token first.");
+        openTokenModal();
+        return;
+      }
+
+      const symbol = document.getElementById("marketSelect").value;
+      const amount = parseFloat(document.getElementById("stakeInput").value) || 1;
+      const duration = parseInt(document.getElementById("ticksSelect").value) || 1;
+
+      const req = {
+        buy: 1,
+        price: amount,
+        parameters: {
+          amount: amount,
+          basis: "stake",
+          contract_type: contractType,
+          currency: "USD",
+          duration: duration,
+          duration_unit: "t",
+          symbol: symbol
+        }
+      };
+
+      ws.send(JSON.stringify(req));
+    }
+
+    function openTokenModal() {
+      document.getElementById("tokenInput").value = apiToken;
+      document.getElementById("tokenModal").classList.remove("hidden");
+    }
+
+    function closeTokenModal() {
+      document.getElementById("tokenModal").classList.add("hidden");
+    }
+
+    function saveToken() {
+      const inputVal = document.getElementById("tokenInput").value.trim();
+      if (!inputVal) {
+        alert("Please enter a valid API token.");
+        return;
+      }
+      apiToken = inputVal;
+      localStorage.setItem("deriv_api_token", apiToken);
+      closeTokenModal();
+      if (ws) ws.close();
+    }
+
+    window.addEventListener("load", () => {
+      updateAffiliateLinks();
+      connectWebSocket();
+    });
+  </script>
+</body>
+</html>
