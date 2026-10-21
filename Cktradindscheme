@@ -2,91 +2,369 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>CK Trading Bot</title>
   <style>
-    body {
-      margin: 0;
-      padding: 20px;
-      background: #101827;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-    .card {
-      max-width: 420px;
-      margin: 30px auto;
-      padding: 24px;
-      background: #1e293b;
-      border-radius: 16px;
-    }
-    h1 { color: #38d9a9; }
-    button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 12px;
-      border: 0;
-      border-radius: 8px;
-      background: #38d9a9;
-      color: #101827;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    input, select {
+    * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #0b0f19;
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px 12px;
+    }
+    .card-container {
+      background-color: #162032;
+      border: 1px solid #233248;
+      border-radius: 16px;
       width: 100%;
-      padding: 12px;
-      margin-top: 8px;
-      border-radius: 8px;
+      max-width: 420px;
+      padding: 20px 18px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+    h1 {
+      color: #38bdf8;
+      text-align: center;
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+    .balance-box {
+      background-color: #0e1626;
+      border: 1px solid #1e2d42;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .balance-title {
+      font-size: 11px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .balance-val {
+      font-size: 26px;
+      font-weight: bold;
+      color: #38bdf8;
+      margin: 4px 0;
+    }
+    .balance-currency {
+      font-size: 12px;
+      color: #64748b;
+    }
+    .affiliate-banner {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
       border: 1px solid #334155;
-      background: #0f172a;
-      color: white;
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .affiliate-banner p {
+      font-size: 12px;
+      color: #cbd5e1;
+      margin-bottom: 8px;
+    }
+    .affiliate-btn {
+      display: block;
+      width: 100%;
+      background-color: #0284c7;
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 13px;
+      padding: 12px;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    .affiliate-btn:active {
+      background-color: #0369a1;
+    }
+    .sub-text {
+      font-size: 10px;
+      color: #94a3b8;
+      margin-top: 6px;
+    }
+    .form-group {
+      margin-bottom: 16px;
     }
     label {
       display: block;
-      margin-top: 12px;
-      font-size: 14px;
-      color: #94a3b8;
-    }
-    .note {
       font-size: 12px;
-      color: #94a3b8;
-      margin-top: 8px;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+    input, select {
+      width: 100%;
+      background-color: #0d1522;
+      border: 1px solid #28374d;
+      color: #ffffff;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+    .btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .btn-rise {
+      background-color: #10b981;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    .btn-fall {
+      background-color: #ef4444;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    .btn-token {
+      width: 100%;
+      background-color: #1a2638;
+      border: 1px solid #2c3d54;
+      color: #38bdf8;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .status-text {
+      text-align: center;
+      font-size: 12px;
+      color: #fbbf24;
+      margin-bottom: 16px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(5, 8, 15, 0.9);
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      z-index: 999;
+    }
+    .modal-card {
+      background-color: #162032;
+      border: 1px solid #233248;
+      border-radius: 16px;
+      padding: 20px;
+      width: 100%;
+      max-width: 380px;
     }
   </style>
 </head>
 <body>
 
-  <div class="card">
+  <div class="card-container">
     <h1>CK Trading Bot</h1>
 
-    <label>Trade amount (USD)</label>
-    <input id="amount" type="number" min="0.35" step="0.01" value="1">
+    <div class="balance-box">
+      <div class="balance-title">Account Balance</div>
+      <div id="balanceDisplay" class="balance-val">--.--</div>
+      <div id="currencyDisplay" class="balance-currency">USD</div>
+    </div>
 
-    <label>Trade duration (ticks)</label>
-    <select id="duration">
-      <option value="1">1 tick</option>
-      <option value="5">5 ticks</option>
-      <option value="10">10 ticks</option>
-    </select>
+    <div class="affiliate-banner">
+      <p>Don't have a Deriv account yet?</p>
+      <a id="affiliateBtnMain" href="https://t.deriv.link?t=JY62HWTRUYMQ" target="_blank" class="affiliate-btn">
+        + Create Deriv Account (Get Started)
+      </a>
+      <div class="sub-text">Sign up using our link to unlock automated bot access.</div>
+    </div>
 
-    <button onclick="connectDeriv()">Connect to Deriv</button>
+    <div class="form-group">
+      <label>Market</label>
+      <select id="marketSelect">
+        <option value="R_100">Volatility 100 Index</option>
+        <option value="R_75">Volatility 75 Index</option>
+        <option value="R_50">Volatility 50 Index</option>
+        <option value="R_25">Volatility 25 Index</option>
+        <option value="R_10">Volatility 10 Index</option>
+        <option value="1HZ100V">Volatility 100 (1s) Index</option>
+        <option value="1HZ75V">Volatility 75 (1s) Index</option>
+      </select>
+    </div>
 
-    <p id="status" class="note">
-      Not connected. Connect your Deriv account to continue.
-    </p>
-    <p class="note">
-      Demo starter only. No trades are placed by this page.
-    </p>
+    <div class="form-group">
+      <label>Trade amount (USD)</label>
+      <input type="number" id="stakeInput" value="1" min="0.35" step="0.5">
+    </div>
+
+    <div class="form-group">
+      <label>Trade duration (ticks)</label>
+      <select id="ticksSelect">
+        <option value="1">1 tick</option>
+        <option value="2">2 ticks</option>
+        <option value="3">3 ticks</option>
+        <option value="4">4 ticks</option>
+        <option value="5">5 ticks</option>
+      </select>
+    </div>
+
+    <div class="btn-grid">
+      <button onclick="executeTrade('CALL')" class="btn-rise">Rise ↗</button>
+      <button onclick="executeTrade('PUT')" class="btn-fall">Fall ↘</button>
+    </div>
+
+    <div id="connectionStatus" class="status-text">Connecting to Deriv...</div>
+
+    <button onclick="openTokenModal()" class="btn-token">🔑 Change / Re-enter API Token</button>
+  </div>
+
+  <!-- Token Modal -->
+  <div id="tokenModal" class="modal-overlay">
+    <div class="modal-card">
+      <h3 style="color: #38bdf8; margin-bottom: 8px;">Connect Deriv API Token</h3>
+      <p style="font-size: 12px; color: #cbd5e1; margin-bottom: 12px;">Enter your Deriv API token below to start trading.</p>
+
+      <div style="background: #0b0f19; padding: 10px; border-radius: 8px; margin-bottom: 12px;">
+        <p style="font-size: 11px; color: #94a3b8;">Need an account?</p>
+        <a href="https://t.deriv.link?t=JY62HWTRUYMQ" target="_blank" style="color: #38bdf8; font-size: 12px; font-weight: bold; text-decoration: none;">
+          1. Create account via affiliate link &rarr;
+        </a>
+        <p style="font-size: 11px; color: #94a3b8; margin-top: 6px;">2. Go to Account Settings &gt; API Token to create a token.</p>
+      </div>
+
+      <input type="text" id="tokenInput" placeholder="Paste API token..." style="margin-bottom: 12px;">
+
+      <div style="display: flex; gap: 8px;">
+        <button onclick="saveToken()" style="flex: 1; background: #0284c7; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold;">Save</button>
+        <button onclick="closeTokenModal()" style="background: #475569; color: white; border: none; padding: 10px 16px; border-radius: 8px;">Cancel</button>
+      </div>
+    </div>
   </div>
 
   <script>
-    function connectDeriv() {
-      const APP_ID = "34JjnKJzecylG5kwmjaXm";
-      const authUrl = `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&l=EN&brand=deriv`;
-      window.location.href = authUrl;
-    }
-  </script>
+    const DEFAULT_AFFILIATE_URL = "https://t.deriv.link?t=JY62HWTRUYMQ";
+    const APP_ID = 1089;
+    let ws = null;
+    let apiToken = localStorage.getItem("deriv_api_token") || "";
 
+    function connectWebSocket() {
+      const statusEl = document.getElementById("connectionStatus");
+      statusEl.innerText = "Connecting to Deriv...";
+
+      ws = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`);
+
+      ws.onopen = () => {
+        if (apiToken) {
+          statusEl.innerText = "Authorizing...";
+          ws.send(JSON.stringify({ authorize: apiToken }));
+        } else {
+          statusEl.innerText = "API Token Required";
+          openTokenModal();
+        }
+      };
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+
+        if (data.msg_type === "authorize") {
+          if (data.error) {
+            statusEl.innerText = "Invalid API Token";
+            alert("Authorization failed: " + data.error.message);
+            openTokenModal();
+          } else {
+            statusEl.innerText = "Connected (" + data.authorize.email + ")";
+            ws.send(JSON.stringify({ balance: 1, subscribe: 1 }));
+          }
+        }
+
+        if (data.msg_type === "balance" && data.balance) {
+          document.getElementById("balanceDisplay").innerText = parseFloat(data.balance.balance).toFixed(2);
+          document.getElementById("currencyDisplay").innerText = data.balance.currency || "USD";
+        }
+
+        if (data.msg_type === "buy") {
+          if (data.error) {
+            alert("Trade failed: " + data.error.message);
+          } else {
+            alert("Trade executed successfully! ID: " + data.buy.contract_id);
+          }
+        }
+      };
+
+      ws.onerror = () => { statusEl.innerText = "Connection Error"; };
+      ws.onclose = () => {
+        statusEl.innerText = "Disconnected. Reconnecting...";
+        setTimeout(connectWebSocket, 4000);
+      };
+    }
+
+    function executeTrade(contractType) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        alert("Bot is not connected.");
+        return;
+      }
+      if (!apiToken) {
+        openTokenModal();
+        return;
+      }
+
+      const symbol = document.getElementById("marketSelect").value;
+      const amount = parseFloat(document.getElementById("stakeInput").value) || 1;
+      const duration = parseInt(document.getElementById("ticksSelect").value) || 1;
+
+      ws.send(JSON.stringify({
+        buy: 1,
+        price: amount,
+        parameters: {
+          amount: amount,
+          basis: "stake",
+          contract_type: contractType,
+          currency: "USD",
+          duration: duration,
+          duration_unit: "t",
+          symbol: symbol
+        }
+      }));
+    }
+
+    function openTokenModal() {
+      document.getElementById("tokenInput").value = apiToken;
+      document.getElementById("tokenModal").style.display = "flex";
+    }
+
+    function closeTokenModal() {
+      document.getElementById("tokenModal").style.display = "none";
+    }
+
+    function saveToken() {
+      const inputVal = document.getElementById("tokenInput").value.trim();
+      if (inputVal) {
+        apiToken = inputVal;
+        localStorage.setItem("deriv_api_token", apiToken);
+        closeTokenModal();
+        if (ws) ws.close();
+      }
+    }
+
+    window.addEventListener("load", connectWebSocket);
+  </script>
 </body>
 </html>
