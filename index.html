@@ -57,7 +57,13 @@
   </div>
 
   <script>
-    const APP_ID = "34JJnKJzecylG5kwmjaXm";
+    const ENDPOINTS = [
+      "wss://ws.binaryws.com/websockets/v3?app_id=1089",
+      "wss://ws.derivws.com/websockets/v3?app_id=34JJnKJzecylG5kwmjaXm",
+      "wss://ws.derivws.com/websockets/v3?app_id=1089"
+    ];
+
+    let endpointIndex = 0;
     let token = localStorage.getItem("deriv_token") || "";
     let ws = null;
     let pingInterval = null;
@@ -65,30 +71,30 @@
     function connect() {
       const statusEl = document.getElementById("status");
       statusEl.style.color = "#fbbf24";
-      statusEl.innerText = "Connecting to Deriv...";
+      statusEl.innerText = `Connecting (Server ${endpointIndex + 1})...`;
 
       if (ws) {
         ws.onopen = ws.onmessage = ws.onerror = ws.onclose = null;
         ws.close();
       }
 
-      ws = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`);
+      const currentEndpoint = ENDPOINTS[endpointIndex];
+      ws = new WebSocket(currentEndpoint);
 
       ws.onopen = () => {
-        // Keep connection alive with a ping every 30 seconds
         clearInterval(pingInterval);
         pingInterval = setInterval(() => {
-          if (ws.readyState === WebSocket.OPEN) {
+          if (ws && ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({ ping: 1 }));
           }
-        }, 30000);
+        }, 20000);
 
         if (token) {
           statusEl.innerText = "Authorizing...";
           ws.send(JSON.stringify({ authorize: token }));
         } else {
-          statusEl.style.color = "#ef4444";
-          statusEl.innerText = "API Token missing! Click below to enter it.";
+          statusEl.style.color = "#38bdf8";
+          statusEl.innerText = "Connected! Click below to enter API Token.";
         }
       };
 
@@ -98,7 +104,7 @@
         if (d.msg_type === "authorize") {
           if (d.error) {
             statusEl.style.color = "#ef4444";
-            statusEl.innerText = "Invalid Token!";
+            statusEl.innerText = "Invalid API Token!";
             alert("Authorization error: " + d.error.message);
           } else {
             statusEl.style.color = "#10b981";
@@ -115,27 +121,29 @@
           if (d.error) {
             alert("Trade failed: " + d.error.message);
           } else {
-            alert("Trade placed successfully! Contract ID: " + d.buy.contract_id);
+            alert("Trade placed! Contract ID: " + d.buy.contract_id);
           }
         }
       };
 
-      ws.onerror = (err) => {
+      ws.onerror = () => {
         statusEl.style.color = "#ef4444";
         statusEl.innerText = "Connection Error";
       };
 
-      ws.onclose = (e) => {
+      ws.onclose = () => {
         clearInterval(pingInterval);
         statusEl.style.color = "#ef4444";
-        statusEl.innerText = "Disconnected. Retrying in 5s...";
-        setTimeout(connect, 5000);
+        statusEl.innerText = "Retrying alternative server...";
+        // Rotate to next endpoint fallback
+        endpointIndex = (endpointIndex + 1) % ENDPOINTS.length;
+        setTimeout(connect, 3000);
       };
     }
 
     function trade(type) {
       if (!ws || ws.readyState !== WebSocket.OPEN) {
-        alert("Bot is not connected to Deriv.");
+        alert("Bot is not connected.");
         return;
       }
       if (!token) {
