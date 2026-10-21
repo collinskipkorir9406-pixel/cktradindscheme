@@ -52,25 +52,43 @@
       <button class="btn-trade fall" onclick="trade('PUT')">Fall ↘</button>
     </div>
 
-    <div id="status" style="color: #fbbf24;">Connecting to Deriv...</div>
+    <div id="status" style="color: #fbbf24;">Connecting...</div>
     <button onclick="setToken()" class="btn-link">🔑 Set / Change API Token</button>
   </div>
 
   <script>
     const APP_ID = "1089";
+    const ENDPOINTS = [
+      `wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`,
+      `wss://ws.binaryws.com/websockets/v3?app_id=${APP_ID}`
+    ];
+    let currentEndpoint = 0;
     let token = localStorage.getItem("deriv_token") || "";
     let ws = null;
+    let pingInterval = null;
 
     function initWS() {
       const statusEl = document.getElementById("status");
       statusEl.style.color = "#fbbf24";
-      statusEl.innerText = "Connecting to Deriv...";
+      statusEl.innerText = "Connecting to server...";
 
-      ws = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`);
+      if (ws) {
+        ws.onopen = ws.onmessage = ws.onerror = ws.onclose = null;
+        ws.close();
+      }
+
+      ws = new WebSocket(ENDPOINTS[currentEndpoint]);
 
       ws.onopen = () => {
+        clearInterval(pingInterval);
+        pingInterval = setInterval(() => {
+          if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ ping: 1 }));
+          }
+        }, 15000);
+
         if (token) {
-          statusEl.innerText = "Authorizing...";
+          statusEl.innerText = "Authorizing token...";
           ws.send(JSON.stringify({ authorize: token }));
         } else {
           statusEl.style.color = "#10b981";
@@ -111,9 +129,11 @@
       };
 
       ws.onclose = () => {
+        clearInterval(pingInterval);
         statusEl.style.color = "#ef4444";
-        statusEl.innerText = "Disconnected. Reconnecting...";
-        setTimeout(initWS, 3000);
+        statusEl.innerText = "Switching server path...";
+        currentEndpoint = (currentEndpoint + 1) % ENDPOINTS.length;
+        setTimeout(initWS, 2000);
       };
     }
 
