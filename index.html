@@ -52,37 +52,76 @@
       <button class="btn-trade fall" onclick="trade('PUT')">Fall ↘</button>
     </div>
 
-    <div id="status" style="color: #10b981;">Ready (HTTPS Mode)</div>
+    <div id="status" style="color: #fbbf24;">Connecting to Deriv...</div>
     <button onclick="setToken()" class="btn-link">🔑 Set / Change API Token</button>
   </div>
 
   <script>
     const APP_ID = "1089";
     let token = localStorage.getItem("deriv_token") || "";
+    let ws = null;
 
-    async function checkBalance() {
-      if (!token) {
-        document.getElementById("status").innerText = "API Token missing! Click below.";
-        return;
-      }
-      try {
-        const res = await fetch(`https://ws.derivws.com/websockets/v3?app_id=${APP_ID}&authorize=${token}`);
-        const data = await res.json();
-        if (data.error) {
-          document.getElementById("status").style.color = "#ef4444";
-          document.getElementById("status").innerText = "Invalid Token";
-        } else if (data.authorize) {
-          document.getElementById("status").style.color = "#10b981";
-          document.getElementById("status").innerText = "Connected: " + data.authorize.email;
-          document.getElementById("bal").innerText = parseFloat(data.authorize.balance).toFixed(2) + " USD";
+    function initWS() {
+      const statusEl = document.getElementById("status");
+      statusEl.style.color = "#fbbf24";
+      statusEl.innerText = "Connecting to Deriv...";
+
+      ws = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`);
+
+      ws.onopen = () => {
+        if (token) {
+          statusEl.innerText = "Authorizing...";
+          ws.send(JSON.stringify({ authorize: token }));
+        } else {
+          statusEl.style.color = "#10b981";
+          statusEl.innerText = "Connected! Click below to enter API Token.";
         }
-      } catch (err) {
-        document.getElementById("status").style.color = "#ef4444";
-        document.getElementById("status").innerText = "Network constraint met.";
-      }
+      };
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        
+        if (data.msg_type === "authorize") {
+          if (data.error) {
+            statusEl.style.color = "#ef4444";
+            statusEl.innerText = "Invalid Token";
+          } else {
+            statusEl.style.color = "#10b981";
+            statusEl.innerText = "Connected: " + data.authorize.email;
+            ws.send(JSON.stringify({ balance: 1, subscribe: 1 }));
+          }
+        }
+
+        if (data.msg_type === "balance" && data.balance) {
+          document.getElementById("bal").innerText = parseFloat(data.balance.balance).toFixed(2) + " " + data.balance.currency;
+        }
+
+        if (data.msg_type === "buy") {
+          if (data.error) {
+            alert("Trade Error: " + data.error.message);
+          } else {
+            alert("Trade Successful! Contract ID: " + data.buy.contract_id);
+          }
+        }
+      };
+
+      ws.onerror = () => {
+        statusEl.style.color = "#ef4444";
+        statusEl.innerText = "Connection error";
+      };
+
+      ws.onclose = () => {
+        statusEl.style.color = "#ef4444";
+        statusEl.innerText = "Disconnected. Reconnecting...";
+        setTimeout(initWS, 3000);
+      };
     }
 
-    async function trade(type) {
+    function trade(type) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        alert("Connecting to server, please wait...");
+        return;
+      }
       if (!token) {
         alert("Please set your API token first.");
         setToken();
@@ -91,30 +130,20 @@
 
       const market = document.getElementById("market").value;
       const stake = parseFloat(document.getElementById("stake").value) || 1;
-      const statusEl = document.getElementById("status");
 
-      statusEl.style.color = "#fbbf24";
-      statusEl.innerText = "Placing trade...";
-
-      try {
-        // Using standard secure HTTPS POST/GET query structure for execution
-        const res = await fetch(`https://ws.derivws.com/websockets/v3?app_id=${APP_ID}&buy=1&price=${stake}&parameters[amount]=${stake}&parameters[basis]=stake&parameters[contract_type]=${type}&parameters[currency]=USD&parameters[duration]=1&parameters[duration_unit]=t&parameters[symbol]=${market}&authorize=${token}`);
-        const data = await res.json();
-
-        if (data.error) {
-          statusEl.style.color = "#ef4444";
-          statusEl.innerText = "Trade Error";
-          alert("Trade failed: " + data.error.message);
-        } else if (data.buy) {
-          statusEl.style.color = "#10b981";
-          statusEl.innerText = "Trade Successful!";
-          alert("Trade placed successfully! Contract ID: " + data.buy.contract_id);
-          checkBalance();
+      ws.send(JSON.stringify({
+        buy: 1,
+        price: stake,
+        parameters: {
+          amount: stake,
+          basis: "stake",
+          contract_type: type,
+          currency: "USD",
+          duration: 1,
+          duration_unit: "t",
+          symbol: market
         }
-      } catch (err) {
-        statusEl.style.color = "#ef4444";
-        statusEl.innerText = "Execution failed";
-      }
+      }));
     }
 
     function setToken() {
@@ -122,11 +151,16 @@
       if (input !== null) {
         token = input.trim();
         localStorage.setItem("deriv_token", token);
-        checkBalance();
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          document.getElementById("status").innerText = "Authorizing...";
+          ws.send(JSON.stringify({ authorize: token }));
+        } else {
+          initWS();
+        }
       }
     }
 
-    window.onload = checkBalance;
+    window.onload = initWS;
   </script>
 </body>
 </html>
