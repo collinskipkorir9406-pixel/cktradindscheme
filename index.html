@@ -52,98 +52,37 @@
       <button class="btn-trade fall" onclick="trade('PUT')">Fall ↘</button>
     </div>
 
-    <div id="status" style="color: #fbbf24;">Connecting to Deriv...</div>
+    <div id="status" style="color: #10b981;">Ready (HTTPS Mode)</div>
     <button onclick="setToken()" class="btn-link">🔑 Set / Change API Token</button>
   </div>
 
   <script>
-    // Standard public endpoints using stable cluster routing
-    const ENDPOINTS = [
-      "wss://ws.derivws.com/websockets/v3?app_id=1089",
-      "wss://ws.binaryws.com/websockets/v3?app_id=1089"
-    ];
-
-    let endpointIndex = 0;
+    const APP_ID = "1089";
     let token = localStorage.getItem("deriv_token") || "";
-    let ws = null;
-    let pingInterval = null;
 
-    function connect() {
-      const statusEl = document.getElementById("status");
-      statusEl.style.color = "#fbbf24";
-      statusEl.innerText = "Connecting securely...";
-
-      if (ws) {
-        ws.onopen = ws.onmessage = ws.onerror = ws.onclose = null;
-        ws.close();
-      }
-
-      ws = new WebSocket(ENDPOINTS[endpointIndex]);
-
-      ws.onopen = () => {
-        clearInterval(pingInterval);
-        pingInterval = setInterval(() => {
-          if (ws && ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ ping: 1 }));
-          }
-        }, 15000);
-
-        if (token) {
-          statusEl.innerText = "Authorizing token...";
-          ws.send(JSON.stringify({ authorize: token }));
-        } else {
-          statusEl.style.color = "#10b981";
-          statusEl.innerText = "Connected! Click below to enter API Token.";
-        }
-      };
-
-      ws.onmessage = (e) => {
-        const d = JSON.parse(e.data);
-
-        if (d.msg_type === "authorize") {
-          if (d.error) {
-            statusEl.style.color = "#ef4444";
-            statusEl.innerText = "Invalid Token";
-            alert("Authorization error: " + d.error.message);
-          } else {
-            statusEl.style.color = "#10b981";
-            statusEl.innerText = "Active: " + (d.authorize.email || "Trading Account");
-            ws.send(JSON.stringify({ balance: 1, subscribe: 1 }));
-          }
-        }
-
-        if (d.msg_type === "balance" && d.balance) {
-          document.getElementById("bal").innerText = parseFloat(d.balance.balance).toFixed(2) + " " + (d.balance.currency || "USD");
-        }
-
-        if (d.msg_type === "buy") {
-          if (d.error) {
-            alert("Trade failed: " + d.error.message);
-          } else {
-            alert("Trade successful! Contract ID: " + d.buy.contract_id);
-          }
-        }
-      };
-
-      ws.onerror = () => {
-        statusEl.style.color = "#ef4444";
-        statusEl.innerText = "Socket Error";
-      };
-
-      ws.onclose = () => {
-        clearInterval(pingInterval);
-        statusEl.style.color = "#ef4444";
-        statusEl.innerText = "Switching route...";
-        endpointIndex = (endpointIndex + 1) % ENDPOINTS.length;
-        setTimeout(connect, 1500);
-      };
-    }
-
-    function trade(type) {
-      if (!ws || ws.readyState !== WebSocket.OPEN) {
-        alert("Bot is connecting, please wait a moment.");
+    async function checkBalance() {
+      if (!token) {
+        document.getElementById("status").innerText = "API Token missing! Click below.";
         return;
       }
+      try {
+        const res = await fetch(`https://ws.derivws.com/websockets/v3?app_id=${APP_ID}&authorize=${token}`);
+        const data = await res.json();
+        if (data.error) {
+          document.getElementById("status").style.color = "#ef4444";
+          document.getElementById("status").innerText = "Invalid Token";
+        } else if (data.authorize) {
+          document.getElementById("status").style.color = "#10b981";
+          document.getElementById("status").innerText = "Connected: " + data.authorize.email;
+          document.getElementById("bal").innerText = parseFloat(data.authorize.balance).toFixed(2) + " USD";
+        }
+      } catch (err) {
+        document.getElementById("status").style.color = "#ef4444";
+        document.getElementById("status").innerText = "Network constraint met.";
+      }
+    }
+
+    async function trade(type) {
       if (!token) {
         alert("Please set your API token first.");
         setToken();
@@ -152,20 +91,30 @@
 
       const market = document.getElementById("market").value;
       const stake = parseFloat(document.getElementById("stake").value) || 1;
+      const statusEl = document.getElementById("status");
 
-      ws.send(JSON.stringify({
-        buy: 1,
-        price: stake,
-        parameters: {
-          amount: stake,
-          basis: "stake",
-          contract_type: type,
-          currency: "USD",
-          duration: 1,
-          duration_unit: "t",
-          symbol: market
+      statusEl.style.color = "#fbbf24";
+      statusEl.innerText = "Placing trade...";
+
+      try {
+        // Using standard secure HTTPS POST/GET query structure for execution
+        const res = await fetch(`https://ws.derivws.com/websockets/v3?app_id=${APP_ID}&buy=1&price=${stake}&parameters[amount]=${stake}&parameters[basis]=stake&parameters[contract_type]=${type}&parameters[currency]=USD&parameters[duration]=1&parameters[duration_unit]=t&parameters[symbol]=${market}&authorize=${token}`);
+        const data = await res.json();
+
+        if (data.error) {
+          statusEl.style.color = "#ef4444";
+          statusEl.innerText = "Trade Error";
+          alert("Trade failed: " + data.error.message);
+        } else if (data.buy) {
+          statusEl.style.color = "#10b981";
+          statusEl.innerText = "Trade Successful!";
+          alert("Trade placed successfully! Contract ID: " + data.buy.contract_id);
+          checkBalance();
         }
-      }));
+      } catch (err) {
+        statusEl.style.color = "#ef4444";
+        statusEl.innerText = "Execution failed";
+      }
     }
 
     function setToken() {
@@ -173,11 +122,11 @@
       if (input !== null) {
         token = input.trim();
         localStorage.setItem("deriv_token", token);
-        connect();
+        checkBalance();
       }
     }
 
-    window.onload = connect;
+    window.onload = checkBalance;
   </script>
 </body>
 </html>
