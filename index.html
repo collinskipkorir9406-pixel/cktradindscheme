@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>traderscheme - powered by deriv</title>
+  <title>TraderScheme - Structured Trading Workspace</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,201 +14,91 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
     body { background-color: #030712; color: #ffffff; min-height: 100vh; overflow-x: hidden; }
 
-    /* Top Bar */
-    header {
-      width: 100%; background: #080d1a; border-bottom: 1px solid rgba(255,255,255,0.08);
-      padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50;
+    /* Top Market Bar & Header */
+    .ticker-bar {
+      background: #080d1a; border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 8px 16px; font-size: 11px; display: flex; gap: 20px; align-items: center; color: #94a3b8; overflow-x: auto; white-space: nowrap;
     }
-    .brand-container { display: flex; align-items: center; gap: 10px; }
-    .ck-avatar {
-      width: 34px; height: 34px; border-radius: 50%; background: #00a4ff; color: #fff;
-      font-weight: 900; font-size: 13px; display: flex; align-items: center; justify-content: center;
-    }
-    .brand-title { font-size: 16px; font-weight: 800; }
-    .brand-subtitle { font-size: 10px; color: #e11d48; font-weight: 600; }
+    .ticker-bar span { color: #10b981; font-weight: 600; }
+    .ticker-bar .red { color: #f43f5e; }
 
-    .nav-tabs { display: flex; gap: 8px; }
-    .nav-tab {
-      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-      padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; color: #94a3b8; cursor: pointer;
+    header {
+      width: 100%; background: rgba(3, 7, 18, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50;
     }
-    .nav-tab.active { background: #00a4ff; color: #ffffff; border-color: #00a4ff; }
+    .brand-container { display: flex; flex-direction: column; }
+    .brand-title { font-size: 18px; font-weight: 900; letter-spacing: -0.5px; }
+    .brand-subtitle { font-size: 9px; color: #f43f5e; font-weight: 700; letter-spacing: 0.5px; }
+
+    .header-right { display: flex; gap: 10px; align-items: center; }
+    .btn-header-login {
+      background: transparent; border: 1px solid rgba(255,255,255,0.15); color: #fff;
+      padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: none;
+    }
+    .btn-header-getstarted {
+      background: #00a4ff; border: none; color: #fff;
+      padding: 7px 16px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; text-decoration: none;
+      box-shadow: 0 2px 10px rgba(0,164,255,0.3);
+    }
+
+    /* Hero Section */
+    .hero-section { max-width: 650px; margin: 40px auto 20px auto; padding: 0 20px; text-align: center; }
+    .badge-pill {
+      display: inline-flex; align-items: center; gap: 6px; background: rgba(16,185,129,0.1);
+      border: 1px solid rgba(16,185,129,0.25); padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; color: #10b981; margin-bottom: 24px;
+    }
+    .badge-dot { width: 6px; height: 6px; background: #10b981; border-radius: 50%; }
+
+    .hero-heading { font-size: 38px; font-weight: 900; line-height: 1.15; margin-bottom: 16px; letter-spacing: -1px; }
+    .hero-heading span { color: #00a4ff; }
+    .hero-p { font-size: 14px; color: #94a3b8; margin-bottom: 32px; line-height: 1.6; }
+
+    /* Action Buttons */
+    .hero-buttons { display: flex; flex-direction: column; gap: 12px; max-width: 440px; margin: 0 auto 30px auto; }
+    .btn-main-blue {
+      width: 100%; background: linear-gradient(135deg, #00a4ff, #0077ff); border: none; color: #fff; padding: 16px;
+      border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 20px rgba(0,164,255,0.4);
+      display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none;
+    }
+    .btn-main-white {
+      width: 100%; background: rgba(255,255,255,0.92); border: none; color: #030712; padding: 16px;
+      border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none;
+    }
+    .explore-link { font-size: 12px; color: #64748b; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; margin-top: 10px; }
+
+    /* Info Cards Grid */
+    .info-grid { max-width: 650px; margin: 30px auto; padding: 0 20px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    @media (max-width: 500px) { .info-grid { grid-template-columns: 1fr; } }
+
+    .info-card {
+      background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px; padding: 18px; text-align: center;
+    }
+    .info-card-title { font-size: 16px; font-weight: 800; margin-bottom: 4px; color: #fff; }
+    .info-card-desc { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Dashboard Workspace View (Hidden by default until logged in) */
+    #dashboardView { display: none; max-width: 800px; margin: 30px auto; padding: 0 20px; text-align: center; }
+    .dash-header { margin-bottom: 30px; }
+    .dash-subtitle { font-size: 11px; letter-spacing: 1px; color: #10b981; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; }
+    .dash-title { font-size: 28px; font-weight: 900; }
+    .dash-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; text-align: left; }
+    @media (max-width: 550px) { .dash-grid { grid-template-columns: 1fr; } }
+
+    .dash-card {
+      background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px; padding: 24px 20px; position: relative;
+    }
+    .card-num { font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 12px; }
+    .card-h { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+    .card-p { font-size: 12px; color: #94a3b8; margin-bottom: 20px; }
+    .card-btn { color: #00a4ff; font-size: 13px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
 
     .account-badge {
       display: flex; align-items: center; gap: 8px; background: rgba(16,185,129,0.1);
       border: 1px solid rgba(16,185,129,0.3); padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 700; color: #10b981;
     }
 
-    /* Landing View */
-    #landingView { max-width: 480px; margin: 50px auto; padding: 20px; text-align: center; }
-    .hero-heading { font-size: 36px; font-weight: 900; margin-bottom: 16px; }
-    .hero-heading span { color: #00a4ff; }
-    .hero-p { font-size: 14px; color: #94a3b8; margin-bottom: 28px; line-height: 1.5; }
-    
-    .btn-login-main {
-      width: 100%; background: #00a4ff; border: none; color: #fff; padding: 16px;
-      border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; 
-      box-shadow: 0 4px 20px rgba(0,164,255,0.4); display: block; text-decoration: none; text-align: center;
-    }
-
-    /* Dashboard Trading View */
-    #dashboardView { display: none; max-width: 800px; margin: 30px auto; padding: 0 20px; text-align: center; }
-    .dash-header { margin-bottom: 30px; }
-    .dash-subtitle { font-size: 11px; letter-spacing: 1px; color: #10b981; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; }
-    .dash-title { font-size: 28px; font-weight: 900; }
-
-    .dash-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-    @media (max-width: 550px) { .dash-grid { grid-template-columns: 1fr; } }
-
-    .dash-card {
-      background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px; padding: 24px 20px; text-align: left; position: relative; transition: transform 0.2s;
-    }
-    .dash-card:hover { transform: translateY(-2px); border-color: rgba(0, 164, 255, 0.3); }
-    .card-num { font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 12px; }
-    .card-h { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
-    .card-p { font-size: 12px; color: #94a3b8; margin-bottom: 20px; }
-    .card-btn { color: #00a4ff; font-size: 13px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
-
-    /* AI Badge */
     .ai-badge {
-      position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 50%;
-      background: linear-gradient(135deg, #a855f7, #3b82f6); display: flex; align-items: center; justify-content: center;
-      color: #fff; font-weight: 900; font-size: 18px; box-shadow: 0 6px 24px rgba(168,85,247,0.5); cursor: pointer; z-index: 100;
-    }
-  </style>
-</head>
-<body>
-
-  <header>
-    <div class="brand-container">
-      <div class="ck-avatar">TS</div>
-      <div>
-        <div class="brand-title">traderscheme</div>
-        <div class="brand-subtitle">powered by deriv</div>
-      </div>
-    </div>
-
-    <div class="nav-tabs" id="navTabs" style="display: none;">
-      <button class="nav-tab active"><i class="fa-solid fa-house"></i> Dashboard</button>
-      <button class="nav-tab" onclick="alert('Bot Builder Ready')"><i class="fa-solid fa-gears"></i> Bot Builder</button>
-    </div>
-
-    <div id="authArea">
-      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&redirect_uri=https%3A%2F%2Fcollinskipkorir9406-pixel.github.io%2Fcktradindscheme%2F&l=en&brand=deriv" class="btn-login-main" style="padding: 8px 16px; font-size: 13px; display: inline-block;">Log In</a>
-    </div>
-  </header>
-
-  <!-- LANDING PAGE -->
-  <div id="landingView">
-    <h1 class="hero-heading">Welcome to <span>TraderScheme</span></h1>
-    <p class="hero-p">Structured trading, built for focus. Log in with your Deriv account to launch bots and access automations.</p>
-    
-    <!-- Native Link Button guaranteed to redirect -->
-    <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&redirect_uri=https%3A%2F%2Fcollinskipkorir9406-pixel.github.io%2Fcktradindscheme%2F&l=en&brand=deriv" class="btn-login-main">
-      <i class="fa-solid fa-bolt"></i> Log In and Trade
-    </a>
-  </div>
-
-  <!-- DASHBOARD WORKSPACE -->
-  <div id="dashboardView">
-    <div class="dash-header">
-      <div class="dash-subtitle">● TRADERSCHEME / YOUR TRADING WORKSPACE</div>
-      <h2 class="dash-title">Center for automations</h2>
-    </div>
-
-    <div class="dash-grid">
-      <div class="dash-card">
-        <div class="card-num">01</div>
-        <div class="card-h">Load Bot</div>
-        <div class="card-p">Open your trading strategy</div>
-        <a href="#" class="card-btn" onclick="alert('Select your XML bot file to load')">Choose a bot <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-      </div>
-
-      <div class="dash-card">
-        <div class="card-num">02</div>
-        <div class="card-h">Premium Bots</div>
-        <div class="card-p">Exclusive automated strategies</div>
-        <a href="#" class="card-btn" style="color: #eab308;" onclick="alert('Opening Premium Bots')">Explore premium bots <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-      </div>
-
-      <div class="dash-card">
-        <div class="card-num">03</div>
-        <div class="card-h">Speed Bot</div>
-        <div class="card-p">One-click automated trading</div>
-        <a href="#" class="card-btn" onclick="alert('Launching Speed Bot')">Launch Speed Bot <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-      </div>
-
-      <div class="dash-card">
-        <div class="card-num">04</div>
-        <div class="card-h">Manual Trading</div>
-        <div class="card-p">Full control, trade your way</div>
-        <a href="#" class="card-btn" style="color: #a855f7;" onclick="alert('Starting Manual Trading')">Start manual trading <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-      </div>
-    </div>
-  </div>
-
-  <div class="ai-badge" onclick="alert('AI Bot Scanner Active')">AI</div>
-
-  <script>
-    const APP_ID = '34JjnKJzecylG5kwmjaXm';
-
-    function initSession() {
-      const urlParams = new URLSearchParams(window.location.search);
-      let token = urlParams.get('token1');
-      let account = urlParams.get('acct1');
-
-      if (token && account) {
-        localStorage.setItem('deriv_token', token);
-        localStorage.setItem('deriv_account', account);
-        window.history.replaceState({}, document.title, window.location.pathname);
-      } else {
-        token = localStorage.getItem('deriv_token');
-        account = localStorage.getItem('deriv_account');
-      }
-
-      if (token && account) {
-        showDashboard(account, token);
-      }
-    }
-
-    function showDashboard(account, token) {
-      document.getElementById('landingView').style.display = 'none';
-      document.getElementById('dashboardView').style.display = 'block';
-      document.getElementById('navTabs').style.display = 'flex';
-
-      document.getElementById('authArea').innerHTML = `
-        <div class="account-badge">
-          <i class="fa-solid fa-wallet"></i> <span id="balanceDisplay">${account}</span>
-          <button onclick="logout()" style="background:none; border:none; color:#f43f5e; cursor:pointer; margin-left:8px;" title="Log out">
-            <i class="fa-solid fa-right-from-bracket"></i>
-          </button>
-        </div>
-      `;
-
-      fetchLiveBalance(token);
-    }
-
-    function fetchLiveBalance(token) {
-      const ws = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`);
-      ws.onopen = () => ws.send(JSON.stringify({ authorize: token }));
-      ws.onmessage = (msg) => {
-        const response = JSON.parse(msg.data);
-        if (response.msg_type === 'authorize') {
-          const balance = response.authorize.balance;
-          const currency = response.authorize.currency;
-          document.getElementById('balanceDisplay').innerText = `${balance} ${currency}`;
-          ws.close();
-        }
-      };
-    }
-
-    function logout() {
-      localStorage.clear();
-      window.location.reload();
-    }
-
-    window.addEventListener('DOMContentLoaded', initSession);
-  </script>
-</body>
-</html>
+      position: fixed; bottom: 24px;
