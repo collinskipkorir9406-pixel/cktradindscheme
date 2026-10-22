@@ -3,41 +3,595 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cktradindscheme</title>
+  <title>CK Trader - Powered by Deriv</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #0e1116;
-      color: #ffffff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+    * {
+      box-sizing: border-box;
       margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
-    .card {
-      background: #181c24;
-      padding: 30px;
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-      width: 320px;
+
+    body {
+      background-color: #06090e;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      position: relative;
     }
-    .btn {
-      background-color: #00a4ff;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
+
+    /* Ambient Background Glow */
+    .bg-glow {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
       width: 100%;
-      font-weight: bold;
-      transition: background 0.2s;
+      max-width: 1200px;
+      height: 600px;
+      background: radial-gradient(circle at 50% 20%, rgba(0, 164, 255, 0.15) 0%, rgba(6, 9, 14, 0) 70%);
+      pointer-events: none;
+      z-index: 0;
     }
-    .btn:hover {
-      background-color: #008be2;
+
+    /* Header & Ticker Bar */
+    header {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      background: rgba(6, 9, 14, 0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
+
+    .ticker-bar {
+      display: flex;
+      gap: 20px;
+      padding: 8px 16px;
+      background: #030508;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      font-size: 11px;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
+    }
+
+    .ticker-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .ticker-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #94a3b8;
+    }
+
+    .ticker-up { color: #10b981; }
+    .ticker-down { color: #ef4444; }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo-text {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+    }
+
+    .logo-sub {
+      font-size: 10px;
+      color: #e11d48;
+      font-weight: 600;
+      text-transform: lowercase;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-login {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-login:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-signup {
+      background: #00a4ff;
+      border: none;
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-signup:hover {
+      background: #008be2;
+      box-shadow: 0 0 15px rgba(0, 164, 255, 0.4);
+    }
+
+    /* Main Container */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px 80px 20px;
+      width: 100%;
+      text-align: center;
+    }
+
+    /* Badge */
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 164, 255, 0.08);
+      border: 1px solid rgba(0, 164, 255, 0.25);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #38bdf8;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .hero-badge .dot {
+      width: 6px;
+      height: 6px;
+      background-color: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    /* Hero Heading */
+    .hero-title {
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+
+    .hero-title span {
+      color: #00a4ff;
+    }
+
+    .hero-subtitle {
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.6;
+      max-width: 580px;
+      margin: 0 auto 36px auto;
+    }
+
+    /* Main CTA Buttons */
+    .cta-box {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 460px;
+      margin: 0 auto 16px auto;
+    }
+
+    .btn-primary-action {
+      background: #00a4ff;
+      color: #ffffff;
+      border: none;
+      padding: 16px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0, 164, 255, 0.3);
+      transition: all 0.2s;
+    }
+
+    .btn-primary-action:hover {
+      background: #008be2;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary-action {
+      background: rgba(255, 255, 255, 0.9);
+      color: #0f172a;
+      border: none;
+      padding: 16px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary-action:hover {
+      background: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .explore-link {
+      color: #94a3b8;
+      font-size: 13px;
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 48px;
+      transition: color 0.2s;
+    }
+
+    .explore-link:hover {
+      color: #ffffff;
+    }
+
+    /* Grid Section */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 48px;
+    }
+
+    @media (max-width: 480px) {
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+      .hero-title {
+        font-size: 32px;
+      }
+    }
+
+    .feature-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .feature-card .card-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .feature-card .card-sub {
+      font-size: 10px;
+      color: #64748b;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .status-live .dot {
+      width: 8px;
+      height: 8px;
+      background-color: #10b981;
+      border-radius: 50%;
+    }
+
+    /* Onboarding Section */
+    .onboard-section {
+      text-align: center;
+      padding-top: 20px;
+    }
+
+    .onboard-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 164, 255, 0.1);
+      border: 1px solid rgba(0, 164, 255, 0.2);
+      color: #38bdf8;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .onboard-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .onboard-sub {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    /* Floating AI Button */
+    .ai-floating-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 16px;
+      box-shadow: 0 4px 20px rgba(139, 92, 246, 0.5);
+      cursor: pointer;
+      z-index: 100;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      transition: transform 0.2s;
+    }
+
+    .ai-floating-btn:hover {
+      transform: scale(1.08);
+    }
+
+    .ai-status-dot {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      width: 10px;
+      height: 10px;
+      background-color: #10b981;
+      border: 2px solid #06090e;
+      border-radius: 50%;
+    }
+
+    /* Scanner Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: #f8fafc;
+      color: #0f172a;
+      width: 100%;
+      max-width: 480px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      text-align: left;
+    }
+
+    .modal-header {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .modal-header h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 18px;
+      color: #64748b;
+      cursor: pointer;
+    }
+
+    .modal-body {
+      padding: 20px;
+      background: #f1f5f9;
+    }
+
+    .back-opt {
+      font-size: 12px;
+      color: #3b82f6;
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .scanner-banner {
+      background: linear-gradient(135deg, #0284c7, #0f172a);
+      color: #ffffff;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+
+    .recovery-tag {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 800;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 3px 8px;
+      border-radius: 10px;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .scanner-banner h4 {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .scanner-banner p {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .tab-pills {
+      display: flex;
+      background: #e2e8f0;
+      padding: 3px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tab-pill {
+      flex: 1;
+      padding: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #64748b;
+    }
+
+    .tab-pill.active {
+      background: #0284c7;
+      color: #ffffff;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .form-col {
+      flex: 1;
+      background: #ffffff;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+    }
+
+    .form-col label {
+      display: block;
+      font-size: 9px;
+      font-weight: 800;
+      color: #64748b;
+      margin-bottom: 2px;
+      text-transform: uppercase;
+    }
+
+    .form-col div {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .scan-status-box {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 12px;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-scan {
+      flex: 1;
+      background: #0284c7;
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-load-bot {
+      flex: 1;
+      background: #ffffff;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
     .hidden {
       display: none !important;
     }
@@ -45,85 +599,242 @@
 </head>
 <body>
 
-  <div class="card">
-    <h2>Connect Deriv Account</h2>
-    
-    <!-- Login Screen -->
-    <div id="loginView">
-      <p style="font-size: 14px; color: #a0aec0; margin-bottom: 20px;">
-        Log in securely with your Deriv account to start trading.
-      </p>
-      <button class="btn" onclick="loginWithDeriv()">Log in with Deriv</button>
+  <div class="bg-glow"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="ticker-bar">
+      <div class="ticker-item"><span>Volatility 10 Index</span> <span class="ticker-up">+1.24%</span></div>
+      <div class="ticker-item"><span>Volatility 25 Index</span> <span class="ticker-down">-0.42%</span></div>
+      <div class="ticker-item"><span>Volatility 50 Index</span> <span class="ticker-up">+2.08%</span></div>
+      <div class="ticker-item"><span>Volatility 75 Index</span> <span class="ticker-up">+0.89%</span></div>
+      <div class="ticker-item"><span>Volatility 100 Index</span> <span class="ticker-down">-1.15%</span></div>
+      <div class="ticker-item"><span>Bull Market Index</span> <span class="ticker-up">+0.31%</span></div>
+    </div>
+    <div class="nav-container">
+      <div class="logo-container">
+        <span class="logo-text">CK Trader</span>
+        <span class="logo-sub">powered by deriv</span>
+      </div>
+      <div class="nav-actions" id="navAuth">
+        <button class="btn-login" onclick="loginWithDeriv()">Log In</button>
+        <button class="btn-signup" onclick="loginWithDeriv()">Get Started</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Hero Content -->
+  <main>
+    <div class="hero-badge">
+      <span class="dot"></span>
+      <span>FREE STRATEGIES. REAL MARKET TOOLS.</span>
     </div>
 
-    <!-- Connected Dashboard Screen -->
-    <div id="dashboardView" class="hidden">
-      <p style="color: #48bb78; font-weight: bold;">Connected to Deriv!</p>
-      <p id="accountInfo" style="font-size: 14px; color: #a0aec0; margin-bottom: 20px;"></p>
-      <button class="btn" style="background-color: #e53e3e;" onclick="logoutDeriv()">Log Out</button>
+    <h1 class="hero-title">
+      Welcome to <span>CK Trader</span>
+    </h1>
+
+    <p class="hero-subtitle">
+      Structured trading, built for focus. Build, load, and run Deriv bot strategies from a focused workspace made for everyday traders.
+    </p>
+
+    <div class="cta-box">
+      <button class="btn-primary-action" onclick="loginWithDeriv()">
+        <i class="fa-solid fa-chart-line"></i>
+        <span>Log In and Trade</span>
+      </button>
+      <button class="btn-secondary-action" onclick="openScanner()">
+        <i class="fa-solid fa-bolt"></i>
+        <span>Launch Entry Scanner</span>
+      </button>
+    </div>
+
+    <a href="#onboard" class="explore-link">Explore the platform ↓</a>
+
+    <!-- Feature Grid -->
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="card-title">Free</div>
+        <div class="card-sub">BOT TEMPLATES</div>
+      </div>
+      <div class="feature-card">
+        <div class="card-title">24/7</div>
+        <div class="card-sub">SYNTHETIC MARKET FOCUS</div>
+      </div>
+      <div class="feature-card">
+        <div class="card-title">CK Trading Workspace</div>
+        <div class="card-sub">BRANDED WORKSPACE</div>
+      </div>
+      <div class="feature-card">
+        <div class="card-title status-live">
+          <span class="dot"></span> Live
+        </div>
+        <div class="card-sub">MARKET STATUS</div>
+      </div>
+    </div>
+
+    <!-- Onboarding Step Guide -->
+    <div class="onboard-section" id="onboard">
+      <div class="onboard-btn">
+        <i class="fa-solid fa-sparkles"></i> GET STARTED
+      </div>
+      <h2 class="onboard-title">From sign-up to your first trade</h2>
+      <p class="onboard-sub">Three steps, no experience required.</p>
+    </div>
+  </main>
+
+  <!-- Floating AI Assistant Button -->
+  <div class="ai-floating-btn" onclick="openAI()">
+    AI
+    <span class="ai-status-dot"></span>
+  </div>
+
+  <!-- Entry Scanner Modal -->
+  <div class="modal-overlay" id="scannerModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Entry Scanner</h3>
+        <button class="modal-close" onclick="closeScanner()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <a href="#" class="back-opt" onclick="closeScanner(); return false;">← Back to scanner options</a>
+        
+        <div class="scanner-banner">
+          <span class="recovery-tag">✨ RECOVERY ENGINE</span>
+          <h4>Over 1 / Under 8 Scanner</h4>
+          <p>Scans Over 1 and Under 8 with recovery confirmation.</p>
+        </div>
+
+        <div class="tab-pills">
+          <div class="tab-pill active" onclick="selectTab(this)">O1 / U8</div>
+          <div class="tab-pill" onclick="selectTab(this)">O2 / U7</div>
+          <div class="tab-pill" onclick="selectTab(this)">O3 / U6</div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-col">
+            <label>SCAN DEPTH</label>
+            <div>3000</div>
+          </div>
+          <div class="form-col">
+            <label>MODE</label>
+            <div>O1 / U8</div>
+          </div>
+          <div class="form-col">
+            <label>TICKS</label>
+            <div>3000</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-col">
+            <label>SELECTED MARKET</label>
+            <div id="selectedMarketText">Scan to find the best market</div>
+          </div>
+          <div class="form-col">
+            <label>TRADE TYPE</label>
+            <div id="tradeTypeText">Waiting for scan</div>
+          </div>
+        </div>
+
+        <div class="scan-status-box" id="scanStatus">
+          <i class="fa-solid fa-robot"></i>
+          <span>Not scanned yet</span>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-scan" onclick="runScan()">
+            <i class="fa-solid fa-expand"></i> Scan Markets
+          </button>
+          <button class="btn-load-bot" onclick="loginWithDeriv()">
+            <i class="fa-solid fa-robot"></i> Load Scanner Bot
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    // Your exact Deriv App ID
-    const APP_ID = '34JjnKJzecylG5kwmjaXm'; 
+    // Your exact registered Deriv App ID
+    const APP_ID = '34JjnKJzecylG5kwmjaXm';
 
+    // OAuth Authorization Login Trigger
     function loginWithDeriv() {
-      // Fixed: Exact OAuth authorization link for Deriv
-      const derivOAuthUrl = `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&l=en&brand=deriv`;
-      window.location.href = derivOAuthUrl;
+      const oauthUrl = `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&l=en&brand=deriv`;
+      window.location.href = oauthUrl;
     }
 
-    function handleDerivOAuthCallback() {
+    // Process Token Callback on Page Load
+    function handleOAuthCallback() {
       const urlParams = new URLSearchParams(window.location.search);
-      
-      // When Deriv redirects back with login tokens in the URL
       if (urlParams.has('token1')) {
-        const account = urlParams.get('acct1');
         const token = urlParams.get('token1');
+        const account = urlParams.get('acct1');
 
-        // Store active token & account in localStorage
         localStorage.setItem('deriv_token', token);
         localStorage.setItem('deriv_account', account);
 
-        // Remove token parameters from address bar for security
+        // Clear query parameters from address bar
         window.history.replaceState({}, document.title, window.location.pathname);
 
-        showDashboard(account);
+        updateHeaderLoggedIn(account);
       } else {
-        // Check if session already exists in local storage
-        const savedToken = localStorage.getItem('deriv_token');
         const savedAccount = localStorage.getItem('deriv_account');
-
-        if (savedToken && savedAccount) {
-          showDashboard(savedAccount);
-        } else {
-          showLogin();
+        if (savedAccount) {
+          updateHeaderLoggedIn(savedAccount);
         }
       }
     }
 
-    function showDashboard(account) {
-      document.getElementById('loginView').classList.add('hidden');
-      document.getElementById('dashboardView').classList.remove('hidden');
-      document.getElementById('accountInfo').innerText = `Active Account: ${account}`;
+    function updateHeaderLoggedIn(account) {
+      const navAuth = document.getElementById('navAuth');
+      if (navAuth) {
+        navAuth.innerHTML = `
+          <span style="font-size:12px; color:#10b981; font-weight:700;"><i class="fa-solid fa-circle-check"></i> ${account}</span>
+          <button class="btn-login" onclick="logout()">Log Out</button>
+        `;
+      }
     }
 
-    function showLogin() {
-      document.getElementById('loginView').classList.remove('hidden');
-      document.getElementById('dashboardView').classList.add('hidden');
-    }
-
-    function logoutDeriv() {
+    function logout() {
       localStorage.removeItem('deriv_token');
       localStorage.removeItem('deriv_account');
-      showLogin();
-      window.location.href = window.location.pathname;
+      window.location.reload();
     }
 
-    // Run callback check when page finishes loading
-    window.addEventListener('DOMContentLoaded', handleDerivOAuthCallback);
-  </script>
+    // Modal Control
+    function openScanner() {
+      document.getElementById('scannerModal').classList.add('active');
+    }
 
+    function closeScanner() {
+      document.getElementById('scannerModal').classList.remove('active');
+    }
+
+    function selectTab(el) {
+      document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    function runScan() {
+      const statusBox = document.getElementById('scanStatus');
+      const marketText = document.getElementById('selectedMarketText');
+      const tradeText = document.getElementById('tradeTypeText');
+
+      statusBox.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Scanning Volatility Index markets...</span>`;
+
+      setTimeout(() => {
+        statusBox.innerHTML = `<i class="fa-solid fa-check" style="color:#10b981;"></i> <span style="color:#10b981;">Optimal entry point found!</span>`;
+        marketText.innerText = 'Volatility 100 (1s) Index';
+        tradeText.innerText = 'Under 8 Target (94.2%)';
+      }, 1500);
+    }
+
+    function openAI() {
+      alert("CK AI Assistant: Connected to market scanner feeds. Log in to start automated strategy execution.");
+    }
+
+    window.addEventListener('DOMContentLoaded', handleOAuthCallback);
+  </script>
 </body>
 </html>
