@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>TraderScheme - Deriv Connected</title>
+  <title>TraderScheme - CKTrader Bot</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -38,28 +38,28 @@
   <!-- ==================== VIEW 1: LANDING PAGE ==================== -->
   <div id="landingView" class="min-h-screen flex flex-col justify-between">
     <header class="w-full bg-bgNav/90 border-b border-cardBorder backdrop-blur-md px-4 py-3 flex items-center justify-between sticky top-0 z-40">
-      <div class="flex items-center gap-2.5 cursor-pointer">
+      <div class="flex items-center gap-2.5 cursor-pointer" onclick="goToDashboard()">
         <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brandBlue to-brandCyan flex items-center justify-center font-black text-white text-sm shadow-md shadow-cyan-500/30">
           CK
         </div>
         <div class="flex flex-col">
-          <span class="font-bold text-white text-base leading-none">TraderScheme</span>
+          <span class="font-bold text-white text-base leading-none">traderscheme</span>
           <span class="text-[9px] text-slate-400 mt-0.5">powered by <span class="text-rose-500 font-bold">deriv</span></span>
         </div>
       </div>
 
       <div class="flex items-center gap-2">
-        <button onclick="loginWithDeriv()" class="px-4 py-1.5 rounded-xl bg-slate-900 border border-slate-700/80 text-xs font-semibold text-slate-200 hover:bg-slate-800 transition">
+        <button onclick="goToDashboard()" class="px-4 py-1.5 rounded-xl bg-slate-900 border border-slate-700/80 text-xs font-semibold text-slate-200 hover:bg-slate-800 transition">
           Log In
         </button>
-        <button onclick="loginWithDeriv()" class="px-4 py-1.5 rounded-xl bg-gradient-to-r from-brandBlue to-brandCyan text-xs font-bold text-white shadow-md shadow-cyan-500/25 hover:opacity-95 transition">
+        <button onclick="goToDashboard()" class="px-4 py-1.5 rounded-xl bg-gradient-to-r from-brandBlue to-brandCyan text-xs font-bold text-white shadow-md shadow-cyan-500/25 hover:opacity-95 transition">
           Get Started
         </button>
       </div>
     </header>
 
     <main class="w-full max-w-md mx-auto px-5 pt-6 pb-12 flex-grow flex flex-col items-center text-center bg-grid-pattern relative">
-      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/70 text-[10px] font-bold text-slate-300 tracking-wider uppercase mb-6">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/70 text-[10px] font-bold text-slate-300 tracking-wider uppercase mb-6 shadow-sm">
         <span class="w-2 h-2 rounded-full bg-emerald-400"></span> FREE STRATEGIES. REAL MARKET TOOLS.
       </div>
 
@@ -68,56 +68,101 @@
       </h1>
 
       <p class="text-slate-400 text-xs md:text-sm leading-relaxed max-w-xs mb-8">
-        Structured trading, built for focus. Build, load, and run Deriv bot strategies connected directly to your Deriv account.
+        Structured trading, built for focus. Build, load, and run Deriv bot strategies from a focused workspace made for everyday traders.
       </p>
 
       <div class="w-full space-y-3.5 mb-8">
-        <button onclick="loginWithDeriv()" class="w-full py-3.5 px-6 rounded-2xl font-bold text-sm text-white bg-gradient-to-r from-brandBlue to-brandCyan hover:opacity-95 transition shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
-          Log In with Deriv Account
+        <button onclick="goToDashboard()" class="w-full py-3.5 px-6 rounded-2xl font-bold text-sm text-white bg-gradient-to-r from-brandBlue to-brandCyan hover:opacity-95 transition shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Log In and Trade
         </button>
 
-        <button onclick="openTokenModal()" class="w-full py-3.5 px-6 rounded-2xl font-bold text-sm text-slate-800 bg-[#E2E8F0] hover:bg-white transition flex items-center justify-center gap-2 shadow-md">
-          <svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 0121 9z"/></svg>
-          Connect via API Token
+        <button onclick="goToDashboard()" class="w-full py-3.5 px-6 rounded-2xl font-bold text-sm text-slate-800 bg-[#E2E8F0] hover:bg-white transition flex items-center justify-center gap-2 shadow-md">
+          <svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Create Free Account
         </button>
+      </div>
+
+      <a href="#dashboard" onclick="goToDashboard()" class="text-xs font-semibold text-slate-400 hover:text-white transition mb-10 inline-flex items-center gap-1">
+        Explore the course &darr;
+      </a>
+
+      <div class="grid grid-cols-2 gap-3 w-full mb-10">
+        <div class="p-4 rounded-2xl bg-cardBg/90 border border-cardBorder text-center shadow-md">
+          <div class="font-extrabold text-base text-white">Free</div>
+          <div class="text-[9px] font-bold text-slate-500 tracking-wider uppercase mt-0.5">BOT TEMPLATES</div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-cardBg/90 border border-cardBorder text-center shadow-md">
+          <div class="font-extrabold text-base text-white">24/7</div>
+          <div class="text-[9px] font-bold text-slate-500 tracking-wider uppercase mt-0.5">SYNTHETIC MARKET FOCUS</div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-cardBg/90 border border-cardBorder text-center shadow-md">
+          <div class="font-bold text-xs text-slate-200 truncate">www.traderscheme.com</div>
+          <div class="text-[9px] font-bold text-slate-500 tracking-wider uppercase mt-0.5">BRANDED WORKSPACE</div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-cardBg/90 border border-cardBorder text-center shadow-md flex flex-col items-center justify-center">
+          <div class="flex items-center gap-1.5 font-bold text-white text-xs">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Live
+          </div>
+          <div class="text-[9px] font-bold text-slate-500 tracking-wider uppercase mt-0.5">MARKET STATUS</div>
+        </div>
       </div>
     </main>
   </div>
 
+
   <!-- ==================== VIEW 2: BOT DASHBOARD ==================== -->
   <div id="dashboardView" class="min-h-screen hidden pb-12">
+    <!-- TOP NAV BAR -->
     <header class="w-full bg-[#080E21] border-b border-slate-800/80 px-4 py-2.5 flex items-center justify-between sticky top-0 z-30">
       <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brandBlue to-brandCyan flex items-center justify-center font-bold text-white text-sm">CK</div>
-        <span class="font-bold tracking-tight text-white">TraderScheme</span>
+        <button onclick="goToLanding()" class="p-1.5 rounded-lg bg-slate-800/60 text-slate-300 hover:text-white">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 00-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        </button>
+        <div class="flex items-center gap-2 cursor-pointer" onclick="goToLanding()">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brandBlue to-brandCyan flex items-center justify-center font-bold text-white text-sm">CK</div>
+          <span class="font-bold tracking-tight text-white">TraderScheme</span>
+        </div>
       </div>
 
       <div class="flex items-center gap-3">
         <div class="flex items-center bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1 text-xs gap-2">
-          <span id="accountTypeBadge" class="text-[10px] bg-emerald-500/20 text-emerald-400 font-bold px-1.5 py-0.5 rounded uppercase">DEMO</span>
+          <span id="accountModeBadge" class="text-[10px] bg-emerald-500/20 text-emerald-400 font-bold px-1.5 py-0.5 rounded uppercase">DEMO</span>
           <span class="text-slate-200 font-mono font-bold" id="userBalance">$10,000.00</span>
-          <span class="text-[10px] text-slate-400" id="userCurrency">USD</span>
+          <span class="text-[10px] text-slate-400">USD</span>
         </div>
-        <button onclick="logout()" class="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white" title="Disconnect">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        <button onclick="openTokenModal()" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-brandBlue to-brandCyan text-xs font-semibold text-white shadow-md shadow-cyan-500/20 flex items-center gap-1.5 hover:opacity-90 transition">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 0121 9z"/></svg>
+          Connect Deriv
         </button>
       </div>
     </header>
 
-    <main class="max-w-4xl mx-auto px-4 pt-6 space-y-6">
-      <div id="connectionBanner" class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-800/50 flex items-center justify-between text-xs text-emerald-300">
-        <span id="accountInfoText">Connected to Deriv Account: Authorized</span>
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+    <!-- DASHBOARD CONTAINER -->
+    <main class="max-w-4xl mx-auto px-4 pt-6 space-y-5">
+
+      <!-- Deriv Account Connection Bar -->
+      <div id="derivConnectionBar" class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-wrap items-center justify-between text-xs gap-2">
+        <div class="flex items-center gap-2">
+          <span id="derivStatusDot" class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+          <span id="derivConnectionStatus" class="font-medium text-slate-300">Deriv Account: Not Connected (Using Simulated Balance)</span>
+        </div>
+        <button onclick="openTokenModal()" class="text-brandCyan font-bold underline hover:text-white transition">
+          Enter Deriv API Token
+        </button>
       </div>
 
+      <!-- BOT CONTROL PANEL -->
       <div class="p-5 rounded-2xl bg-brandCard border border-brandCardBorder shadow-lg space-y-4">
         <div class="flex items-center justify-between">
           <h2 class="font-bold text-white text-base">BOT CONTROL CENTER</h2>
-          <span id="botStatusBadge" class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-slate-800 text-slate-400">STOPPED</span>
+          <span id="botStatusBadge" class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-slate-800 text-slate-400 border border-slate-700">STOPPED</span>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs text-slate-400 mb-1">Strategy Type</label>
             <select id="strategySelect" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white">
@@ -134,109 +179,25 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-          <button onclick="startBot()" class="py-3 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-500 text-white">START BOT</button>
-          <button onclick="stopBot()" class="py-3 rounded-xl font-bold text-xs bg-rose-700 hover:bg-rose-600 text-white">STOP BOT</button>
+        <div class="grid grid-cols-2 gap-3 pt-2">
+          <button id="startBtn" onclick="startBot()" class="py-3 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/20">START BOT</button>
+          <button id="stopBtn" onclick="stopBot()" disabled class="py-3 rounded-xl font-bold text-xs bg-rose-900/40 text-rose-300 border border-rose-800/60 cursor-not-allowed">STOP BOT</button>
         </div>
       </div>
     </main>
   </div>
 
-  <!-- API TOKEN INPUT MODAL -->
+  <!-- IN-APP DERIV API TOKEN MODAL -->
   <div id="tokenModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-[#0D1836] border border-slate-700 text-white w-full max-w-sm rounded-2xl p-6 shadow-2xl space-y-4">
-      <h3 class="text-base font-bold">Connect via Deriv API Token</h3>
-      <p class="text-xs text-slate-400">Generate an API token from your Deriv Account Settings -> API Token and paste it below:</p>
-      <input type="password" id="derivTokenInput" placeholder="Paste your Deriv API Token" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-brandBlue" />
-      <div class="flex gap-2">
-        <button onclick="closeTokenModal()" class="w-1/2 py-2 rounded-xl text-xs bg-slate-800 text-slate-300">Cancel</button>
-        <button onclick="saveApiToken()" class="w-1/2 py-2 rounded-xl text-xs bg-gradient-to-r from-brandBlue to-brandCyan text-white font-bold">Connect</button>
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-white">Connect Deriv Account</h3>
+        <button onclick="closeTokenModal()" class="text-slate-400 hover:text-white">&times;</button>
       </div>
-    </div>
-  </div>
-
-  <script>
-    const APP_ID = '1089'; // Default Deriv App ID
-    let userToken = localStorage.getItem('deriv_token') || '';
-    let ws = null;
-
-    function loginWithDeriv() {
-      // Redirects user directly to Deriv OAuth URL
-      const redirectUrl = window.location.origin + window.location.pathname;
-      const derivAuthUrl = `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&l=EN&platform=traderscheme`;
-      window.location.href = derivAuthUrl;
-    }
-
-    function openTokenModal() { document.getElementById('tokenModal').classList.remove('hidden'); }
-    function closeTokenModal() { document.getElementById('tokenModal').classList.add('hidden'); }
-
-    function saveApiToken() {
-      const token = document.getElementById('derivTokenInput').value.trim();
-      if (token) {
-        localStorage.setItem('deriv_token', token);
-        userToken = token;
-        closeTokenModal();
-        connectWebSocket();
-        showDashboard();
-      }
-    }
-
-    // Capture OAuth Token on Redirect back from Deriv
-    function checkUrlForDerivToken() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const token1 = urlParams.get('token1');
-      const acct1 = urlParams.get('acct1');
-
-      if (token1) {
-        localStorage.setItem('deriv_token', token1);
-        if (acct1) localStorage.setItem('deriv_acct', acct1);
-        userToken = token1;
-        window.history.replaceState({}, document.title, window.location.pathname); // Clean URL
-      }
-
-      if (userToken) {
-        showDashboard();
-        connectWebSocket();
-      }
-    }
-
-    function showDashboard() {
-      document.getElementById('landingView').classList.add('hidden');
-      document.getElementById('dashboardView').classList.remove('hidden');
-    }
-
-    function logout() {
-      localStorage.removeItem('deriv_token');
-      localStorage.removeItem('deriv_acct');
-      userToken = '';
-      if (ws) ws.close();
-      document.getElementById('dashboardView').classList.add('hidden');
-      document.getElementById('landingView').classList.remove('hidden');
-    }
-
-    function connectWebSocket() {
-      ws = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`);
-      ws.onopen = () => {
-        if (userToken) {
-          ws.send(JSON.stringify({ authorize: userToken }));
-        }
-      };
-
-      ws.onmessage = (msg) => {
-        const data = JSON.parse(msg.data);
-        if (data.msg_type === 'authorize' && data.authorize) {
-          const auth = data.authorize;
-          document.getElementById('userBalance').innerText = `$${parseFloat(auth.balance).toFixed(2)}`;
-          document.getElementById('userCurrency').innerText = auth.currency;
-          document.getElementById('accountTypeBadge').innerText = auth.is_virtual ? 'DEMO' : 'REAL';
-          document.getElementById('accountInfoText').innerText = `Connected: ${auth.loginid} (${auth.email})`;
-        }
-      };
-    }
-
-    window.onload = () => {
-      checkUrlForDerivToken();
-    };
-  </script>
-</body>
-</html>
+      <p class="text-xs text-slate-300 leading-relaxed">
+        To trade with your real or demo Deriv balance, paste your **Deriv API Token** (Get it from Deriv &rarr; Account Settings &rarr; Security & Safety &rarr; API Token with 'Read' & 'Trade' scopes):
+      </p>
+      <input type="password" id="derivTokenInput" placeholder="Paste your Deriv API Token" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-brandBlue" />
+      <div class="flex gap-2">
+        <button onclick="closeTokenModal()" class="w-1/2 py-2.5 rounded-xl text-xs bg-slate-800 text-slate-300 font-semibold">Cancel</button>
+        <button onclick="connectDerivWithToken()" class="w-1/2 py-2
