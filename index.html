@@ -14,6 +14,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
     body { background-color: #030712; color: #ffffff; min-height: 100vh; overflow-x: hidden; }
 
+    /* Top Bar */
     header {
       width: 100%; background: #080d1a; border-bottom: 1px solid rgba(255,255,255,0.08);
       padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50;
@@ -38,17 +39,18 @@
       border: 1px solid rgba(16,185,129,0.3); padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 700; color: #10b981;
     }
 
-    #landingView { max-width: 480px; margin: 60px auto; padding: 20px; text-align: center; }
+    /* Landing View */
+    #landingView { max-width: 480px; margin: 50px auto; padding: 20px; text-align: center; }
     .hero-heading { font-size: 36px; font-weight: 900; margin-bottom: 16px; }
     .hero-heading span { color: #00a4ff; }
     .hero-p { font-size: 14px; color: #94a3b8; margin-bottom: 28px; line-height: 1.5; }
     .btn-login-main {
       width: 100%; background: #00a4ff; border: none; color: #fff; padding: 16px;
       border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 20px rgba(0,164,255,0.4);
-      display: block; text-decoration: none; text-align: center;
     }
 
-    #dashboardView { display: none; max-width: 800px; margin: 40px auto; padding: 0 20px; text-align: center; }
+    /* Dashboard Trading View */
+    #dashboardView { display: none; max-width: 800px; margin: 30px auto; padding: 0 20px; text-align: center; }
     .dash-header { margin-bottom: 30px; }
     .dash-subtitle { font-size: 11px; letter-spacing: 1px; color: #10b981; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; }
     .dash-title { font-size: 28px; font-weight: 900; }
@@ -66,6 +68,7 @@
     .card-p { font-size: 12px; color: #94a3b8; margin-bottom: 20px; }
     .card-btn { color: #00a4ff; font-size: 13px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
 
+    /* AI Badge */
     .ai-badge {
       position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 50%;
       background: linear-gradient(135deg, #a855f7, #3b82f6); display: flex; align-items: center; justify-content: center;
@@ -90,118 +93,24 @@
     </div>
 
     <div id="authArea">
-      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&l=en&brand=deriv" class="btn-login-main" style="padding: 8px 16px; font-size: 13px; display: inline-block;">Log In</a>
+      <button class="btn-login-main" style="padding: 8px 16px; font-size: 13px;" onclick="loginWithDeriv()">Log In</button>
     </div>
   </header>
 
+  <!-- LANDING PAGE -->
   <div id="landingView">
     <h1 class="hero-heading">Welcome to <span>TraderScheme</span></h1>
     <p class="hero-p">Structured trading, built for focus. Log in with your Deriv account to launch bots and access automations.</p>
-    <!-- Direct link using Deriv OAuth Login endpoint -->
-    <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&l=en&brand=deriv" class="btn-login-main">
+    <button class="btn-login-main" onclick="loginWithDeriv()">
       <i class="fa-solid fa-bolt"></i> Log In and Trade
-    </a>
+    </button>
   </div>
 
+  <!-- DASHBOARD WORKSPACE -->
   <div id="dashboardView">
     <div class="dash-header">
       <div class="dash-subtitle">● TRADERSCHEME / YOUR TRADING WORKSPACE</div>
       <h2 class="dash-title">Center for automations</h2>
     </div>
 
-    <div class="dash-grid">
-      <div class="dash-card">
-        <div class="card-num">01</div>
-        <div class="card-h">Load Bot</div>
-        <div class="card-p">Open your trading strategy</div>
-        <a href="#" class="card-btn" onclick="alert('Select your XML bot file to load')">Choose a bot <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-      </div>
-
-      <div class="dash-card">
-        <div class="card-num">02</div>
-        <div class="card-h">Premium Bots</div>
-        <div class="card-p">Exclusive automated strategies</div>
-        <a href="#" class="card-btn" style="color: #eab308;" onclick="alert('Opening Premium Bots')">Explore premium bots <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-      </div>
-
-      <div class="dash-card">
-        <div class="card-num">03</div>
-        <div class="card-h">Speed Bot</div>
-        <div class="card-p">One-click automated trading</div>
-        <a href="#" class="card-btn" onclick="alert('Launching Speed Bot')">Launch Speed Bot <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-      </div>
-
-      <div class="dash-card">
-        <div class="card-num">04</div>
-        <div class="card-h">Manual Trading</div>
-        <div class="card-p">Full control, trade your way</div>
-        <a href="#" class="card-btn" style="color: #a855f7;" onclick="alert('Starting Manual Trading')">Start manual trading <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-      </div>
-    </div>
-  </div>
-
-  <div class="ai-badge" onclick="alert('AI Bot Scanner Active')">AI</div>
-
-  <script>
-    const APP_ID = '34JjnKJzecylG5kwmjaXm';
-
-    function initSession() {
-      const urlParams = new URLSearchParams(window.location.search);
-      let token = urlParams.get('token1');
-      let account = urlParams.get('acct1');
-
-      if (token && account) {
-        localStorage.setItem('deriv_token', token);
-        localStorage.setItem('deriv_account', account);
-        window.history.replaceState({}, document.title, window.location.pathname);
-      } else {
-        token = localStorage.getItem('deriv_token');
-        account = localStorage.getItem('deriv_account');
-      }
-
-      if (token && account) {
-        showDashboard(account, token);
-      }
-    }
-
-    function showDashboard(account, token) {
-      document.getElementById('landingView').style.display = 'none';
-      document.getElementById('dashboardView').style.display = 'block';
-      document.getElementById('navTabs').style.display = 'flex';
-
-      document.getElementById('authArea').innerHTML = `
-        <div class="account-badge">
-          <i class="fa-solid fa-wallet"></i> <span id="balanceDisplay">${account}</span>
-          <button onclick="logout()" style="background:none; border:none; color:#f43f5e; cursor:pointer; margin-left:8px;" title="Log out">
-            <i class="fa-solid fa-right-from-bracket"></i>
-          </button>
-        </div>
-      `;
-
-      fetchLiveBalance(token);
-    }
-
-    function fetchLiveBalance(token) {
-      const ws = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`);
-      ws.onopen = () => ws.send(JSON.stringify({ authorize: token }));
-      ws.onmessage = (msg) => {
-        const response = JSON.parse(msg.data);
-        if (response.msg_type === 'authorize') {
-          const balance = response.authorize.balance;
-          const currency = response.authorize.currency;
-          document.getElementById('balanceDisplay').innerText = `${balance} ${currency}`;
-          ws.close();
-        }
-      };
-    }
-
-    function logout() {
-      localStorage.clear();
-      window.location.reload();
-    }
-
-    window.addEventListener('DOMContentLoaded', initSession);
-  </script>
-
-</body>
-</html>
+    <div class="dash
