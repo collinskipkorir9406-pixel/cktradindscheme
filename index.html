@@ -48,7 +48,7 @@
   <div class="card">
     <h2>Connect Deriv Account</h2>
     
-    <!-- Login View -->
+    <!-- Login Screen -->
     <div id="loginView">
       <p style="font-size: 14px; color: #a0aec0; margin-bottom: 20px;">
         Log in securely with your Deriv account to start trading.
@@ -56,7 +56,7 @@
       <button class="btn" onclick="loginWithDeriv()">Log in with Deriv</button>
     </div>
 
-    <!-- Connected Dashboard View -->
+    <!-- Connected Dashboard Screen -->
     <div id="dashboardView" class="hidden">
       <p style="color: #48bb78; font-weight: bold;">Connected to Deriv!</p>
       <p id="accountInfo" style="font-size: 14px; color: #a0aec0; margin-bottom: 20px;"></p>
@@ -69,7 +69,7 @@
     const APP_ID = '34JjnKJzecylG5kwmjaXm'; 
 
     function loginWithDeriv() {
-      // Direct OAuth authorization URL
+      // Fixed: Exact OAuth authorization link for Deriv
       const derivOAuthUrl = `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&l=en&brand=deriv`;
       window.location.href = derivOAuthUrl;
     }
@@ -77,21 +77,21 @@
     function handleDerivOAuthCallback() {
       const urlParams = new URLSearchParams(window.location.search);
       
-      // When user returns from Deriv with tokens in URL
+      // When Deriv redirects back with login tokens in the URL
       if (urlParams.has('token1')) {
         const account = urlParams.get('acct1');
         const token = urlParams.get('token1');
 
-        // Save session locally
+        // Store active token & account in localStorage
         localStorage.setItem('deriv_token', token);
         localStorage.setItem('deriv_account', account);
 
-        // Remove token params from URL bar for security & cleanliness
+        // Remove token parameters from address bar for security
         window.history.replaceState({}, document.title, window.location.pathname);
 
         showDashboard(account);
       } else {
-        // Check if session exists in local storage
+        // Check if session already exists in local storage
         const savedToken = localStorage.getItem('deriv_token');
         const savedAccount = localStorage.getItem('deriv_account');
 
@@ -107,8 +107,6 @@
       document.getElementById('loginView').classList.add('hidden');
       document.getElementById('dashboardView').classList.remove('hidden');
       document.getElementById('accountInfo').innerText = `Active Account: ${account}`;
-      
-      // Use localStorage.getItem('deriv_token') in your trading WebSocket connection
     }
 
     function showLogin() {
@@ -123,7 +121,7 @@
       window.location.href = window.location.pathname;
     }
 
-    // Run check when page loads
+    // Run callback check when page finishes loading
     window.addEventListener('DOMContentLoaded', handleDerivOAuthCallback);
   </script>
 
