@@ -14,7 +14,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
     body { background-color: #030712; color: #ffffff; min-height: 100vh; overflow-x: hidden; }
 
-    /* Top Bar */
+    /* Header Bar */
     header {
       width: 100%; background: #080d1a; border-bottom: 1px solid rgba(255,255,255,0.08);
       padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50;
@@ -39,8 +39,8 @@
       border: 1px solid rgba(16,185,129,0.3); padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 700; color: #10b981;
     }
 
-    /* Landing View */
-    #landingView { max-width: 480px; margin: 40px auto; padding: 20px; text-align: center; }
+    /* Landing Screen (Logged Out) */
+    #landingView { max-width: 480px; margin: 60px auto; padding: 20px; text-align: center; }
     .hero-heading { font-size: 36px; font-weight: 900; margin-bottom: 16px; }
     .hero-heading span { color: #00a4ff; }
     .hero-p { font-size: 14px; color: #94a3b8; margin-bottom: 28px; line-height: 1.5; }
@@ -49,8 +49,8 @@
       border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 20px rgba(0,164,255,0.4);
     }
 
-    /* Dashboard Trading View */
-    #dashboardView { display: none; max-width: 800px; margin: 30px auto; padding: 0 20px; text-align: center; }
+    /* Trading Workspace (Logged In) */
+    #dashboardView { display: none; max-width: 800px; margin: 40px auto; padding: 0 20px; text-align: center; }
     .dash-header { margin-bottom: 30px; }
     .dash-subtitle { font-size: 11px; letter-spacing: 1px; color: #10b981; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; }
     .dash-title { font-size: 28px; font-weight: 900; }
@@ -68,7 +68,7 @@
     .card-p { font-size: 12px; color: #94a3b8; margin-bottom: 20px; }
     .card-btn { color: #00a4ff; font-size: 13px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
 
-    /* AI Badge */
+    /* Floating AI Badge */
     .ai-badge {
       position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 50%;
       background: linear-gradient(135deg, #a855f7, #3b82f6); display: flex; align-items: center; justify-content: center;
@@ -78,6 +78,7 @@
 </head>
 <body>
 
+  <!-- Top Navigation Header -->
   <header>
     <div class="brand-container">
       <div class="ck-avatar">TS</div>
@@ -97,7 +98,7 @@
     </div>
   </header>
 
-  <!-- LANDING PAGE (Not Logged In) -->
+  <!-- LANDING PAGE (Shown when logged out) -->
   <div id="landingView">
     <h1 class="hero-heading">Welcome to <span>TraderScheme</span></h1>
     <p class="hero-p">Structured trading, built for focus. Log in with your Deriv account to launch bots and access automations.</p>
@@ -106,7 +107,7 @@
     </button>
   </div>
 
-  <!-- DASHBOARD PAGE (Logged In) -->
+  <!-- DASHBOARD WORKSPACE (Shown when logged in) -->
   <div id="dashboardView">
     <div class="dash-header">
       <div class="dash-subtitle">● TRADERSCHEME / YOUR TRADING WORKSPACE</div>
@@ -144,65 +145,71 @@
     </div>
   </div>
 
+  <!-- Floating AI Badge -->
   <div class="ai-badge" onclick="alert('AI Bot Scanner Active')">AI</div>
 
   <script>
     const APP_ID = '34JjnKJzecylG5kwmjaXm';
 
+    // Fixed OAuth Direct Authorization Link
     function loginWithDeriv() {
-      const oauthUrl = `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&l=en&brand=deriv`;
+      const redirectUri = encodeURIComponent(window.location.origin + window.location.pathname);
+      const oauthUrl = `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&redirect_uri=${redirectUri}&l=en&brand=deriv`;
       window.location.href = oauthUrl;
     }
 
+    // Process token on redirect or stored session
     function initSession() {
       const urlParams = new URLSearchParams(window.location.search);
       let token = urlParams.get('token1');
       let account = urlParams.get('acct1');
-      let currency = urlParams.get('currency1') || 'USD';
 
       if (token && account) {
         localStorage.setItem('deriv_token', token);
         localStorage.setItem('deriv_account', account);
-        localStorage.setItem('deriv_currency', currency);
+        // Clean URL params from browser bar
         window.history.replaceState({}, document.title, window.location.pathname);
       } else {
         token = localStorage.getItem('deriv_token');
         account = localStorage.getItem('deriv_account');
-        currency = localStorage.getItem('deriv_currency') || 'USD';
       }
 
       if (token && account) {
-        showDashboard(account, currency, token);
+        showDashboard(account, token);
       }
     }
 
-    function showDashboard(account, currency, token) {
+    function showDashboard(account, token) {
       document.getElementById('landingView').style.display = 'none';
       document.getElementById('dashboardView').style.display = 'block';
       document.getElementById('navTabs').style.display = 'flex';
 
       document.getElementById('authArea').innerHTML = `
         <div class="account-badge">
-          <i class="fa-solid fa-wallet"></i> ${account} (${currency})
-          <button onclick="logout()" style="background:none; border:none; color:#f43f5e; cursor:pointer; margin-left:8px;"><i class="fa-solid fa-right-from-bracket"></i></button>
+          <i class="fa-solid fa-wallet"></i> <span id="balanceDisplay">${account}</span>
+          <button onclick="logout()" style="background:none; border:none; color:#f43f5e; cursor:pointer; margin-left:8px;" title="Log out">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
         </div>
       `;
 
-      fetchBalance(token);
+      fetchLiveBalance(token);
     }
 
-    function fetchBalance(token) {
+    // Connect to Deriv WebSocket to get actual account balance
+    function fetchLiveBalance(token) {
       const ws = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`);
-      ws.onopen = () => ws.send(JSON.stringify({ authorize: token }));
+      
+      ws.onopen = () => {
+        ws.send(JSON.stringify({ authorize: token }));
+      };
+
       ws.onmessage = (msg) => {
-        const data = JSON.parse(msg.data);
-        if (data.msg_type === 'authorize') {
-          const bal = data.authorize.balance;
-          const curr = data.authorize.currency;
-          document.querySelector('.account-badge').innerHTML = `
-            <i class="fa-solid fa-wallet"></i> ${bal} ${curr}
-            <button onclick="logout()" style="background:none; border:none; color:#f43f5e; cursor:pointer; margin-left:8px;"><i class="fa-solid fa-right-from-bracket"></i></button>
-          `;
+        const response = JSON.parse(msg.data);
+        if (response.msg_type === 'authorize') {
+          const balance = response.authorize.balance;
+          const currency = response.authorize.currency;
+          document.getElementById('balanceDisplay').innerText = `${balance} ${currency}`;
           ws.close();
         }
       };
@@ -215,5 +222,6 @@
 
     window.addEventListener('DOMContentLoaded', initSession);
   </script>
+
 </body>
 </html>
