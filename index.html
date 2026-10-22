@@ -263,6 +263,126 @@
     }
 
     window.addEventListener('DOMContentLoaded', initSession);
+
+<!-- CK Trading Bot: public live market panel -->
+<section id="ck-market" style="max-width:760px;margin:24px auto;padding:18px;background:#111827;color:#f9fafb;border:1px solid #374151;border-radius:16px;font-family:Arial,sans-serif;">
+  <h2 style="margin-top:0;">CK Trading Bot — Live Market</h2>
+  <p>Market: Volatility 100 Index</p>
+  <p id="ck-status" role="status">Connecting to Deriv...</p>
+  <div style="font-size:28px;font-weight:bold;margin:16px 0;">
+    <span id="ck-price">Waiting for price...</span>
+  </div>
+  <canvas id="ck-chart" height="150" style="width:100%;height:150px;background:#0b1220;border-radius:8px;"></canvas>
+  <p style="font-size:12px;color:#9ca3af;">Public market data only. This panel does not place trades.</p>
+</section>
+
+<script>
+(function () {
+  const status = document.getElementById("ck-status");
+  const priceBox = document.getElementById("ck-price");
+  const canvas = document.getElementById("ck-chart");
+  if (!status || !priceBox || !canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  const prices = [];
+  let socket;
+  let reconnectTimer;
+
+  function drawChart() {
+    const width = canvas.clientWidth || 300;
+    const height = 150;
+    canvas.width = width;
+    canvas.height = height;
+    ctx.clearRect(0, 0, width, height);
+
+    if (prices.length < 2) return;
+
+    const min = Math.min(...prices);
+    const max = Math.max(...prices);
+    const range = max - min || 1;
+
+    ctx.beginPath();
+    ctx.strokeStyle = "#34d399";
+    ctx.lineWidth = 2;
+
+    prices.forEach((p, i) => {
+      const x = i * width / (prices.length - 1);
+      const y = height - 10 - ((p - min) / range) * (height - 20);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+
+    ctx.stroke();
+  }
+
+  function addPrice(value) {
+    const price = Number(value);
+    if (!Number.isFinite(price)) return;
+
+    prices.push(price);
+    if (prices.length > 60) prices.shift();
+
+    priceBox.textContent = price.toFixed(2);
+    drawChart();
+  }
+
+  function connect() {
+    clearTimeout(reconnectTimer);
+    status.textContent = "Connecting to Deriv...";
+
+    socket = new WebSocket(
+      "wss://ws.derivws.com/websockets/v3?app_id=34JjnKJzecylG5kwmjaXm"
+    );
+
+    socket.onopen = function () {
+      status.textContent = "Connected — loading recent prices...";
+      socket.send(JSON.stringify({
+        ticks_history: "R_100",
+        count: 50,
+        end: "latest",
+        style: "ticks"
+      }));
+    };
+
+    socket.onmessage = function (event) {
+      const data = JSON.parse(event.data);
+
+      if (data.error) {
+        status.textContent = "Deriv error: " + data.error.message;
+        return;
+      }
+
+      if (data.history && data.msg_type === "history") {
+        prices.length = 0;
+        data.history.prices.forEach(addPrice);
+
+        socket.send(JSON.stringify({
+          ticks: "R_100",
+          subscribe: 1
+        }));
+
+        status.textContent = "Connected — waiting for live updates...";
+      }
+
+      if (data.tick) {
+        addPrice(data.tick.quote);
+        status.textContent = "Live market data connected";
+      }
+    };
+
+    socket.onerror = function () {
+      status.textContent = "Connection problem. Retrying...";
+    };
+
+    socket.onclose = function () {
+      status.textContent = "Disconnected. Reconnecting...";
+      reconnectTimer = setTimeout(connect, 5000);
+    };
+  }
+
+  connect();
+})();
+</script>
   </script>
 </body>
 </html>
