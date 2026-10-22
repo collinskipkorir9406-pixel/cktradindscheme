@@ -14,7 +14,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
     body { background-color: #030712; color: #ffffff; min-height: 100vh; overflow-x: hidden; }
 
-    /* Top Market Bar & Header */
     .ticker-bar {
       background: #080d1a; border-bottom: 1px solid rgba(255,255,255,0.06);
       padding: 8px 16px; font-size: 11px; display: flex; gap: 20px; align-items: center; color: #94a3b8; overflow-x: auto; white-space: nowrap;
@@ -41,7 +40,6 @@
       box-shadow: 0 2px 10px rgba(0,164,255,0.3);
     }
 
-    /* Hero Section */
     .hero-section { max-width: 650px; margin: 40px auto 20px auto; padding: 0 20px; text-align: center; }
     .badge-pill {
       display: inline-flex; align-items: center; gap: 6px; background: rgba(16,185,129,0.1);
@@ -53,7 +51,6 @@
     .hero-heading span { color: #00a4ff; }
     .hero-p { font-size: 14px; color: #94a3b8; margin-bottom: 32px; line-height: 1.6; }
 
-    /* Action Buttons */
     .hero-buttons { display: flex; flex-direction: column; gap: 12px; max-width: 440px; margin: 0 auto 30px auto; }
     .btn-main-blue {
       width: 100%; background: linear-gradient(135deg, #00a4ff, #0077ff); border: none; color: #fff; padding: 16px;
@@ -67,7 +64,6 @@
     }
     .explore-link { font-size: 12px; color: #64748b; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; margin-top: 10px; }
 
-    /* Info Cards Grid */
     .info-grid { max-width: 650px; margin: 30px auto; padding: 0 20px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
     @media (max-width: 500px) { .info-grid { grid-template-columns: 1fr; } }
 
@@ -78,7 +74,6 @@
     .info-card-title { font-size: 16px; font-weight: 800; margin-bottom: 4px; color: #fff; }
     .info-card-desc { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    /* Dashboard Workspace View (Hidden by default until logged in) */
     #dashboardView { display: none; max-width: 800px; margin: 30px auto; padding: 0 20px; text-align: center; }
     .dash-header { margin-bottom: 30px; }
     .dash-subtitle { font-size: 11px; letter-spacing: 1px; color: #10b981; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; }
@@ -101,4 +96,173 @@
     }
 
     .ai-badge {
-      position: fixed; bottom: 24px;
+      position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 50%;
+      background: linear-gradient(135deg, #a855f7, #3b82f6); display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 900; font-size: 18px; box-shadow: 0 6px 24px rgba(168,85,247,0.5); cursor: pointer; z-index: 100;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ticker-bar">
+    <div>Market Index <span>+2.09%</span></div>
+    <div>•</div>
+    <div>Bull Market Index <span class="red">-0.31%</span></div>
+    <div>•</div>
+    <div>Volatility 100 <span>+3.14%</span></div>
+  </div>
+
+  <header>
+    <div class="brand-container">
+      <div class="brand-title">traderscheme</div>
+      <div class="brand-subtitle">POWERED BY DERIV</div>
+    </div>
+
+    <div id="authHeaderArea" class="header-right">
+      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&l=en&brand=deriv" class="btn-header-login">Log In</a>
+      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&l=en&brand=deriv" class="btn-header-getstarted">Get Started</a>
+    </div>
+  </header>
+
+  <div id="landingView">
+    <div class="hero-section">
+      <div class="badge-pill">
+        <div class="badge-dot"></div>
+        FREE STRATEGIES. REAL MARKET TOOLS.
+      </div>
+
+      <h1 class="hero-heading">Welcome to <span>TraderScheme</span></h1>
+      <p class="hero-p">Structured trading, built for focus. Build, load, and run Deriv bot strategies from a focused workspace made for everyday traders.</p>
+
+      <div class="hero-buttons">
+        <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&l=en&brand=deriv" class="btn-main-blue">
+          <i class="fa-solid fa-bolt"></i> Log In and Trade
+        </a>
+        <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&l=en&brand=deriv" class="btn-main-white">
+          <i class="fa-solid fa-user-plus"></i> Create Free Account
+        </a>
+      </div>
+
+      <a href="#" class="explore-link">Explore the course <i class="fa-solid fa-arrow-down"></i></a>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-card-title">Free</div>
+        <div class="info-card-desc">Bot Templates</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">24/7</div>
+        <div class="info-card-desc">Synthetic Market Focus</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title" style="font-size: 13px;">traderscheme.com</div>
+        <div class="info-card-desc">Branded Workspace</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title" style="color: #10b981;"><span style="display:inline-block; width:8px; height:8px; background:#10b981; border-radius:50%; margin-right:4px;"></span> Live</div>
+        <div class="info-card-desc">Market Status</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="dashboardView">
+    <div class="dash-header">
+      <div class="dash-subtitle">● TRADERSCHEME / YOUR TRADING WORKSPACE</div>
+      <h2 class="dash-title">Center for automations</h2>
+    </div>
+
+    <div class="dash-grid">
+      <div class="dash-card">
+        <div class="card-num">01</div>
+        <div class="card-h">Load Bot</div>
+        <div class="card-p">Open your trading strategy</div>
+        <a href="#" class="card-btn" onclick="alert('Select your XML bot file to load')">Choose a bot <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+      </div>
+
+      <div class="dash-card">
+        <div class="card-num">02</div>
+        <div class="card-h">Premium Bots</div>
+        <div class="card-p">Exclusive automated strategies</div>
+        <a href="#" class="card-btn" style="color: #eab308;" onclick="alert('Opening Premium Bots')">Explore premium bots <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+      </div>
+
+      <div class="dash-card">
+        <div class="card-num">03</div>
+        <div class="card-h">Speed Bot</div>
+        <div class="card-p">One-click automated trading</div>
+        <a href="#" class="card-btn" onclick="alert('Launching Speed Bot')">Launch Speed Bot <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+      </div>
+
+      <div class="dash-card">
+        <div class="card-num">04</div>
+        <div class="card-h">Manual Trading</div>
+        <div class="card-p">Full control, trade your way</div>
+        <a href="#" class="card-btn" style="color: #a855f7;" onclick="alert('Starting Manual Trading')">Start manual trading <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="ai-badge" onclick="alert('AI Bot Scanner Active')">AI</div>
+
+  <script>
+    const APP_ID = '34JjnKJzecylG5kwmjaXm';
+
+    function initSession() {
+      const urlParams = new URLSearchParams(window.location.search);
+      let token = urlParams.get('token1');
+      let account = urlParams.get('acct1');
+
+      if (token && account) {
+        localStorage.setItem('deriv_token', token);
+        localStorage.setItem('deriv_account', account);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } else {
+        token = localStorage.getItem('deriv_token');
+        account = localStorage.getItem('deriv_account');
+      }
+
+      if (token && account) {
+        showDashboard(account, token);
+      }
+    }
+
+    function showDashboard(account, token) {
+      document.getElementById('landingView').style.display = 'none';
+      document.getElementById('dashboardView').style.display = 'block';
+
+      document.getElementById('authHeaderArea').innerHTML = `
+        <div class="account-badge">
+          <i class="fa-solid fa-wallet"></i> <span id="balanceDisplay">${account}</span>
+          <button onclick="logout()" style="background:none; border:none; color:#f43f5e; cursor:pointer; margin-left:8px;" title="Log out">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </div>
+      `;
+
+      fetchLiveBalance(token);
+    }
+
+    function fetchLiveBalance(token) {
+      const ws = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`);
+      ws.onopen = () => ws.send(JSON.stringify({ authorize: token }));
+      ws.onmessage = (msg) => {
+        const response = JSON.parse(msg.data);
+        if (response.msg_type === 'authorize') {
+          const balance = response.authorize.balance;
+          const currency = response.authorize.currency;
+          document.getElementById('balanceDisplay').innerText = `${balance} ${currency}`;
+          ws.close();
+        }
+      };
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.reload();
+    }
+
+    window.addEventListener('DOMContentLoaded', initSession);
+  </script>
+</body>
+</html>
