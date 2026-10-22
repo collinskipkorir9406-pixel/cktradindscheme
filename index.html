@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CK Trader - Structured Trading</title>
+  <title>TraderScheme</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -23,7 +23,7 @@
     }
   </script>
   <style>
-    /* Subtle background grid effect */
+    /* Subtle background grid pattern */
     .bg-grid-pattern {
       background-image: radial-gradient(rgba(0, 163, 255, 0.12) 1px, transparent 1px);
       background-size: 24px 24px;
@@ -32,52 +32,36 @@
 </head>
 <body class="bg-bgDark text-white font-sans antialiased min-h-screen flex flex-col justify-between select-none">
 
-  <!-- TOP HEADER / NAVIGATION BAR -->
+  <!-- TOP HEADER NAVBAR (Matching Screenshot Exact Layout) -->
   <header class="w-full bg-bgNav/90 border-b border-cardBorder backdrop-blur-md px-4 py-3 flex items-center justify-between sticky top-0 z-40">
-    <!-- Logo -->
-    <div class="flex items-center gap-2">
-      <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brandBlue to-brandCyan flex items-center justify-center font-bold text-white text-sm shadow-md shadow-cyan-500/20">
+    <!-- Left Logo & Branding -->
+    <div class="flex items-center gap-2.5">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brandBlue to-brandCyan flex items-center justify-center font-black text-white text-sm shadow-md shadow-cyan-500/30 tracking-wider">
         CK
       </div>
       <div class="flex flex-col">
-        <span class="font-extrabold tracking-tight text-white leading-none text-base">traderscheme</span>
-        <span class="text-[9px] text-slate-400 font-medium tracking-wide">powered by <span class="text-rose-500 font-bold">deriv</span></span>
+        <span class="font-bold tracking-tight text-white leading-none text-base">traderscheme</span>
+        <span class="text-[9px] text-slate-400 font-medium tracking-wide mt-0.5">powered by <span class="text-rose-500 font-bold">deriv</span></span>
       </div>
     </div>
 
-    <!-- Top Right Action Buttons -->
+    <!-- Right Action Buttons -->
     <div class="flex items-center gap-2">
-      <button class="px-4 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-semibold text-slate-200 hover:bg-slate-800 transition">
+      <button class="px-4 py-1.5 rounded-xl bg-slate-900 border border-slate-700/80 text-xs font-semibold text-slate-200 hover:bg-slate-800 transition">
         Log In
       </button>
-      <button class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-brandBlue to-brandCyan text-xs font-bold text-white shadow-md shadow-cyan-500/20 hover:opacity-90 transition">
+      <button class="px-4 py-1.5 rounded-xl bg-gradient-to-r from-brandBlue to-brandCyan text-xs font-bold text-white shadow-md shadow-cyan-500/25 hover:opacity-95 transition">
         Get Started
       </button>
     </div>
   </header>
 
-  <!-- LIVE TICKER BAR -->
-  <div class="w-full bg-[#050A18] border-b border-cardBorder/60 py-2 px-4 text-[11px] font-mono flex justify-around text-slate-400 overflow-x-auto whitespace-nowrap gap-4">
-    <div class="flex items-center gap-1.5">
-      <span>Step Index</span>
-      <span class="text-emerald-400 font-bold">+0.41%</span>
-    </div>
-    <div class="flex items-center gap-1.5">
-      <span>Range Break 100</span>
-      <span class="text-emerald-400 font-bold">+1.17%</span>
-    </div>
-    <div class="flex items-center gap-1.5">
-      <span>Jump 100 Index</span>
-      <span class="text-rose-400 font-bold">-0.63%</span>
-    </div>
-  </div>
-
   <!-- HERO SECTION -->
-  <main class="w-full max-w-md mx-auto px-5 pt-8 pb-12 flex-grow flex flex-col items-center text-center bg-grid-pattern relative">
+  <main class="w-full max-w-md mx-auto px-5 pt-6 pb-12 flex-grow flex flex-col items-center text-center bg-grid-pattern relative">
     
     <!-- Top Pill Tag -->
-    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 border border-slate-700/70 text-[10px] font-bold text-slate-300 tracking-wider uppercase mb-6 shadow-sm">
-      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/70 text-[10px] font-bold text-slate-300 tracking-wider uppercase mb-6 shadow-sm">
+      <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
       FREE STRATEGIES. REAL MARKET TOOLS.
     </div>
 
