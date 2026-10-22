@@ -1,106 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CK Trading Bot</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CKTrader v2.4 - Deriv Bot Engine</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brandDark: '#050914',
+            brandCard: '#0B132B',
+            brandCardBorder: '#1C2B4B',
+            brandBlue: '#00A3FF',
+            brandCyan: '#00D2FF',
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    body { background-color: #0b0f19; color: #ffffff; font-family: -apple-system, sans-serif; padding: 16px; margin: 0; display: flex; justify-content: center; }
-    .card { background: #162032; padding: 20px; border-radius: 16px; width: 100%; max-width: 400px; border: 1px solid #233248; box-shadow: 0 10px 25px rgba(0,0,0,0.5); box-sizing: border-box; }
-    h2 { color: #38bdf8; text-align: center; margin-top: 0; font-size: 20px; }
-    .bal-box { background: #0e1626; padding: 14px; border-radius: 10px; text-align: center; margin-bottom: 16px; border: 1px solid #1e2d42; }
-    .btn-affiliate { display: block; background: #0284c7; color: #fff; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; text-align: center; margin-bottom: 16px; font-size: 13px; }
-    .btn-grid { display: flex; gap: 10px; margin-bottom: 16px; }
-    .btn-trade { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; color: white; cursor: pointer; font-size: 14px; }
-    .rise { background: #10b981; }
-    .fall { background: #ef4444; }
-    input, select { width: 100%; padding: 10px; margin: 6px 0 14px; border-radius: 8px; border: 1px solid #2c3d54; background: #0d1522; color: #fff; box-sizing: border-box; font-size: 14px; outline: none; }
-    label { font-size: 12px; color: #cbd5e1; font-weight: 600; }
-    #status { text-align: center; font-size: 12px; font-weight: bold; margin-top: 10px; color: #10b981; }
-    .btn-link { background: none; border: none; color: #38bdf8; font-size: 12px; text-decoration: underline; cursor: pointer; width: 100%; margin-top: 8px; }
+    /* Custom scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #050914; }
+    ::-webkit-scrollbar-thumb { background: #1C2B4B; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #00A3FF; }
   </style>
 </head>
-<body>
+<body class="bg-brandDark text-slate-100 font-sans antialiased min-h-screen pb-12 select-none">
 
-  <div class="card">
-    <h2>CK Trading Bot</h2>
-
-    <div class="bal-box">
-      <small style="color: #94a3b8; font-size: 10px; letter-spacing: 1px;">ACCOUNT BALANCE</small>
-      <h3 id="bal" style="color: #38bdf8; margin: 4px 0 0 0; font-size: 24px;">1000.00 USD</h3>
+  <!-- TOP NAV BAR -->
+  <header class="w-full bg-[#080E21] border-b border-slate-800/80 px-4 py-2.5 flex items-center justify-between sticky top-0 z-30">
+    <div class="flex items-center gap-3">
+      <button onclick="toggleNavMenu()" class="p-1.5 rounded-lg bg-slate-800/60 text-slate-300 hover:text-white">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brandBlue to-brandCyan flex items-center justify-center font-bold text-white text-sm shadow-md shadow-cyan-500/20">CK</div>
+        <span class="font-bold tracking-tight text-white">CKTrader <span class="text-[10px] text-brandBlue px-1.5 py-0.5 rounded bg-brandBlue/10 border border-brandBlue/30">v2.4</span></span>
+      </div>
     </div>
 
-    <!-- Affiliate Banner -->
-    <a href="https://t.deriv.link?t=JY62HWTRUYMQ" target="_blank" class="btn-affiliate">
-      + Create Deriv Account (Get Started)
-    </a>
+    <!-- Center Navigation Tabs -->
+    <nav class="hidden md:flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl border border-slate-800 text-xs">
+      <button class="px-4 py-1.5 rounded-lg font-medium bg-brandBlue/20 text-brandCyan border border-brandBlue/30">Dashboard</button>
+      <button onclick="openScannerModal()" class="px-4 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white hover:bg-slate-800/50 transition">Entry Scanner</button>
+      <button class="px-4 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white hover:bg-slate-800/50 transition">Bot Builder</button>
+      <button class="px-4 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white hover:bg-slate-800/50 transition flex items-center gap-1">Volt <span class="text-xs font-bold text-cyan-400">AI</span></button>
+    </nav>
 
-    <label>Market</label>
-    <select id="market">
-      <option value="R_100">Volatility 100 Index</option>
-      <option value="R_75">Volatility 75 Index</option>
-      <option value="R_50">Volatility 50 Index</option>
-      <option value="R_25">Volatility 25 Index</option>
-      <option value="R_10">Volatility 10 Index</option>
-    </select>
+    <!-- Right Controls -->
+    <div class="flex items-center gap-3">
+      <div class="flex items-center bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1 text-xs gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="text-slate-300 font-mono" id="navBalance">$10,000.00</span>
+        <span class="text-[10px] bg-slate-800 text-slate-400 px-1 rounded">USD</span>
+      </div>
+      <button onclick="openScannerModal()" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-brandBlue to-brandCyan text-xs font-semibold text-white shadow-md shadow-cyan-500/20 flex items-center gap-1.5 hover:opacity-90 transition">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        Scanner
+      </button>
+    </div>
+  </header>
 
-    <label>Trade Amount (USD)</label>
-    <input type="number" id="stake" value="1" min="0.35" step="0.5">
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-6xl mx-auto px-4 pt-6 space-y-6">
 
-    <div class="btn-grid">
-      <button class="btn-trade rise" onclick="trade('CALL')">Rise ↗</button>
-      <button class="btn-trade fall" onclick="trade('PUT')">Fall ↘</button>
+    <!-- HERO HEADER CARD -->
+    <div class="p-6 rounded-2xl bg-gradient-to-br from-[#0B142D] to-[#070D1E] border border-brandCardBorder shadow-xl relative overflow-hidden">
+      <div class="absolute -right-10 -top-10 w-48 h-48 bg-brandBlue/10 rounded-full blur-3xl pointer-events-none"></div>
+      
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brandBlue/10 border border-brandBlue/30 text-xs text-brandCyan mb-3">
+        <span class="w-2 h-2 rounded-full bg-brandCyan"></span> AUTOMATED DERIV BOT ENGINE
+      </div>
+
+      <h1 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight mb-2">
+        Structured Trading. <span class="text-transparent bg-clip-text bg-gradient-to-r from-brandBlue to-brandCyan">Zero Emotion.</span>
+      </h1>
+      <p class="text-slate-400 text-xs md:text-sm max-w-2xl leading-relaxed mb-6">
+        Configure automated strategies for Volatility Indices, Synthetic Markets, and Forex using real-time Deriv WebSocket feeds.
+      </p>
+
+      <!-- Status Bar -->
+      <div class="grid grid-cols-3 gap-3 max-w-xl bg-slate-950/60 p-3 rounded-xl border border-slate-800/80 text-center">
+        <div>
+          <div class="text-[10px] uppercase tracking-wider text-slate-500">Server Latency</div>
+          <div class="text-sm font-bold text-emerald-400 font-mono mt-0.5" id="latencyVal">24 ms</div>
+        </div>
+        <div class="border-x border-slate-800">
+          <div class="text-[10px] uppercase tracking-wider text-slate-500">Execution Engine</div>
+          <div class="text-sm font-bold text-brandCyan mt-0.5">High Speed</div>
+        </div>
+        <div>
+          <div class="text-[10px] uppercase tracking-wider text-slate-500">Market Feed</div>
+          <div class="text-sm font-bold text-indigo-400 mt-0.5" id="feedStatus">WebSocket Connected</div>
+        </div>
+      </div>
     </div>
 
-    <div id="status">Bot Ready (VPN Mode Active)</div>
-    <button onclick="setToken()" class="btn-link">🔑 Set / Change API Token</button>
-  </div>
+    <!-- MAIN DASHBOARD GRID -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-  <script>
-    let token = localStorage.getItem("deriv_token") || "";
+      <!-- BOT CONTROL CENTER (LEFT) -->
+      <div class="lg:col-span-6 space-y-5">
+        <div class="p-5 rounded-2xl bg-brandCard border border-brandCardBorder shadow-lg">
+          <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-2">
+              <svg class="w-5 h-5 text-brandCyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+              <h2 class="font-bold text-white text-base">Bot Control Center</h2>
+            </div>
+            <span id="botStatusBadge" class="px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wider bg-slate-800 text-slate-400 border border-slate-700">STOPPED</span>
+          </div>
 
-    function checkTokenStatus() {
-      if (!token) {
-        document.getElementById("status").style.color = "#fbbf24";
-        document.getElementById("status").innerText = "Token not set. Click below to add it.";
-      } else {
-        document.getElementById("status").style.color = "#10b981";
-        document.getElementById("status").innerText = "API Token Saved Successfully";
-      }
-    }
+          <form id="botForm" onsubmit="event.preventDefault();" class="space-y-4">
+            <!-- Strategy Selector -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1.5">Strategy / Algorithm</label>
+              <select id="strategySelect" onchange="updateStrategyDesc()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm font-medium text-white focus:outline-none focus:border-brandBlue">
+                <option value="RISE_FALL">Rise / Fall (Trend Momentum)</option>
+                <option value="OVER_UNDER">Over 1 / Under 8 (Scanner Mode)</option>
+                <option value="EVEN_ODD">Even / Odd (Digit Volatility)</option>
+                <option value="MATCHES_DIFFERS">Matches / Differs (Digit Shield)</option>
+              </select>
+              <p id="strategyDesc" class="text-[11px] text-slate-500 italic mt-1.5">Executes CALL when price ticks upwards and PUT when it ticks downwards.</p>
+            </div>
 
-    function trade(type) {
-      if (!token) {
-        alert("Please set your API token first.");
-        setToken();
-        return;
-      }
+            <!-- Market & Ticks -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1.5">Synthetic Market</label>
+                <select id="marketSelect" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-xs font-medium text-white focus:outline-none focus:border-brandBlue">
+                  <option value="R_100">Volatility 100 Index</option>
+                  <option value="R_75">Volatility 75 Index</option>
+                  <option value="R_50">Volatility 50 Index</option>
+                  <option value="R_25">Volatility 25 Index</option>
+                  <option value="R_10">Volatility 10 Index</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1.5">Ticks / Duration</label>
+                <select id="durationSelect" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2.5 text-xs font-medium text-white focus:outline-none focus:border-brandBlue">
+                  <option value="1">1 Tick</option>
+                  <option value="3" selected>3 Ticks</option>
+                  <option value="5">5 Ticks</option>
+                  <option value="10">10 Ticks</option>
+                </select>
+              </div>
+            </div>
 
-      const market = document.getElementById("market").value;
-      const stake = parseFloat(document.getElementById("stake").value) || 1;
-      const statusEl = document.getElementById("status");
-
-      statusEl.style.color = "#fbbf24";
-      statusEl.innerText = "Placing " + type + " contract on " + market + "...";
-
-      // Secure local execution feedback loop bypassing harsh firewalls
-      setTimeout(() => {
-        statusEl.style.color = "#10b981";
-        statusEl.innerText = "Contract Executed Successfully!";
-        alert("Trade Placed! Stake: " + stake + " USD | Market: " + market + " | Direction: " + type);
-      }, 800);
-    }
-
-    function setToken() {
-      const input = prompt("Enter your Deriv API Token:", token);
-      if (input !== null) {
-        token = input.trim();
-        localStorage.setItem("deriv_token", token);
-        checkTokenStatus();
-      }
-    }
-
-    window.onload = checkTokenStatus;
-  </script>
-</body>
-</html>
+            <!-- Stake, Target, Stop Loss -->
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1.5">Stake ($)</label>
+                <input type="number" id="stakeInput" value="10.00" step="1" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono font-bold text-white focus:outline-none focus:border-brandBlue" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1.5">Target ($)</label>
+                <input
