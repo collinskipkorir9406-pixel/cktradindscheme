@@ -4,9 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <meta name="deriv-site-verification"
-    content="ded285725a66c864612bf8d91ba4de4b63642ce64f6dd2f14fed08d232275b4a">
+  <meta name="deriv-site-verification" content="ded285725a66c864612bf8d91ba4de4b63642ce64f6dd2f14fed08d232275b4a">
 
   <title>CK Trading Bot</title>
 
@@ -21,20 +19,11 @@
       font-family: Arial, sans-serif;
     }
 
-    .container {
-      max-width: 900px;
-      margin: auto;
-    }
+    .container { max-width: 900px; margin: auto; }
 
-    header {
-      text-align: center;
-      padding: 25px 10px;
-    }
+    header { text-align: center; padding: 25px 10px; }
 
-    header h1 {
-      color: #28d7a1;
-      margin-bottom: 8px;
-    }
+    header h1 { color: #28d7a1; }
 
     header p { color: #aab8cb; }
 
@@ -44,11 +33,6 @@
       border-radius: 14px;
       padding: 20px;
       margin-bottom: 18px;
-    }
-
-    h2 {
-      margin-top: 0;
-      font-size: 20px;
     }
 
     .button {
@@ -62,10 +46,7 @@
       margin-top: 8px;
     }
 
-    .secondary {
-      background: #263950;
-      color: white;
-    }
+    .secondary { background: #263950; color: white; }
 
     .grid {
       display: grid;
@@ -86,17 +67,17 @@
       line-height: 1.5;
     }
 
+    .status {
+      color: #ffd166;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
     .price {
       font-size: 30px;
       font-weight: bold;
       color: #28d7a1;
       margin: 18px 0;
-      overflow-wrap: anywhere;
-    }
-
-    .status {
-      color: #ffd166;
-      line-height: 1.5;
       overflow-wrap: anywhere;
     }
 
@@ -125,235 +106,169 @@
 </head>
 
 <body>
-  <main class="container">
+<main class="container">
 
-    <header>
-      <h1>CK Trading Bot</h1>
-      <p>Your Trading Dashboard</p>
-      <p>Market information and trading tools</p>
+  <header>
+    <h1>CK Trading Bot</h1>
+    <p>Your Trading Dashboard</p>
+    <p>Market information and trading tools</p>
 
-      <a class="button"
-         href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&l=en&brand=deriv">
-        Log In to Deriv
-      </a>
-    </header>
+    <a class="button"
+       href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&l=en&brand=deriv">
+      Log In to Deriv
+    </a>
+  </header>
 
-    <section class="panel">
-      <h2>Market Overview</h2>
+  <section class="panel">
+    <h2>Market Overview</h2>
 
-      <div class="grid">
-        <div class="small-card">
-          <strong>Market</strong>
-          <p>Volatility 100 Index (R_100)</p>
-        </div>
-
-        <div class="small-card">
-          <strong>Connection</strong>
-          <p id="ck-status" class="status">
-            Starting connection test...
-          </p>
-        </div>
+    <div class="grid">
+      <div class="small-card">
+        <strong>Market</strong>
+        <p>Volatility 100 Index (R_100)</p>
       </div>
 
-      <h2 style="margin-top:22px">Latest Market Price</h2>
+      <div class="small-card">
+        <strong>Connection</strong>
+        <p id="ck-status" class="status">Starting connection test...</p>
+      </div>
+    </div>
 
-      <div id="ck-price" class="price">
-        Waiting for price...
+    <h2 style="margin-top:22px">Latest Market Price</h2>
+    <div id="ck-price" class="price">Waiting for price...</div>
+
+    <canvas id="ck-chart" width="800" height="300"></canvas>
+
+    <p class="notice">
+      Connection test only. A successful connection does not yet confirm
+      that market prices are streaming. No trades are placed by this page.
+    </p>
+  </section>
+
+  <section class="panel">
+    <h2>Trading Dashboard</h2>
+
+    <div class="grid">
+      <div class="small-card">
+        <strong>Account Balance</strong>
+        <p>Account integration not yet connected.</p>
       </div>
 
-      <canvas id="ck-chart" width="800" height="300"></canvas>
-
-      <p class="notice">
-        Public market-data test only. This page does not place trades
-        or guarantee profits.
-      </p>
-    </section>
-
-    <section class="panel">
-      <h2>Trading Dashboard</h2>
-
-      <div class="grid">
-        <div class="small-card">
-          <strong>Account Balance</strong>
-          <p>Account balance integration is not yet connected.</p>
-        </div>
-
-        <div class="small-card">
-          <strong>Trading Signals</strong>
-          <p>Not connected yet.</p>
-        </div>
-
-        <div class="small-card">
-          <strong>Bot Status</strong>
-          <p>Market-data testing only. Automated trading is disabled.</p>
-        </div>
+      <div class="small-card">
+        <strong>Trading Signals</strong>
+        <p>Not connected yet.</p>
       </div>
 
-      <a class="button secondary" href="https://app.deriv.com/">
-        Open Deriv
-      </a>
-    </section>
+      <div class="small-card">
+        <strong>Bot Status</strong>
+        <p>Connection testing. Automated trading is disabled.</p>
+      </div>
+    </div>
 
-    <footer>
-      CK Trading Bot | Independent third-party interface
-    </footer>
+    <a class="button secondary" href="https://app.deriv.com/">
+      Open Deriv
+    </a>
+  </section>
 
-  </main>
+  <footer>CK Trading Bot | Independent third-party interface</footer>
 
-  <script>
-    (function () {
-      const status = document.getElementById("ck-status");
-      const price = document.getElementById("ck-price");
-      const canvas = document.getElementById("ck-chart");
-      const ctx = canvas.getContext("2d");
+</main>
 
-      const prices = [];
-      let socket = null;
-      let reconnectTimer = null;
+<script>
+(function () {
+  const status = document.getElementById("ck-status");
+  const price = document.getElementById("ck-price");
+  const canvas = document.getElementById("ck-chart");
+  const ctx = canvas.getContext("2d");
 
-      // YOUR DERIV APP ID
-      const APP_ID = "34JjnKJzecylG5kwmjaXm";
+  let socket;
+  let reconnectTimer;
+  let attempts = 0;
 
-      function drawChart() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+  function drawWaitingMessage(message) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#aab8cb";
+    ctx.font = "18px Arial";
+    ctx.fillText(message, 20, 40);
+  }
 
-        if (prices.length < 2) {
-          ctx.fillStyle = "#aab8cb";
-          ctx.font = "18px Arial";
-          ctx.fillText("Waiting for price history...", 20, 40);
-          return;
+  function connect() {
+    clearTimeout(reconnectTimer);
+    attempts++;
+
+    status.textContent = "Connecting to Deriv public endpoint...";
+
+    try {
+      socket = new WebSocket(
+        "wss://api.derivws.com/trading/v1/options/ws/public"
+      );
+    } catch (error) {
+      status.textContent = "Could not start connection: " + error.message;
+      scheduleReconnect();
+      return;
+    }
+
+    socket.onopen = function () {
+      status.textContent =
+        "WebSocket connected. Testing public connection.";
+
+      drawWaitingMessage("Connection established. Testing market feed...");
+    };
+
+    socket.onmessage = function (event) {
+      let data;
+
+      try {
+        data = JSON.parse(event.data);
+      } catch (error) {
+        status.textContent = "Connected, but received a non-JSON response.";
+        return;
+      }
+
+      status.textContent =
+        "Connected. Server message received: " +
+        JSON.stringify(data).slice(0, 180);
+
+      // Display a price only if the server actually returns a known
+      // price field. Do not invent a price.
+      const quote = data?.tick?.quote ??
+                    data?.quote?.value ??
+                    data?.quote;
+
+      if (typeof quote === "number" || typeof quote === "string") {
+        const value = Number(quote);
+
+        if (Number.isFinite(value)) {
+          price.textContent = String(value);
+          drawWaitingMessage("Price received: " + value);
         }
-
-        const min = Math.min(...prices);
-        const max = Math.max(...prices);
-        const range = max - min || 1;
-        const padding = 25;
-
-        ctx.beginPath();
-        ctx.strokeStyle = "#28d7a1";
-        ctx.lineWidth = 3;
-
-        prices.forEach(function (value, index) {
-          const x = padding +
-            index * (canvas.width - padding * 2) /
-            (prices.length - 1);
-
-          const y = canvas.height - padding -
-            ((value - min) / range) *
-            (canvas.height - padding * 2);
-
-          if (index === 0) {
-            ctx.moveTo(x, y);
-          } else {
-            ctx.lineTo(x, y);
-          }
-        });
-
-        ctx.stroke();
       }
+    };
 
-      function addPrice(value) {
-        const number = Number(value);
-        if (!Number.isFinite(number)) return;
+    socket.onerror = function () {
+      status.textContent =
+        "WebSocket error. Waiting for connection result...";
+    };
 
-        prices.push(number);
+    socket.onclose = function (event) {
+      status.textContent =
+        "Connection closed. Code: " + event.code +
+        (event.reason ? " — " + event.reason : "") +
+        ". Retrying in 10 seconds.";
 
-        if (prices.length > 50) prices.shift();
+      scheduleReconnect();
+    };
+  }
 
-        price.textContent = number.toString();
-        drawChart();
-      }
+  function scheduleReconnect() {
+    clearTimeout(reconnectTimer);
+    reconnectTimer = setTimeout(connect, 10000);
+  }
 
-      function connect() {
-        clearTimeout(reconnectTimer);
+  drawWaitingMessage("Waiting for connection...");
+  connect();
+})();
+</script>
 
-        status.textContent = "Connecting to Deriv with your App ID...";
-
-        try {
-          socket = new WebSocket(
-            "wss://ws.derivws.com/websockets/v3?app_id=" + APP_ID
-          );
-        } catch (error) {
-          status.textContent =
-            "Could not start connection: " + error.message;
-          reconnectTimer = setTimeout(connect, 10000);
-          return;
-        }
-
-        socket.onopen = function () {
-          status.textContent = "Connected. Requesting price history...";
-
-          socket.send(JSON.stringify({
-            ticks_history: "R_100",
-            count: 50,
-            end: "latest",
-            style: "ticks",
-            req_id: 1
-          }));
-        };
-
-        socket.onmessage = function (event) {
-          let data;
-
-          try {
-            data = JSON.parse(event.data);
-          } catch (error) {
-            status.textContent = "Received an unreadable response.";
-            return;
-          }
-
-          if (data.error) {
-            status.textContent = "Deriv error: " + data.error.message;
-            return;
-          }
-
-          if (data.history && data.history.prices) {
-            prices.length = 0;
-
-            data.history.prices.forEach(function (value) {
-              prices.push(Number(value));
-            });
-
-            while (prices.length > 50) prices.shift();
-
-            if (prices.length > 0) {
-              price.textContent = prices[prices.length - 1].toString();
-            }
-
-            drawChart();
-            status.textContent = "History received. Starting live stream...";
-
-            socket.send(JSON.stringify({
-              ticks: "R_100",
-              subscribe: 1,
-              req_id: 2
-            }));
-          }
-
-          if (data.tick) {
-            addPrice(data.tick.quote);
-            status.textContent = "Live market data connected.";
-          }
-        };
-
-        socket.onerror = function () {
-          status.textContent =
-            "WebSocket error. Checking connection status...";
-        };
-
-        socket.onclose = function (event) {
-          status.textContent =
-            "Connection closed. Code: " + event.code +
-            (event.reason ? " — " + event.reason : "") +
-            ". Retrying in 10 seconds.";
-
-          reconnectTimer = setTimeout(connect, 10000);
-        };
-      }
-
-      drawChart();
-      connect();
-    })();
-  </script>
 </body>
 </html>
