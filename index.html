@@ -4,12 +4,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="deriv-site-verification" content="ded285725a66c864612bf8d91ba4de4b63642ce64f6dd2f14fed08d232275b4a">
+
+  <meta name="deriv-site-verification"
+    content="ded285725a66c864612bf8d91ba4de4b63642ce64f6dd2f14fed08d232275b4a">
 
   <title>CK Trading Bot</title>
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -19,13 +23,24 @@
       font-family: Arial, sans-serif;
     }
 
-    .container { max-width: 900px; margin: auto; }
+    .container {
+      max-width: 900px;
+      margin: auto;
+    }
 
-    header { text-align: center; padding: 25px 10px; }
+    header {
+      text-align: center;
+      padding: 25px 10px;
+    }
 
-    header h1 { color: #28d7a1; }
+    header h1 {
+      color: #28d7a1;
+      margin-bottom: 8px;
+    }
 
-    header p { color: #aab8cb; }
+    header p {
+      color: #aab8cb;
+    }
 
     .panel {
       background: #111e30;
@@ -33,6 +48,11 @@
       border-radius: 14px;
       padding: 20px;
       margin-bottom: 18px;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 20px;
     }
 
     .button {
@@ -46,7 +66,10 @@
       margin-top: 8px;
     }
 
-    .secondary { background: #263950; color: white; }
+    .secondary {
+      background: #263950;
+      color: white;
+    }
 
     .grid {
       display: grid;
@@ -130,7 +153,9 @@
 
       <div class="small-card">
         <strong>Connection</strong>
-        <p id="ck-status" class="status">Starting connection test...</p>
+        <p id="ck-status" class="status">
+          Connecting to Deriv...
+        </p>
       </div>
     </div>
 
@@ -140,8 +165,8 @@
     <canvas id="ck-chart" width="800" height="300"></canvas>
 
     <p class="notice">
-      Connection test only. A successful connection does not yet confirm
-      that market prices are streaming. No trades are placed by this page.
+      Public market-data testing only. No trades are placed.
+      Prices are not guaranteed profits or trading advice.
     </p>
   </section>
 
@@ -161,7 +186,7 @@
 
       <div class="small-card">
         <strong>Bot Status</strong>
-        <p>Connection testing. Automated trading is disabled.</p>
+        <p>Market-data testing only. Automated trading is disabled.</p>
       </div>
     </div>
 
@@ -170,7 +195,9 @@
     </a>
   </section>
 
-  <footer>CK Trading Bot | Independent third-party interface</footer>
+  <footer>
+    CK Trading Bot | Independent third-party interface
+  </footer>
 
 </main>
 
@@ -181,21 +208,69 @@
   const canvas = document.getElementById("ck-chart");
   const ctx = canvas.getContext("2d");
 
+  const prices = [];
   let socket;
   let reconnectTimer;
-  let attempts = 0;
 
-  function drawWaitingMessage(message) {
+  function drawChart() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#aab8cb";
-    ctx.font = "18px Arial";
-    ctx.fillText(message, 20, 40);
+
+    if (prices.length < 2) {
+      ctx.fillStyle = "#aab8cb";
+      ctx.font = "18px Arial";
+      ctx.fillText("Waiting for market prices...", 20, 40);
+      return;
+    }
+
+    const min = Math.min(...prices);
+    const max = Math.max(...prices);
+    const range = max - min || 1;
+    const padding = 25;
+
+    ctx.beginPath();
+    ctx.strokeStyle = "#28d7a1";
+    ctx.lineWidth = 3;
+
+    prices.forEach(function (value, index) {
+      const x = padding +
+        index * (canvas.width - padding * 2) /
+        (prices.length - 1);
+
+      const y = canvas.height - padding -
+        ((value - min) / range) *
+        (canvas.height - padding * 2);
+
+      if (index === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    });
+
+    ctx.stroke();
+  }
+
+  function addPrice(value) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return;
+
+    prices.push(number);
+
+    if (prices.length > 50) {
+      prices.shift();
+    }
+
+    price.textContent = number.toString();
+    drawChart();
+  }
+
+  function scheduleReconnect() {
+    clearTimeout(reconnectTimer);
+    reconnectTimer = setTimeout(connect, 10000);
   }
 
   function connect() {
     clearTimeout(reconnectTimer);
-    attempts++;
-
     status.textContent = "Connecting to Deriv public endpoint...";
 
     try {
@@ -203,16 +278,24 @@
         "wss://api.derivws.com/trading/v1/options/ws/public"
       );
     } catch (error) {
-      status.textContent = "Could not start connection: " + error.message;
+      status.textContent =
+        "Could not create connection: " + error.message;
       scheduleReconnect();
       return;
     }
 
     socket.onopen = function () {
       status.textContent =
-        "WebSocket connected. Testing public connection.";
+        "Connected. Requesting market-price history...";
 
-      drawWaitingMessage("Connection established. Testing market feed...");
+      // Request recent tick history.
+      socket.send(JSON.stringify({
+        ticks_history: "R_100",
+        count: 50,
+        end: "latest",
+        style: "ticks",
+        req_id: 1
+      }));
     };
 
     socket.onmessage = function (event) {
@@ -221,27 +304,47 @@
       try {
         data = JSON.parse(event.data);
       } catch (error) {
-        status.textContent = "Connected, but received a non-JSON response.";
+        status.textContent = "Could not read the server response.";
         return;
       }
 
-      status.textContent =
-        "Connected. Server message received: " +
-        JSON.stringify(data).slice(0, 180);
+      if (data.error) {
+        status.textContent =
+          "Deriv error: " + data.error.message;
+        return;
+      }
 
-      // Display a price only if the server actually returns a known
-      // price field. Do not invent a price.
-      const quote = data?.tick?.quote ??
-                    data?.quote?.value ??
-                    data?.quote;
+      if (data.history && data.history.prices) {
+        prices.length = 0;
 
-      if (typeof quote === "number" || typeof quote === "string") {
-        const value = Number(quote);
+        data.history.prices.forEach(function (value) {
+          prices.push(Number(value));
+        });
 
-        if (Number.isFinite(value)) {
-          price.textContent = String(value);
-          drawWaitingMessage("Price received: " + value);
+        while (prices.length > 50) {
+          prices.shift();
         }
+
+        if (prices.length > 0) {
+          price.textContent =
+            String(prices[prices.length - 1]);
+        }
+
+        drawChart();
+
+        status.textContent =
+          "History received. Requesting live prices...";
+
+        socket.send(JSON.stringify({
+          ticks: "R_100",
+          subscribe: 1,
+          req_id: 2
+        }));
+      }
+
+      if (data.tick) {
+        addPrice(data.tick.quote);
+        status.textContent = "Live market data connected.";
       }
     };
 
@@ -260,12 +363,7 @@
     };
   }
 
-  function scheduleReconnect() {
-    clearTimeout(reconnectTimer);
-    reconnectTimer = setTimeout(connect, 10000);
-  }
-
-  drawWaitingMessage("Waiting for connection...");
+  drawChart();
   connect();
 })();
 </script>
