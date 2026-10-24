@@ -4,228 +4,294 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="deriv-site-verification" content="ded285725a66c864612bf8d91ba4de4b63642ce64f6dd2f14fed08d232275b4a">
-  <title>CK Trading Bot - TraderScheme</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta name="deriv-site-verification"
+    content="ded285725a66c864612bf8d91ba4de4b63642ce64f6dd2f14fed08d232275b4a">
+
+  <title>CK Trading Bot</title>
 
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Inter, Arial, sans-serif; }
-    body { background: #030712; color: #fff; min-height: 100vh; overflow-x: hidden; }
-    header { background: #080d1a; border-bottom: 1px solid #263244; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-    .brand-title { font-size: 20px; font-weight: 900; }
-    .brand-subtitle { color: #00a4ff; font-size: 10px; font-weight: 800; }
-    .header-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    .btn { display: inline-block; text-decoration: none; padding: 10px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
-    .btn-outline { color: #fff; border: 1px solid #475569; }
-    .btn-blue { color: #fff; background: #0077ff; border: none; }
-    .ticker-bar { padding: 10px 16px; background: #080d1a; border-bottom: 1px solid #263244; color: #9ca3af; font-size: 12px; }
-    .green { color: #34d399; }
-    .hero { max-width: 720px; margin: 48px auto 30px; padding: 0 20px; text-align: center; }
-    .badge { color: #34d399; background: #052e25; padding: 7px 12px; border-radius: 20px; font-size: 11px; display: inline-block; margin-bottom: 22px; }
-    h1 { font-size: clamp(30px, 7vw, 46px); font-weight: 900; line-height: 1.15; margin-bottom: 18px; }
-    h1 span { color: #00a4ff; }
-    .hero p { color: #9ca3af; font-size: 14px; line-height: 1.7; margin-bottom: 24px; }
-    .hero-buttons { max-width: 430px; margin: auto; display: grid; gap: 12px; }
-    .hero-buttons a { padding: 15px; font-size: 14px; text-align: center; }
-    .info-grid { max-width: 720px; margin: 28px auto; padding: 0 20px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .info-card, .dash-card, #ck-market { background: #0f172a; border: 1px solid #263244; border-radius: 14px; padding: 20px; }
-    .info-card { text-align: center; }
-    .info-card-title { font-weight: 800; margin-bottom: 6px; }
-    .info-card-desc { color: #94a3b8; font-size: 11px; }
-    #dashboardView { display: none; max-width: 800px; margin: 30px auto; padding: 0 20px; }
-    .dash-header { text-align: center; margin-bottom: 24px; }
-    .dash-subtitle { color: #34d399; font-size: 11px; margin-bottom: 8px; }
-    .dash-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-    .dash-card h3 { margin: 10px 0; }
-    .dash-card p { color: #9ca3af; font-size: 12px; margin-bottom: 16px; }
-    .dash-card a { color: #00a4ff; text-decoration: none; font-size: 13px; }
-    .account-badge { font-size: 12px; color: #34d399; }
-    #ck-market { max-width: 760px; margin: 30px auto; padding: 20px; }
-    #ck-market h2 { font-size: 22px; margin-bottom: 12px; }
-    #ck-market p { color: #9ca3af; font-size: 13px; line-height: 1.6; margin: 8px 0; }
-    #ck-status { color: #fbbf24 !important; }
-    #ck-price { font-size: clamp(26px, 7vw, 36px); font-weight: 800; color: #34d399; }
-    #ck-chart { width: 100%; height: 180px; display: block; background: #080d1a; border-radius: 8px; margin-top: 16px; }
-    .ai-badge { position: fixed; right: 16px; bottom: 18px; background: #6d28d9; border-radius: 50%; padding: 18px; font-weight: 900; z-index: 10; }
-    @media(max-width: 520px) {
-      .info-grid, .dash-grid { grid-template-columns: 1fr; }
-      header { padding: 14px; }
-      #ck-market { margin: 20px 12px; }
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #08111f;
+      color: #f3f6fc;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+    }
+
+    header {
+      text-align: center;
+      padding: 25px 10px;
+    }
+
+    header h1 {
+      color: #28d7a1;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: #aab8cb;
+    }
+
+    .panel {
+      background: #111e30;
+      border: 1px solid #263950;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 20px;
+    }
+
+    .button {
+      display: inline-block;
+      background: #28d7a1;
+      color: #07151a;
+      text-decoration: none;
+      font-weight: bold;
+      padding: 13px 18px;
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+
+    .secondary {
+      background: #263950;
+      color: white;
+    }
+
+    .price {
+      font-size: 30px;
+      font-weight: bold;
+      color: #28d7a1;
+      margin: 18px 0;
+      overflow-wrap: anywhere;
+    }
+
+    .status {
+      color: #ffd166;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+    }
+
+    .small-card {
+      background: #0b1727;
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .small-card p {
+      color: #aab8cb;
+      font-size: 14px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 180px;
+      display: block;
+      background: #0b1727;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+
+    .notice {
+      color: #aab8cb;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    footer {
+      text-align: center;
+      color: #8495ab;
+      font-size: 12px;
+      padding: 20px 0;
     }
   </style>
 </head>
 
 <body>
-  <div class="ticker-bar">
-    CK TRADING BOT &nbsp; • &nbsp; <span class="green">Public market data</span>
-  </div>
+  <main class="container">
 
-  <header>
-    <div>
-      <div class="brand-title">CK Trading Bot</div>
-      <div class="brand-subtitle">POWERED BY DERIV</div>
-    </div>
-    <div id="authHeaderArea" class="header-right">
-      <a class="btn btn-outline" href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&l=en&brand=deriv">Log In</a>
-      <a class="btn btn-blue" href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&l=en&brand=deriv">Get Started</a>
-    </div>
-  </header>
+    <header>
+      <h1>CK Trading Bot</h1>
+      <p>Your Trading Dashboard</p>
+      <p>Market information and trading tools</p>
 
-  <main>
-    <section id="landingView">
-      <div class="hero">
-        <div class="badge">● FREE TRADING WORKSPACE</div>
-        <h1>Welcome to <span>CK Trading Bot</span></h1>
-        <p>Explore public market prices and charts in your own trading workspace. This version displays market data and does not place trades.</p>
-        <div class="hero-buttons">
-          <a class="btn btn-blue" href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&l=en&brand=deriv">Log In to Deriv</a>
-          <a class="btn btn-outline" href="#ck-market">View Live Market</a>
+      <a class="button"
+         href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&l=en&brand=deriv">
+        Log In to Deriv
+      </a>
+    </header>
+
+    <section class="panel">
+      <h2>Market Overview</h2>
+
+      <div class="grid">
+        <div class="small-card">
+          <strong>Market</strong>
+          <p>Volatility 100 Index</p>
+        </div>
+
+        <div class="small-card">
+          <strong>Connection</strong>
+          <p id="ck-status" class="status">
+            Starting connection test...
+          </p>
         </div>
       </div>
 
-      <div class="info-grid">
-        <div class="info-card">
-          <div class="info-card-title">Free</div>
-          <div class="info-card-desc">Market Panel</div>
-        </div>
-        <div class="info-card">
-          <div class="info-card-title">Live</div>
-          <div class="info-card-desc">When connected</div>
-        </div>
-        <div class="info-card">
-          <div class="info-card-title">Volatility 100</div>
-          <div class="info-card-desc">Selected market</div>
-        </div>
-        <div class="info-card">
-          <div class="info-card-title green">Practice</div>
-          <div class="info-card-desc">No trades placed</div>
-        </div>
+      <h2 style="margin-top:22px">Latest Market Price</h2>
+
+      <div id="ck-price" class="price">
+        Waiting for price...
       </div>
+
+      <canvas id="ck-chart" width="800" height="300"></canvas>
+
+      <p class="notice">
+        This panel displays public market data only. It does not place
+        trades or guarantee profits.
+      </p>
     </section>
 
-    <!-- Live public market panel -->
-    <section id="ck-market">
-      <h2><i class="fa-solid fa-chart-line"></i> Live Market Prices</h2>
-      <p>Market: Volatility 100 Index (R_100)</p>
-      <p id="ck-status" role="status" aria-live="polite">Connecting to Deriv...</p>
-      <div><span id="ck-price">Waiting for price...</span></div>
-      <canvas id="ck-chart" height="180"></canvas>
-      <p>Public market data only. This panel does not place trades or require your trading password.</p>
+    <section class="panel">
+      <h2>Trading Dashboard</h2>
+
+      <div class="grid">
+        <div class="small-card">
+          <strong>Account Balance</strong>
+          <p>Log in to view your account through Deriv.</p>
+        </div>
+
+        <div class="small-card">
+          <strong>Trading Signals</strong>
+          <p>Not connected yet.</p>
+        </div>
+
+        <div class="small-card">
+          <strong>Bot Status</strong>
+          <p>Market-data test only. Automated trading is disabled.</p>
+        </div>
+      </div>
+
+      <a class="button secondary"
+         href="https://app.deriv.com/">
+        Open Deriv
+      </a>
     </section>
 
-    <section id="dashboardView">
-      <div class="dash-header">
-        <div class="dash-subtitle">YOUR WORKSPACE</div>
-        <h2>Trading Tools</h2>
-        <p style="color:#9ca3af;margin-top:8px;font-size:13px;">These cards are demonstrations, not active trading bots.</p>
-      </div>
-      <div class="dash-grid">
-        <div class="dash-card">
-          <h3>Load Bot</h3>
-          <p>Bot file loading is not implemented yet.</p>
-          <a href="#" onclick="alert('Bot file loading is not implemented yet.');return false;">Choose a bot</a>
-        </div>
-        <div class="dash-card">
-          <h3>Practice Bot</h3>
-          <p>A simulated practice bot can be added next.</p>
-          <a href="#" onclick="alert('Practice bot is not implemented yet.');return false;">Explore practice</a>
-        </div>
-        <div class="dash-card">
-          <h3>Speed Bot</h3>
-          <p>Automated trading is not enabled.</p>
-          <a href="#" onclick="alert('Automated trading is not implemented.');return false;">View details</a>
-        </div>
-        <div class="dash-card">
-          <h3>Manual Trading</h3>
-          <p>Real trading is not enabled in this version.</p>
-          <a href="#" onclick="alert('Trading is not implemented in this version.');return false;">View details</a>
-        </div>
-      </div>
-    </section>
+    <footer>
+      CK Trading Bot | Independent third-party interface
+    </footer>
+
   </main>
 
-  <div class="ai-badge" onclick="alert('CK Trading Bot: market panel only. No AI scanner is running yet.')" aria-label="Bot status">CK</div>
-
   <script>
-    // Public market data only. No account token is used here.
     (function () {
-      const APP_ID = '34JjnKJzecylG5kwmjaXm';
-      const SYMBOL = 'R_100';
-      const statusBox = document.getElementById('ck-status');
-      const priceBox = document.getElementById('ck-price');
-      const canvas = document.getElementById('ck-chart');
-      const ctx = canvas.getContext('2d');
+      const status = document.getElementById("ck-status");
+      const price = document.getElementById("ck-price");
+      const canvas = document.getElementById("ck-chart");
+      const ctx = canvas.getContext("2d");
 
-      let socket = null;
+      const prices = [];
       let reconnectTimer = null;
-      let prices = [];
-      let manuallyClosed = false;
+      let socket = null;
 
       function drawChart() {
-        const width = Math.max(canvas.clientWidth, 280);
-        const height = 180;
-        const dpr = window.devicePixelRatio || 1;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        canvas.width = width * dpr;
-        canvas.height = height * dpr;
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        ctx.clearRect(0, 0, width, height);
-
-        if (prices.length < 2) return;
+        if (prices.length < 2) {
+          ctx.fillStyle = "#aab8cb";
+          ctx.font = "18px Arial";
+          ctx.fillText("Waiting for price history...", 20, 40);
+          return;
+        }
 
         const min = Math.min(...prices);
         const max = Math.max(...prices);
         const range = max - min || 1;
+        const padding = 25;
 
         ctx.beginPath();
-        ctx.strokeStyle = '#34d399';
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = "#28d7a1";
+        ctx.lineWidth = 3;
 
-        prices.forEach(function (price, index) {
-          const x = index * width / (prices.length - 1);
-          const y = height - 12 - ((price - min) / range) * (height - 24);
-          if (index === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
+        prices.forEach(function (value, index) {
+          const x = padding +
+            index * (canvas.width - padding * 2) /
+            (prices.length - 1);
+
+          const y = canvas.height - padding -
+            ((value - min) / range) *
+            (canvas.height - padding * 2);
+
+          if (index === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
         });
 
         ctx.stroke();
       }
 
       function addPrice(value) {
-        const price = Number(value);
-        if (!Number.isFinite(price)) return;
+        const number = Number(value);
 
-        prices.push(price);
-        if (prices.length > 60) prices.shift();
+        if (!Number.isFinite(number)) return;
 
-        priceBox.textContent = price.toFixed(2);
+        prices.push(number);
+
+        if (prices.length > 50) {
+          prices.shift();
+        }
+
+        price.textContent = number.toString();
         drawChart();
       }
 
       function connect() {
         clearTimeout(reconnectTimer);
-        statusBox.textContent = 'Connecting to Deriv...';
+
+        status.textContent = "Connecting to Deriv test service...";
 
         try {
           socket = new WebSocket(
-            'wss://ws.derivws.com/websockets/v3?app_id=' + encodeURIComponent(APP_ID)
+            "wss://ws.derivws.com/websockets/v3?app_id=1089"
           );
         } catch (error) {
-          statusBox.textContent = 'Could not start connection. Retrying...';
-          reconnectTimer = setTimeout(connect, 5000);
+          status.textContent = "Could not create WebSocket: " +
+            error.message;
+          reconnectTimer = setTimeout(connect, 10000);
           return;
         }
 
         socket.onopen = function () {
-          statusBox.textContent = 'Connected. Loading recent prices...';
+          status.textContent = "Connected. Requesting price history...";
+
           socket.send(JSON.stringify({
-            ticks_history: SYMBOL,
+            ticks_history: "R_100",
             count: 50,
-            end: 'latest',
-            style: 'ticks'
+            end: "latest",
+            style: "ticks",
+            req_id: 1
           }));
         };
 
@@ -235,49 +301,68 @@
           try {
             data = JSON.parse(event.data);
           } catch (error) {
-            statusBox.textContent = 'Received an unreadable response.';
+            status.textContent = "Received an unreadable response.";
             return;
           }
 
           if (data.error) {
-            statusBox.textContent = 'Deriv: ' + data.error.message;
+            status.textContent =
+              "Deriv error: " + data.error.message;
             return;
           }
 
-          if (data.history && data.msg_type === 'history') {
-            prices = [];
-            data.history.prices.forEach(addPrice);
+          if (data.history && data.history.prices) {
+            prices.length = 0;
+
+            data.history.prices.forEach(function (value) {
+              prices.push(Number(value));
+            });
+
+            while (prices.length > 50) {
+              prices.shift();
+            }
+
+            if (prices.length > 0) {
+              price.textContent = prices[prices.length - 1].toString();
+            }
+
+            drawChart();
+
+            status.textContent =
+              "History received. Starting live price stream...";
 
             socket.send(JSON.stringify({
-              ticks: SYMBOL,
-              subscribe: 1
+              ticks: "R_100",
+              subscribe: 1,
+              req_id: 2
             }));
-
-            statusBox.textContent = 'Recent prices loaded. Waiting for live updates...';
-            return;
           }
 
           if (data.tick) {
             addPrice(data.tick.quote);
-            statusBox.textContent = 'Live market data connected';
+            status.textContent = "Live market data connected.";
           }
         };
 
         socket.onerror = function () {
-          statusBox.textContent = 'Connection issue. Trying again...';
+          status.textContent =
+            "Connection error. Check internet or WebSocket access.";
         };
 
-        socket.onclose = function () {
-          if (!manuallyClosed) {
-            statusBox.textContent = 'Disconnected. Reconnecting in 5 seconds...';
-            reconnectTimer = setTimeout(connect, 5000);
-          }
+        socket.onclose = function (event) {
+          status.textContent =
+            "Connection closed. Code: " + event.code +
+            (event.reason ? " — " + event.reason : "") +
+            ". Retrying in 10 seconds.";
+
+          reconnectTimer = setTimeout(connect, 10000);
         };
       }
 
-      window.addEventListener('resize', drawChart);
+      drawChart();
       connect();
     })();
   </script>
+
 </body>
 </html>
