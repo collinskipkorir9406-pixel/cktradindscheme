@@ -11,9 +11,7 @@
   <title>CK Trading Bot</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -38,9 +36,7 @@
       margin-bottom: 8px;
     }
 
-    header p {
-      color: #aab8cb;
-    }
+    header p { color: #aab8cb; }
 
     .panel {
       background: #111e30;
@@ -71,6 +67,25 @@
       color: white;
     }
 
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+    }
+
+    .small-card {
+      background: #0b1727;
+      border-radius: 10px;
+      padding: 16px;
+      overflow-wrap: anywhere;
+    }
+
+    .small-card p {
+      color: #aab8cb;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
     .price {
       font-size: 30px;
       font-weight: bold;
@@ -83,23 +98,6 @@
       color: #ffd166;
       line-height: 1.5;
       overflow-wrap: anywhere;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 14px;
-    }
-
-    .small-card {
-      background: #0b1727;
-      border-radius: 10px;
-      padding: 16px;
-    }
-
-    .small-card p {
-      color: #aab8cb;
-      font-size: 14px;
     }
 
     canvas {
@@ -146,7 +144,7 @@
       <div class="grid">
         <div class="small-card">
           <strong>Market</strong>
-          <p>Volatility 100 Index</p>
+          <p>Volatility 100 Index (R_100)</p>
         </div>
 
         <div class="small-card">
@@ -166,8 +164,8 @@
       <canvas id="ck-chart" width="800" height="300"></canvas>
 
       <p class="notice">
-        This panel displays public market data only. It does not place
-        trades or guarantee profits.
+        Public market-data test only. This page does not place trades
+        or guarantee profits.
       </p>
     </section>
 
@@ -177,7 +175,7 @@
       <div class="grid">
         <div class="small-card">
           <strong>Account Balance</strong>
-          <p>Log in to view your account through Deriv.</p>
+          <p>Account balance integration is not yet connected.</p>
         </div>
 
         <div class="small-card">
@@ -187,12 +185,11 @@
 
         <div class="small-card">
           <strong>Bot Status</strong>
-          <p>Market-data test only. Automated trading is disabled.</p>
+          <p>Market-data testing only. Automated trading is disabled.</p>
         </div>
       </div>
 
-      <a class="button secondary"
-         href="https://app.deriv.com/">
+      <a class="button secondary" href="https://app.deriv.com/">
         Open Deriv
       </a>
     </section>
@@ -211,8 +208,11 @@
       const ctx = canvas.getContext("2d");
 
       const prices = [];
-      let reconnectTimer = null;
       let socket = null;
+      let reconnectTimer = null;
+
+      // YOUR DERIV APP ID
+      const APP_ID = "34JjnKJzecylG5kwmjaXm";
 
       function drawChart() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -254,14 +254,11 @@
 
       function addPrice(value) {
         const number = Number(value);
-
         if (!Number.isFinite(number)) return;
 
         prices.push(number);
 
-        if (prices.length > 50) {
-          prices.shift();
-        }
+        if (prices.length > 50) prices.shift();
 
         price.textContent = number.toString();
         drawChart();
@@ -270,15 +267,15 @@
       function connect() {
         clearTimeout(reconnectTimer);
 
-        status.textContent = "Connecting to Deriv test service...";
+        status.textContent = "Connecting to Deriv with your App ID...";
 
         try {
           socket = new WebSocket(
-            "wss://ws.derivws.com/websockets/v3?app_id=1089"
+            "wss://ws.derivws.com/websockets/v3?app_id=" + APP_ID
           );
         } catch (error) {
-          status.textContent = "Could not create WebSocket: " +
-            error.message;
+          status.textContent =
+            "Could not start connection: " + error.message;
           reconnectTimer = setTimeout(connect, 10000);
           return;
         }
@@ -306,8 +303,7 @@
           }
 
           if (data.error) {
-            status.textContent =
-              "Deriv error: " + data.error.message;
+            status.textContent = "Deriv error: " + data.error.message;
             return;
           }
 
@@ -318,18 +314,14 @@
               prices.push(Number(value));
             });
 
-            while (prices.length > 50) {
-              prices.shift();
-            }
+            while (prices.length > 50) prices.shift();
 
             if (prices.length > 0) {
               price.textContent = prices[prices.length - 1].toString();
             }
 
             drawChart();
-
-            status.textContent =
-              "History received. Starting live price stream...";
+            status.textContent = "History received. Starting live stream...";
 
             socket.send(JSON.stringify({
               ticks: "R_100",
@@ -346,7 +338,7 @@
 
         socket.onerror = function () {
           status.textContent =
-            "Connection error. Check internet or WebSocket access.";
+            "WebSocket error. Checking connection status...";
         };
 
         socket.onclose = function (event) {
@@ -363,6 +355,5 @@
       connect();
     })();
   </script>
-
 </body>
 </html>
