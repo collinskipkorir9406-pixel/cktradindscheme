@@ -25,7 +25,8 @@
     .button {
       display: inline-block; background: #28d7a1; color: #07151a;
       text-decoration: none; font-weight: bold; padding: 13px 18px;
-      border-radius: 8px; margin: 8px 5px 0 0;
+      border: 0; border-radius: 8px; margin: 8px 5px 0 0;
+      cursor: pointer; font-size: 15px;
     }
     .secondary { background: #263950; color: white; }
     .grid {
@@ -54,7 +55,10 @@
       background: #0b1727; border-radius: 8px; margin-top: 15px;
     }
     .notice { font-size: 13px; }
-    footer { text-align: center; color: #8495ab; font-size: 12px; padding: 20px 0; }
+    footer {
+      text-align: center; color: #8495ab;
+      font-size: 12px; padding: 20px 0;
+    }
   </style>
 </head>
 <body>
@@ -63,10 +67,13 @@
     <h1>CK Trading Bot</h1>
     <p>Your Trading Dashboard</p>
     <p>Public market information and trading tools</p>
-    <a class="button"
-       href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&amp;l=en&amp;brand=deriv">
+
+    <button class="button" id="login-button" type="button">
       Log In to Deriv
-    </a>
+    </button>
+    <p class="status" id="login-status" aria-live="polite">
+      Not signed in.
+    </p>
   </header>
 
   <section class="panel">
@@ -116,10 +123,14 @@
       </div>
       <div class="small-card">
         <strong>Bot Status</strong>
-        <p class="muted">Market-data testing only. Automated trading is disabled.</p>
+        <p class="muted">
+          Market-data testing only. Automated trading is disabled.
+        </p>
       </div>
     </div>
-    <a class="button secondary" href="https://app.deriv.com/">Open Deriv</a>
+    <a class="button secondary" href="https://app.deriv.com/">
+      Open Deriv
+    </a>
   </section>
 
   <footer>CK Trading Bot | Independent third-party interface</footer>
@@ -129,9 +140,21 @@
 "use strict";
 
 (function () {
+  // OAuth configuration
+  const APP_ID = "34MKk0BSq1Hz7mnKlIjHN";
+  const REDIRECT_URI =
+    "https://collinskipkorir9406-pixel.github.io/cktradindscheme/";
+  const WORKER_URL =
+    "https://steep-snow-a539.collinskipkorir70.workers.dev";
+  const AUTH_URL = "https://auth.deriv.com/oauth2/auth";
+
+  // Public market-data WebSocket
   const ENDPOINT =
     "wss://api.derivws.com/trading/v1/options/ws/public";
 
+  const loginButton = document.getElementById("login-button");
+  const loginStatus = document.getElementById("login-status");
+  const accountStatus = document.getElementById("account-status");
   const statusEl = document.getElementById("status");
   const priceEl = document.getElementById("price");
   const updatedEl = document.getElementById("updated");
@@ -154,6 +177,135 @@
   let retryDelay = 5000;
   let prices = [];
   let decimals = 2;
+
+  function base64Url(bytes) {
+    let binary = "";
+    for (const byte of bytes) binary += String.fromCharCode(byte);
+    return btoa(binary)
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
+  }
+
+  function randomString(length) {
+    const bytes = crypto.getRandomValues(new Uint8Array(length));
+    return base64Url(bytes);
+  }
+
+  async function createCodeChallenge(verifier) {
+    const data = new TextEncoder().encode(verifier);
+    const digest = await crypto.subtle.digest("SHA-256", data);
+    return base64Url(new Uint8Array(digest));
+  }
+
+  async function beginLogin() {
+    try {
+      if (!window.crypto || !crypto.subtle) {
+        throw new Error(
+          "Secure browser cryptography is unavailable. Open the HTTPS website in your browser."
+        );
+      }
+
+      const verifier = randomString(64);
+      const challenge = await createCodeChallenge(verifier);
+      const state = randomString(24);
+
+      sessionStorage.setItem("ck_pkce_verifier", verifier);
+      sessionStorage.setItem("ck_oauth_state", state);
+
+      const url = new URL(AUTH_URL);
+      url.searchParams.set("response_type", "code");
+      url.searchParams.set("client_id", APP_ID);
+      url.searchParams.set("redirect_uri", REDIRECT_URI);
+      url.searchParams.set("scope", "trade account_manage");
+      url.searchParams.set("state", state);
+      url.searchParams.set("code_challenge", challenge);
+      url.searchParams.set("code_challenge_method", "S256");
+
+      loginStatus.textContent = "Opening Deriv authorization...";
+      window.location.assign(url.toString());
+    } catch (error) {
+      loginStatus.textContent = "Could not start login: " + error.message;
+    }
+  }
+
+  async function handleOAuthCallback() {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    const returnedState = params.get("state");
+    const oauthError = params.get("error");
+
+    if (oauthError) {
+      loginStatus.textContent =
+        "Deriv login was not completed: " +
+        (params.get("error_description") || oauthError);
+      cleanCallbackUrl();
+      return;
+    }
+
+    if (!code && !returnedState) return;
+
+    const savedState = sessionStorage.getItem("ck_oauth_state");
+    const verifier = sessionStorage.getItem("ck_pkce_verifier");
+
+    // Validate state before sending the code to the Worker.
+    if (!code || !returnedState || !savedState ||
+        returnedState !== savedState || !verifier) {
+      loginStatus.textContent =
+        "Login could not be verified. Please start login again.";
+      sessionStorage.removeItem("ck_oauth_state");
+      sessionStorage.removeItem("ck_pkce_verifier");
+      cleanCallbackUrl();
+      return;
+    }
+
+    // Consume the state so this callback cannot be reused.
+    sessionStorage.removeItem("ck_oauth_state");
+    loginStatus.textContent = "Verifying authorization with Deriv...";
+
+    try {
+      const response = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: code,
+          code_verifier: verifier,
+          client_id: APP_ID,
+          redirect_uri: REDIRECT_URI
+        })
+      });
+
+      const result = await response.json();
+      sessionStorage.removeItem("ck_pkce_verifier");
+
+      if (!response.ok || !result.access_token) {
+        const detail = result.error_description ||
+          result.error || result.message || "Token exchange failed.";
+        throw new Error(detail);
+      }
+
+      // Keep the short-lived token in memory only.
+      // Do not write it to localStorage or the URL.
+      loginStatus.textContent =
+        "Authorization succeeded. Access token received.";
+      accountStatus.textContent =
+        "Signed in for this page session. Account balance display is not yet connected.";
+      window.ckDerivAccessToken = result.access_token;
+
+      cleanCallbackUrl();
+    } catch (error) {
+      sessionStorage.removeItem("ck_pkce_verifier");
+      loginStatus.textContent =
+        "Login exchange failed: " + error.message +
+        " Check the Worker configuration and try again.";
+      cleanCallbackUrl();
+    }
+  }
+
+  function cleanCallbackUrl() {
+    const cleanUrl = window.location.pathname + window.location.hash;
+    window.history.replaceState({}, document.title, cleanUrl);
+  }
 
   function drawChart() {
     const w = canvas.width;
@@ -327,6 +479,8 @@
     };
   }
 
+  loginButton.addEventListener("click", beginLogin);
+
   marketEl.addEventListener("change", () => {
     marketNameEl.textContent =
       marketNames[marketEl.value] || marketEl.value;
@@ -335,6 +489,7 @@
 
   drawChart();
   connect();
+  handleOAuthCallback();
 })();
 </script>
 </body>
