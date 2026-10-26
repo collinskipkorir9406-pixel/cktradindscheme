@@ -7,8 +7,10 @@
   <meta name="theme-color" content="#08111f">
   <meta name="deriv-site-verification" content="ded285725a66c864612bf8d91ba4de4b63642ce64f6dd2f14fed08d232275b4a">
   <title>CK Trading Bot</title>
+
   <style>
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       padding: 16px;
@@ -16,10 +18,16 @@
       color: #f3f6fc;
       font-family: Arial, sans-serif;
     }
+
     .container { max-width: 900px; margin: auto; }
     header { text-align: center; padding: 24px 8px; }
     h1 { color: #28d7a1; }
-    header p, .muted, .notice { color: #aab8cb; line-height: 1.6; }
+
+    header p, .muted, .notice {
+      color: #aab8cb;
+      line-height: 1.6;
+    }
+
     .panel {
       background: #111e30;
       border: 1px solid #263950;
@@ -27,7 +35,9 @@
       padding: 18px;
       margin-bottom: 18px;
     }
+
     h2 { font-size: 20px; }
+
     .button {
       display: inline-block;
       background: #28d7a1;
@@ -41,24 +51,30 @@
       cursor: pointer;
       font-size: 15px;
     }
+
     .secondary { background: #263950; color: white; }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 14px;
     }
+
     .small-card {
       background: #0b1727;
       border-radius: 10px;
       padding: 16px;
       overflow-wrap: anywhere;
+      min-width: 0;
     }
+
     .status {
       color: #ffd166;
       line-height: 1.6;
       overflow-wrap: anywhere;
       white-space: pre-wrap;
     }
+
     .price {
       font-size: clamp(25px, 6vw, 36px);
       font-weight: bold;
@@ -66,6 +82,17 @@
       margin: 18px 0;
       overflow-wrap: anywhere;
     }
+
+    .balance-amount {
+      color: #28d7a1;
+      font-size: clamp(22px, 5vw, 30px);
+      font-weight: bold;
+      margin: 14px 0 8px;
+      overflow-wrap: anywhere;
+    }
+
+    #real-balance { color: #f3f6fc; }
+
     select {
       width: 100%;
       padding: 13px;
@@ -75,6 +102,7 @@
       border-radius: 8px;
       margin: 10px 0;
     }
+
     canvas {
       width: 100%;
       height: 220px;
@@ -83,7 +111,9 @@
       border-radius: 8px;
       margin-top: 15px;
     }
+
     .notice { font-size: 13px; }
+
     footer {
       text-align: center;
       color: #8495ab;
@@ -92,15 +122,19 @@
     }
   </style>
 </head>
+
 <body>
 <main class="container">
+
   <header>
     <h1>CK Trading Bot</h1>
     <p>Your Trading Dashboard</p>
     <p>Public market information and trading tools</p>
+
     <button class="button" id="login-button" type="button">
       Log In to Deriv
     </button>
+
     <p class="status" id="login-status" aria-live="polite">
       Not signed in.
     </p>
@@ -108,6 +142,7 @@
 
   <section class="panel">
     <h2>Market Overview</h2>
+
     <label for="market">Select market</label>
     <select id="market">
       <option value="1HZ100V">Volatility 100 (1s) Index</option>
@@ -120,18 +155,25 @@
     <div class="grid">
       <div class="small-card">
         <strong>Selected Market</strong>
-        <p class="muted" id="market-name">Volatility 100 (1s) Index</p>
+        <p class="muted" id="market-name">
+          Volatility 100 (1s) Index
+        </p>
       </div>
+
       <div class="small-card">
         <strong>Connection Status</strong>
-        <p class="status" id="status">Starting connection...</p>
+        <p class="status" id="status">
+          Starting connection...
+        </p>
       </div>
     </div>
 
     <h2>Latest Market Price</h2>
     <div class="price" id="price">Waiting for prices...</div>
     <p class="muted" id="updated">No price received yet.</p>
+
     <canvas id="chart" width="800" height="300"></canvas>
+
     <p class="notice">
       Public market data only. No trades are placed.
       Prices can change quickly and are not trading advice.
@@ -140,30 +182,47 @@
 
   <section class="panel">
     <h2>Trading Dashboard</h2>
+
     <div class="grid">
+
       <div class="small-card">
-        <strong>Account Balance</strong>
-        <p class="muted" id="account-status">
-          Not connected. Log in and complete authorization first.
+        <strong>DEMO ACCOUNT</strong>
+        <div class="balance-amount" id="demo-balance">—</div>
+        <p class="muted" id="demo-balance-status">
+          Sign in to load your demo balance.
         </p>
       </div>
+
+      <div class="small-card">
+        <strong>REAL ACCOUNT</strong>
+        <div class="balance-amount" id="real-balance">—</div>
+        <p class="muted" id="real-balance-status">
+          Sign in to load your real balance.
+        </p>
+      </div>
+
       <div class="small-card">
         <strong>Trading Signals</strong>
         <p class="muted">Not connected.</p>
       </div>
+
       <div class="small-card">
         <strong>Bot Status</strong>
         <p class="muted">
           Market-data testing only. Automated trading is disabled.
         </p>
       </div>
+
     </div>
+
     <a class="button secondary" href="https://app.deriv.com/">
       Open Deriv
     </a>
   </section>
 
-  <footer>CK Trading Bot | Independent third-party interface</footer>
+  <footer>
+    CK Trading Bot | Independent third-party interface
+  </footer>
 </main>
 
 <script>
@@ -171,10 +230,13 @@
 
 (function () {
   const APP_ID = "34MKk0BSq1Hz7mnKlIjHN";
+
   const REDIRECT_URI =
     "https://collinskipkorir9406-pixel.github.io/cktradindscheme/";
+
   const WORKER_URL =
     "https://steep-snow-a539.collinskipkorir70.workers.dev";
+
   const AUTH_URL = "https://auth.deriv.com/oauth2/auth";
 
   const MARKET_ENDPOINT =
@@ -182,7 +244,6 @@
 
   const loginButton = document.getElementById("login-button");
   const loginStatus = document.getElementById("login-status");
-  const accountStatus = document.getElementById("account-status");
   const statusEl = document.getElementById("status");
   const priceEl = document.getElementById("price");
   const updatedEl = document.getElementById("updated");
@@ -190,6 +251,13 @@
   const marketNameEl = document.getElementById("market-name");
   const canvas = document.getElementById("chart");
   const ctx = canvas.getContext("2d");
+
+  const demoBalanceEl = document.getElementById("demo-balance");
+  const realBalanceEl = document.getElementById("real-balance");
+  const demoBalanceStatus =
+    document.getElementById("demo-balance-status");
+  const realBalanceStatus =
+    document.getElementById("real-balance-status");
 
   const marketNames = {
     "1HZ100V": "Volatility 100 (1s) Index",
@@ -206,9 +274,17 @@
   let prices = [];
   let decimals = 2;
 
+  // Keep account sockets and login state in memory only.
+  window.ckBalanceSockets = [];
+  window.ckDerivAccessToken = null;
+
   function base64Url(bytes) {
     let binary = "";
-    for (const byte of bytes) binary += String.fromCharCode(byte);
+
+    for (const byte of bytes) {
+      binary += String.fromCharCode(byte);
+    }
+
     return btoa(binary)
       .replace(/\+/g, "-")
       .replace(/\//g, "_")
@@ -216,7 +292,9 @@
   }
 
   function randomString(length) {
-    return base64Url(crypto.getRandomValues(new Uint8Array(length)));
+    return base64Url(
+      crypto.getRandomValues(new Uint8Array(length))
+    );
   }
 
   async function createCodeChallenge(verifier) {
@@ -224,13 +302,16 @@
       "SHA-256",
       new TextEncoder().encode(verifier)
     );
+
     return base64Url(new Uint8Array(digest));
   }
 
   async function beginLogin() {
     try {
       if (!window.crypto || !crypto.subtle) {
-        throw new Error("Secure browser cryptography is unavailable.");
+        throw new Error(
+          "Secure browser cryptography is unavailable."
+        );
       }
 
       const verifier = randomString(64);
@@ -241,6 +322,7 @@
       sessionStorage.setItem("ck_oauth_state", state);
 
       const url = new URL(AUTH_URL);
+
       url.searchParams.set("response_type", "code");
       url.searchParams.set("client_id", APP_ID);
       url.searchParams.set("redirect_uri", REDIRECT_URI);
@@ -249,15 +331,66 @@
       url.searchParams.set("code_challenge", challenge);
       url.searchParams.set("code_challenge_method", "S256");
 
-      loginStatus.textContent = "Opening Deriv authorization...";
+      loginStatus.textContent =
+        "Opening Deriv authorization...";
+
       window.location.assign(url.toString());
+
     } catch (error) {
-      loginStatus.textContent = "Could not start login: " + error.message;
+      loginStatus.textContent =
+        "Could not start login: " + error.message;
     }
   }
 
+  function formatMoney(value, currency) {
+    const amount = Number(value);
+
+    if (!Number.isFinite(amount)) {
+      return "Unavailable";
+    }
+
+    const code = currency || "USD";
+
+    try {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: code,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(amount);
+    } catch (_) {
+      return amount.toFixed(2) + " " + code;
+    }
+  }
+
+  function getApiError(result, fallback) {
+    if (result && result.errors &&
+        result.errors.length && result.errors[0].message) {
+      return result.errors[0].message;
+    }
+
+    return result && (
+      result.message ||
+      result.error_description ||
+      result.error
+    ) || fallback;
+  }
+
   async function loadAccountBalance(accessToken) {
-    accountStatus.textContent = "Loading account details...";
+    demoBalanceEl.textContent = "—";
+    realBalanceEl.textContent = "—";
+
+    demoBalanceStatus.textContent = "Loading demo account...";
+    realBalanceStatus.textContent = "Loading real account...";
+
+    // Close any previous account-specific connections.
+    window.ckBalanceSockets.forEach(ws => {
+      try {
+        ws.close();
+      } catch (_) {}
+    });
+
+    window.ckBalanceSockets = [];
 
     const response = await fetch(
       "https://api.derivws.com/trading/v1/options/accounts",
@@ -271,15 +404,18 @@
     );
 
     let result;
+
     try {
       result = await response.json();
     } catch (_) {
-      throw new Error("The account API returned an unreadable response.");
+      throw new Error(
+        "The account API returned an unreadable response."
+      );
     }
 
     if (!response.ok) {
       throw new Error(
-        result.message || result.error || "Account request was rejected."
+        getApiError(result, "Account request was rejected.")
       );
     }
 
@@ -290,31 +426,207 @@
         : [];
 
     if (!accounts.length) {
-      accountStatus.textContent =
-        "Login succeeded, but no account details were returned.";
+      const message =
+        "No Options accounts were returned. Check your Deriv account and app permissions.";
+
+      demoBalanceEl.textContent = "Unavailable";
+      realBalanceEl.textContent = "Unavailable";
+      demoBalanceStatus.textContent = message;
+      realBalanceStatus.textContent = message;
       return;
     }
 
-    accountStatus.textContent = accounts.map(account => {
-      const balance = account.balance;
-      const currency = account.currency || "";
-      const type = account.account_type || "Account";
+    // Identify accounts by their actual type.
+    const demoAccount = accounts.find(account =>
+      String(account.account_type || "").toLowerCase() === "demo"
+    );
 
-      if (balance === undefined || balance === null) {
-        return type + ": Balance unavailable";
+    const realAccount = accounts.find(account =>
+      String(account.account_type || "").toLowerCase() === "real"
+    );
+
+    if (demoAccount) {
+      showAccount(
+        demoAccount,
+        demoBalanceEl,
+        demoBalanceStatus,
+        "Demo",
+        accessToken
+      );
+    } else {
+      demoBalanceEl.textContent = "Unavailable";
+      demoBalanceStatus.textContent =
+        "No demo Options account was returned.";
+    }
+
+    if (realAccount) {
+      showAccount(
+        realAccount,
+        realBalanceEl,
+        realBalanceStatus,
+        "Real",
+        accessToken
+      );
+    } else {
+      realBalanceEl.textContent = "Unavailable";
+      realBalanceStatus.textContent =
+        "No real Options account was returned.";
+    }
+  }
+
+  function showAccount(
+    account,
+    amountEl,
+    statusEl,
+    label,
+    accessToken
+  ) {
+    const currency = account.currency || "USD";
+
+    // Show an initial balance only if the API actually returned it.
+    if (account.balance !== undefined &&
+        account.balance !== null) {
+      amountEl.textContent =
+        formatMoney(account.balance, currency);
+
+      statusEl.textContent =
+        label + " account balance reported by Deriv.";
+    } else {
+      amountEl.textContent = "—";
+      statusEl.textContent =
+        "Account found. Requesting balance...";
+    }
+
+    if (!account.account_id) {
+      statusEl.textContent =
+        "Account found, but the account ID was not returned.";
+      return;
+    }
+
+    refreshLiveBalance(
+      account,
+      amountEl,
+      statusEl,
+      label,
+      accessToken
+    ).catch(error => {
+      statusEl.textContent =
+        label + " account found; live balance unavailable: " +
+        error.message;
+    });
+  }
+
+  async function refreshLiveBalance(
+    account,
+    amountEl,
+    statusEl,
+    label,
+    accessToken
+  ) {
+    const accountId = account.account_id;
+
+    const response = await fetch(
+      "https://api.derivws.com/trading/v1/options/accounts/" +
+        encodeURIComponent(accountId) + "/otp",
+      {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + accessToken,
+          "Accept": "application/json"
+        }
+      }
+    );
+
+    let result;
+
+    try {
+      result = await response.json();
+    } catch (_) {
+      throw new Error(
+        "The account connection returned an unreadable response."
+      );
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        getApiError(result, "Could not connect to this account.")
+      );
+    }
+
+    const wsUrl =
+      result.data && result.data.url
+        ? result.data.url
+        : null;
+
+    if (!wsUrl) {
+      throw new Error(
+        "Deriv did not return the account WebSocket URL."
+      );
+    }
+
+    const ws = new WebSocket(wsUrl);
+    window.ckBalanceSockets.push(ws);
+
+    ws.onopen = () => {
+      ws.send(JSON.stringify({
+        balance: 1,
+        subscribe: 1,
+        req_id: 1
+      }));
+    };
+
+    ws.onmessage = event => {
+      let data;
+
+      try {
+        data = JSON.parse(event.data);
+      } catch (_) {
+        return;
       }
 
-      const numericBalance = Number(balance);
-      const formattedBalance = Number.isFinite(numericBalance)
-        ? numericBalance.toLocaleString()
-        : String(balance);
+      if (data.error) {
+        statusEl.textContent =
+          label + " balance update error: " +
+          data.error.message;
+        return;
+      }
 
-      return type + ": " + formattedBalance + " " + currency;
-    }).join("\n");
+      if (data.msg_type === "balance" && data.balance) {
+        const balanceData = data.balance;
+
+        const amount =
+          balanceData.balance !== undefined
+            ? balanceData.balance
+            : null;
+
+        const currency =
+          balanceData.currency || account.currency || "USD";
+
+        if (amount !== null && Number.isFinite(Number(amount))) {
+          amountEl.textContent = formatMoney(amount, currency);
+
+          statusEl.textContent =
+            label + " balance · Live updates connected";
+        }
+      }
+    };
+
+    ws.onerror = () => {
+      statusEl.textContent =
+        label + " account found; balance connection encountered an error.";
+    };
+
+    ws.onclose = () => {
+      if (statusEl.textContent.includes("Live updates connected")) {
+        statusEl.textContent =
+          label + " balance · Connection closed; last value retained.";
+      }
+    };
   }
 
   async function handleOAuthCallback() {
     const params = new URLSearchParams(window.location.search);
+
     const code = params.get("code");
     const returnedState = params.get("state");
     const oauthError = params.get("error");
@@ -323,67 +635,95 @@
       loginStatus.textContent =
         "Deriv login was not completed: " +
         (params.get("error_description") || oauthError);
+
       cleanCallbackUrl();
       return;
     }
 
-    if (!code && !returnedState) return;
+    if (!code && !returnedState) {
+      return;
+    }
 
-    const savedState = sessionStorage.getItem("ck_oauth_state");
-    const verifier = sessionStorage.getItem("ck_pkce_verifier");
+    const savedState =
+      sessionStorage.getItem("ck_oauth_state");
+
+    const verifier =
+      sessionStorage.getItem("ck_pkce_verifier");
 
     if (!code || !returnedState || !savedState ||
         returnedState !== savedState || !verifier) {
       loginStatus.textContent =
         "Login could not be verified. Please start login again.";
+
       sessionStorage.removeItem("ck_oauth_state");
       sessionStorage.removeItem("ck_pkce_verifier");
+
       cleanCallbackUrl();
       return;
     }
 
     sessionStorage.removeItem("ck_oauth_state");
-    loginStatus.textContent = "Verifying authorization with Deriv...";
+
+    loginStatus.textContent =
+      "Verifying authorization with Deriv...";
 
     try {
       const response = await fetch(WORKER_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
-          code,
+          code: code,
           code_verifier: verifier,
           client_id: APP_ID,
           redirect_uri: REDIRECT_URI
         })
       });
 
-      const result = await response.json();
+      let result;
+
+      try {
+        result = await response.json();
+      } catch (_) {
+        throw new Error(
+          "The authorization service returned an unreadable response."
+        );
+      }
+
       sessionStorage.removeItem("ck_pkce_verifier");
 
       if (!response.ok || !result.access_token) {
         throw new Error(
-          result.error_description ||
-          result.error ||
-          result.message ||
-          "Token exchange failed."
+          getApiError(result, "Token exchange failed.")
         );
       }
 
-      // Keep the access token in memory only.
+      // Token is held in memory only, not localStorage.
       window.ckDerivAccessToken = result.access_token;
-      loginStatus.textContent = "Authorization succeeded. Access token received.";
+
+      loginStatus.textContent =
+        "Authorization succeeded. Access token received.";
+
       cleanCallbackUrl();
 
       try {
         await loadAccountBalance(result.access_token);
       } catch (error) {
-        accountStatus.textContent =
-          "Signed in, but balance could not be loaded: " + error.message;
+        const message =
+          "Signed in, but accounts could not be loaded: " +
+          error.message;
+
+        demoBalanceStatus.textContent = message;
+        realBalanceStatus.textContent = message;
       }
+
     } catch (error) {
       sessionStorage.removeItem("ck_pkce_verifier");
+
       loginStatus.textContent =
         "Login exchange failed: " + error.message;
+
       cleanCallbackUrl();
     }
   }
@@ -399,12 +739,14 @@
   function drawChart() {
     const w = canvas.width;
     const h = canvas.height;
+
     ctx.clearRect(0, 0, w, h);
     ctx.strokeStyle = "#263950";
     ctx.lineWidth = 1;
 
     for (let i = 1; i < 4; i++) {
       const y = h * i / 4;
+
       ctx.beginPath();
       ctx.moveTo(0, y);
       ctx.lineTo(w, y);
@@ -428,10 +770,17 @@
     ctx.lineWidth = 3;
 
     prices.forEach((value, index) => {
-      const x = pad + index * (w - 2 * pad) / (prices.length - 1);
-      const y = h - pad - ((value - min) / range) * (h - 2 * pad);
-      if (index === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
+      const x =
+        pad + index * (w - 2 * pad) / (prices.length - 1);
+
+      const y =
+        h - pad - ((value - min) / range) * (h - 2 * pad);
+
+      if (index === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
     });
 
     ctx.stroke();
@@ -439,18 +788,25 @@
 
   function showPrice(value, pipSize) {
     const number = Number(value);
+
     if (!Number.isFinite(number)) return;
 
-    if (Number.isInteger(pipSize) && pipSize >= 0 && pipSize <= 10) {
+    if (Number.isInteger(pipSize) &&
+        pipSize >= 0 && pipSize <= 10) {
       decimals = pipSize;
     }
 
     prices.push(number);
-    if (prices.length > 100) prices.shift();
+
+    if (prices.length > 100) {
+      prices.shift();
+    }
 
     priceEl.textContent = number.toFixed(decimals);
+
     updatedEl.textContent =
       "Last updated: " + new Date().toLocaleTimeString();
+
     drawChart();
   }
 
@@ -461,6 +817,7 @@
     if (socket) {
       const old = socket;
       socket = null;
+
       old.onopen = null;
       old.onmessage = null;
       old.onerror = null;
@@ -477,28 +834,38 @@
 
   function reconnect(myGeneration) {
     clearTimeout(reconnectTimer);
+
     reconnectTimer = setTimeout(() => {
-      if (myGeneration === generation) connect();
+      if (myGeneration === generation) {
+        connect();
+      }
     }, retryDelay);
+
     retryDelay = Math.min(retryDelay * 2, 30000);
   }
 
   function connect() {
     stopConnection();
+
     const myGeneration = ++generation;
     const symbol = marketEl.value;
 
     prices = [];
     decimals = 2;
+
     priceEl.textContent = "Waiting for prices...";
     updatedEl.textContent = "Connecting...";
-    statusEl.textContent = "Connecting to Deriv public market data...";
+    statusEl.textContent =
+      "Connecting to Deriv public market data...";
+
     drawChart();
 
     try {
       socket = new WebSocket(MARKET_ENDPOINT);
     } catch (error) {
-      statusEl.textContent = "Connection could not start: " + error.message;
+      statusEl.textContent =
+        "Connection could not start: " + error.message;
+
       reconnect(myGeneration);
       return;
     }
@@ -507,7 +874,10 @@
       if (myGeneration !== generation) return;
 
       retryDelay = 5000;
-      statusEl.textContent = "Connected. Requesting market prices...";
+
+      statusEl.textContent =
+        "Connected. Requesting market prices...";
+
       socket.send(JSON.stringify({
         ticks: symbol,
         subscribe: 1,
@@ -519,40 +889,49 @@
       if (myGeneration !== generation) return;
 
       let data;
+
       try {
         data = JSON.parse(event.data);
       } catch (_) {
-        statusEl.textContent = "Received an unreadable server response.";
+        statusEl.textContent =
+          "Received an unreadable server response.";
         return;
       }
 
       if (data.error) {
-        statusEl.textContent = "API error: " + data.error.message;
+        statusEl.textContent =
+          "API error: " + data.error.message;
         return;
       }
 
       if (data.errors && data.errors.length) {
         statusEl.textContent =
-          "API error: " + (data.errors[0].message || "Request rejected");
+          "API error: " +
+          (data.errors[0].message || "Request rejected");
         return;
       }
 
       if (data.msg_type === "tick" && data.tick) {
         showPrice(data.tick.quote, data.tick.pip_size);
-        statusEl.textContent = "Live market data connected.";
+
+        statusEl.textContent =
+          "Live market data connected.";
         return;
       }
 
       if (data.msg_type) {
-        statusEl.textContent = "Server response: " + data.msg_type;
+        statusEl.textContent =
+          "Server response: " + data.msg_type;
       } else {
-        statusEl.textContent = "Connected; waiting for a price response.";
+        statusEl.textContent =
+          "Connected; waiting for a price response.";
       }
     };
 
     socket.onerror = () => {
       if (myGeneration === generation) {
-        statusEl.textContent = "WebSocket error. Waiting to reconnect.";
+        statusEl.textContent =
+          "WebSocket error. Waiting to reconnect.";
       }
     };
 
@@ -562,7 +941,9 @@
       statusEl.textContent =
         "Disconnected. Code: " + event.code +
         ". Reason: " + (event.reason || "Not provided") +
-        ". Retrying in " + (retryDelay / 1000) + " seconds...";
+        ". Retrying in " + (retryDelay / 1000) +
+        " seconds...";
+
       reconnect(myGeneration);
     };
   }
@@ -572,12 +953,14 @@
   marketEl.addEventListener("change", () => {
     marketNameEl.textContent =
       marketNames[marketEl.value] || marketEl.value;
+
     connect();
   });
 
   drawChart();
   connect();
   handleOAuthCallback();
+
 })();
 </script>
 </body>
