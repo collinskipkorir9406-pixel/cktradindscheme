@@ -36,7 +36,9 @@ footer{text-align:center;color:#8495ab;font-size:12px;padding:20px 0}
 <h1>CK Trading Bot</h1>
 <p>Your Trading Dashboard</p>
 <p>Public market information and trading tools</p>
-<a class="button" href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&amp;l=en&amp;brand=deriv">Log In to Deriv</a>
+<a class="button"
+href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&amp;l=en&amp;brand=deriv">
+Log In to Deriv</a>
 </header>
 
 <section class="panel">
@@ -66,7 +68,10 @@ footer{text-align:center;color:#8495ab;font-size:12px;padding:20px 0}
 <p class="muted" id="updated">No price received yet.</p>
 <canvas id="chart" width="800" height="300"></canvas>
 
-<p class="notice">Public market data only. No trades are placed. Prices are not guaranteed profits or trading advice.</p>
+<p class="notice">
+Public market data only. No trades are placed.
+Prices are not guaranteed profits or trading advice.
+</p>
 </section>
 
 <section class="panel">
@@ -95,6 +100,9 @@ footer{text-align:center;color:#8495ab;font-size:12px;padding:20px 0}
 (function(){
 "use strict";
 
+/* Test App ID: 1089.
+   Replace only with your verified numeric Deriv App ID
+   when you have confirmed it in the application manager. */
 const APP_ID = 1089;
 const ENDPOINT =
   "wss://ws.derivws.com/websockets/v3?app_id=" + APP_ID;
@@ -121,6 +129,8 @@ let pingTimer = null;
 let prices = [];
 let generation = 0;
 let decimals = 2;
+let retryDelay = 5000;
+let tickSubscription = null;
 
 function drawChart(){
   const w = canvas.width;
@@ -157,7 +167,6 @@ function drawChart(){
   prices.forEach(function(value,index){
     const x = pad + index*(w-2*pad)/(prices.length-1);
     const y = h-pad-((value-min)/range)*(h-2*pad);
-
     if(index===0) ctx.moveTo(x,y);
     else ctx.lineTo(x,y);
   });
@@ -186,6 +195,29 @@ function showPrice(value,pipSize){
 function sendRequest(data){
   if(socket && socket.readyState===WebSocket.OPEN){
     socket.send(JSON.stringify(data));
+    return true;
+  }
+  return false;
+}
+
+function stopConnection(){
+  clearTimeout(reconnectTimer);
+  clearInterval(pingTimer);
+  pingTimer = null;
+
+  if(socket){
+    const oldSocket = socket;
+    socket = null;
+    oldSocket.onopen = null;
+    oldSocket.onmessage = null;
+    oldSocket.onerror = null;
+    oldSocket.onclose = null;
+    try{
+      if(oldSocket.readyState===WebSocket.OPEN ||
+         oldSocket.readyState===WebSocket.CONNECTING){
+        oldSocket.close();
+      }
+    }catch(e){}
   }
 }
 
@@ -193,38 +225,29 @@ function scheduleReconnect(myGeneration){
   clearTimeout(reconnectTimer);
   reconnectTimer = setTimeout(function(){
     if(myGeneration===generation) connect();
-  },10000);
+  },retryDelay);
+  retryDelay = Math.min(retryDelay*2,30000);
 }
 
 function connect(){
-  clearTimeout(reconnectTimer);
-  clearInterval(pingTimer);
-
-  if(socket){
-    const oldSocket = socket;
-    socket = null;
-    oldSocket.onclose = null;
-    oldSocket.onerror = null;
-    oldSocket.onmessage = null;
-    oldSocket.onopen = null;
-    try{oldSocket.close();}catch(e){}
-  }
+  stopConnection();
 
   const myGeneration = ++generation;
   const symbol = marketEl.value;
-
+  tickSubscription = null;
   prices = [];
   decimals = 2;
+
   priceEl.textContent = "Waiting for prices...";
   updatedEl.textContent = "Connecting...";
-  statusEl.textContent = "Connecting to Deriv...";
+  statusEl.textContent = "Opening WebSocket connection...";
   drawChart();
 
   try{
     socket = new WebSocket(ENDPOINT);
   }catch(error){
     statusEl.textContent =
-      "Connection setup failed: " + error.message;
+      "Could not create connection: " + error.message;
     scheduleReconnect(myGeneration);
     return;
   }
@@ -232,9 +255,18 @@ function connect(){
   socket.onopen = function(){
     if(myGeneration!==generation) return;
 
+    retryDelay = 5000;
     statusEl.textContent =
-      "Connected. Requesting market history...";
+      "Connected. Requesting live prices...";
 
+    /* Request live ticks directly. */
+    sendRequest({
+      ticks:symbol,
+      subscribe:1,
+      req_id:2
+    });
+
+    /* Request historical data separately. */
     sendRequest({
       ticks_history:symbol,
       count:50,
@@ -255,7 +287,7 @@ function connect(){
     try{
       data = JSON.parse(event.data);
     }catch(error){
-      statusEl.textContent = "Could not read server response.";
+      statusEl.textContent = "Received unreadable server data.";
       return;
     }
 
@@ -265,45 +297,50 @@ function connect(){
       return;
     }
 
+    if(data.msg_type==="ping"){
+      return;
+    }
+
     if(data.msg_type==="history" && data.history){
-      prices = (data.history.prices || [])
+      const historyPrices = (data.history.prices || [])
         .map(Number)
-        .filter(Number.isFinite)
-        .slice(-100);
+        .filter(Number.isFinite);
 
-      if(Number.isInteger(data.pip_size)){
-        decimals = data.pip_size;
-      }
-
-      if(prices.length){
+      if(historyPrices.length){
+        prices = historyPrices.slice(-100);
+        if(Number.isInteger(data.pip_size)){
+          decimals = data.pip_size;
+        }
         priceEl.textContent =
           prices[prices.length-1].toFixed(decimals);
-        updatedEl.textContent = "Historical prices loaded.";
+        updatedEl.textContent = "Historical prices received.";
+        drawChart();
       }
-
-      drawChart();
-
-      statusEl.textContent =
-        "History loaded. Requesting live prices...";
-
-      sendRequest({
-        ticks:symbol,
-        subscribe:1,
-        req_id:2
-      });
       return;
     }
 
     if(data.msg_type==="tick" && data.tick){
+      if(data.subscription){
+        tickSubscription = data.subscription.id;
+      }
       showPrice(data.tick.quote,data.tick.pip_size);
       statusEl.textContent = "Live market data connected.";
+      return;
+    }
+
+    if(data.msg_type==="ohlc" || data.msg_type==="active_symbols"){
+      return;
+    }
+
+    if(data.msg_type){
+      statusEl.textContent = "Server response: " + data.msg_type;
     }
   };
 
   socket.onerror = function(){
     if(myGeneration===generation){
       statusEl.textContent =
-        "WebSocket error. Waiting for connection details...";
+        "WebSocket error. Waiting for close details...";
     }
   };
 
@@ -311,12 +348,13 @@ function connect(){
     if(myGeneration!==generation) return;
 
     clearInterval(pingTimer);
+    pingTimer = null;
 
     statusEl.textContent =
       "Disconnected.\n" +
       "Code: " + event.code + "\n" +
       "Reason: " + (event.reason || "Not provided") +
-      "\nRetrying in 10 seconds...";
+      "\nRetrying in " + (retryDelay/1000) + " seconds...";
 
     scheduleReconnect(myGeneration);
   };
