@@ -2,429 +2,314 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#08111f">
+<meta name="deriv-site-verification" content="ded285725a66c864612bf8d91ba4de4b63642ce64f6dd2f14fed08d232275b4a">
+<title>CK Trading Bot</title>
 
-  <meta name="deriv-site-verification"
-    content="ded285725a66c864612bf8d91ba4de4b63642ce64f6dd2f14fed08d232275b4a">
-
-  <meta name="theme-color" content="#08111f">
-  <title>CK Trading Bot</title>
-
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      padding: 16px;
-      background: #08111f;
-      color: #f3f6fc;
-      font-family: Arial, sans-serif;
-    }
-
-    .container {
-      max-width: 900px;
-      margin: auto;
-    }
-
-    header {
-      text-align: center;
-      padding: 25px 8px;
-    }
-
-    header h1 { color: #28d7a1; }
-
-    header p, .muted, .notice {
-      color: #aab8cb;
-      line-height: 1.6;
-    }
-
-    .panel {
-      background: #111e30;
-      border: 1px solid #263950;
-      border-radius: 14px;
-      padding: 18px;
-      margin-bottom: 18px;
-    }
-
-    h2 { font-size: 20px; }
-
-    .button {
-      display: inline-block;
-      background: #28d7a1;
-      color: #07151a;
-      text-decoration: none;
-      font-weight: bold;
-      padding: 13px 18px;
-      border-radius: 8px;
-      margin: 8px 5px 0 0;
-    }
-
-    .secondary {
-      background: #263950;
-      color: white;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 14px;
-    }
-
-    .small-card {
-      background: #0b1727;
-      border-radius: 10px;
-      padding: 16px;
-      overflow-wrap: anywhere;
-    }
-
-    .status {
-      color: #ffd166;
-      overflow-wrap: anywhere;
-      line-height: 1.5;
-    }
-
-    .price {
-      font-size: clamp(25px, 6vw, 36px);
-      font-weight: bold;
-      color: #28d7a1;
-      margin: 18px 0;
-      overflow-wrap: anywhere;
-    }
-
-    canvas {
-      width: 100%;
-      height: 220px;
-      display: block;
-      background: #0b1727;
-      border-radius: 8px;
-      margin-top: 15px;
-    }
-
-    label, select {
-      display: block;
-      margin: 10px 0;
-    }
-
-    select {
-      width: 100%;
-      padding: 12px;
-      background: #0b1727;
-      color: white;
-      border: 1px solid #263950;
-      border-radius: 8px;
-    }
-
-    footer {
-      text-align: center;
-      color: #8495ab;
-      font-size: 12px;
-      padding: 20px 0;
-    }
-  </style>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:16px;background:#08111f;color:#f3f6fc;font-family:Arial,sans-serif}
+.container{max-width:900px;margin:auto}
+header{text-align:center;padding:24px 8px}
+h1{color:#28d7a1}
+header p,.muted,.notice{color:#aab8cb;line-height:1.6}
+.panel{background:#111e30;border:1px solid #263950;border-radius:14px;padding:18px;margin-bottom:18px}
+h2{font-size:20px}
+.button{display:inline-block;background:#28d7a1;color:#07151a;text-decoration:none;font-weight:bold;padding:13px 18px;border-radius:8px;margin:8px 5px 0 0}
+.secondary{background:#263950;color:white}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
+.small-card{background:#0b1727;border-radius:10px;padding:16px;overflow-wrap:anywhere}
+.status{color:#ffd166;line-height:1.5;overflow-wrap:anywhere}
+.price{font-size:clamp(25px,6vw,36px);font-weight:bold;color:#28d7a1;margin:18px 0;overflow-wrap:anywhere}
+select{width:100%;padding:13px;background:#0b1727;color:white;border:1px solid #263950;border-radius:8px;margin:10px 0}
+canvas{width:100%;height:220px;display:block;background:#0b1727;border-radius:8px;margin-top:15px}
+.notice{font-size:13px}
+footer{text-align:center;color:#8495ab;font-size:12px;padding:20px 0}
+</style>
 </head>
 
 <body>
 <main class="container">
+<header>
+<h1>CK Trading Bot</h1>
+<p>Your Trading Dashboard</p>
+<p>Public market information and trading tools</p>
+<a class="button" href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&amp;l=en&amp;brand=deriv">Log In to Deriv</a>
+</header>
 
-  <header>
-    <h1>CK Trading Bot</h1>
-    <p>Your Trading Dashboard</p>
-    <p>Public market information and trading tools</p>
+<section class="panel">
+<h2>Market Overview</h2>
+<label for="market">Select market</label>
+<select id="market">
+<option value="R_100">Volatility 100 Index</option>
+<option value="R_75">Volatility 75 Index</option>
+<option value="R_50">Volatility 50 Index</option>
+<option value="R_25">Volatility 25 Index</option>
+<option value="R_10">Volatility 10 Index</option>
+</select>
 
-    <a class="button"
-       href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&amp;l=en&amp;brand=deriv">
-      Log In to Deriv
-    </a>
-  </header>
+<div class="grid">
+<div class="small-card">
+<strong>Selected Market</strong>
+<p class="muted" id="market-name">Volatility 100 Index</p>
+</div>
+<div class="small-card">
+<strong>Connection Status</strong>
+<p class="status" id="status">Connecting...</p>
+</div>
+</div>
 
-  <section class="panel">
-    <h2>Market Overview</h2>
+<h2>Latest Market Price</h2>
+<div class="price" id="price">Waiting for prices...</div>
+<p class="muted" id="updated">Waiting for market data...</p>
+<canvas id="chart" width="800" height="300"></canvas>
 
-    <label for="market">Select market</label>
-    <select id="market">
-      <option value="R_100">Volatility 100 Index</option>
-      <option value="R_75">Volatility 75 Index</option>
-      <option value="R_50">Volatility 50 Index</option>
-      <option value="R_25">Volatility 25 Index</option>
-      <option value="R_10">Volatility 10 Index</option>
-    </select>
+<p class="notice">Public market data only. No trades are placed. Prices can change rapidly and do not guarantee profits.</p>
+</section>
 
-    <div class="grid">
-      <div class="small-card">
-        <strong>Selected Market</strong>
-        <p id="market-name" class="muted">Volatility 100 Index</p>
-      </div>
+<section class="panel">
+<h2>Trading Dashboard</h2>
+<div class="grid">
+<div class="small-card">
+<strong>Account Balance</strong>
+<p class="muted">Account authorization not connected.</p>
+</div>
+<div class="small-card">
+<strong>Trading Signals</strong>
+<p class="muted">Not connected.</p>
+</div>
+<div class="small-card">
+<strong>Bot Status</strong>
+<p class="muted">Market-data testing only. Automated trading is disabled.</p>
+</div>
+</div>
+<a class="button secondary" href="https://app.deriv.com/">Open Deriv</a>
+</section>
 
-      <div class="small-card">
-        <strong>Connection Status</strong>
-        <p id="ck-status" class="status">Connecting...</p>
-      </div>
-    </div>
-
-    <h2>Latest Market Price</h2>
-    <div id="ck-price" class="price">Waiting for prices...</div>
-    <p class="muted" id="last-update">No price received yet.</p>
-
-    <canvas id="ck-chart" width="800" height="300"
-      aria-label="Live market price chart"></canvas>
-
-    <p class="notice">
-      Public market-data display only. This website does not place trades
-      or guarantee profits. Prices may change rapidly.
-    </p>
-  </section>
-
-  <section class="panel">
-    <h2>Trading Dashboard</h2>
-
-    <div class="grid">
-      <div class="small-card">
-        <strong>Account Balance</strong>
-        <p class="muted">Connect and authorize an account before adding this feature.</p>
-      </div>
-
-      <div class="small-card">
-        <strong>Trading Signals</strong>
-        <p class="muted">Not available yet. No signals are being generated.</p>
-      </div>
-
-      <div class="small-card">
-        <strong>Bot Status</strong>
-        <p class="muted">Market-data testing only. Automated trading is disabled.</p>
-      </div>
-    </div>
-
-    <a class="button secondary" href="https://app.deriv.com/">
-      Open Deriv
-    </a>
-  </section>
-
-  <footer>
-    CK Trading Bot | Independent third-party interface
-  </footer>
+<footer>CK Trading Bot | Independent third-party interface</footer>
 </main>
 
 <script>
-(function () {
-  "use strict";
+(function(){
+"use strict";
 
-  const APP_ID = "34JjnKJzecylG5kwmjaXm";
-  const ENDPOINT =
-    "wss://ws.derivws.com/websockets/v3?app_id=" +
-    encodeURIComponent(APP_ID);
+/* Deriv's documented example/testing app ID.
+   Replace with your approved numeric app ID before production. */
+const APP_ID = 1089;
+const ENDPOINT = "wss://ws.derivws.com/websockets/v3?app_id=" + APP_ID;
 
-  const status = document.getElementById("ck-status");
-  const priceDisplay = document.getElementById("ck-price");
-  const updateDisplay = document.getElementById("last-update");
-  const marketSelect = document.getElementById("market");
-  const marketName = document.getElementById("market-name");
-  const canvas = document.getElementById("ck-chart");
-  const ctx = canvas.getContext("2d");
+const statusEl = document.getElementById("status");
+const priceEl = document.getElementById("price");
+const updatedEl = document.getElementById("updated");
+const marketEl = document.getElementById("market");
+const marketNameEl = document.getElementById("market-name");
+const canvas = document.getElementById("chart");
+const ctx = canvas.getContext("2d");
 
-  let socket = null;
-  let reconnectTimer = null;
-  let prices = [];
-  let connectionNumber = 0;
+const names = {
+  R_100:"Volatility 100 Index",
+  R_75:"Volatility 75 Index",
+  R_50:"Volatility 50 Index",
+  R_25:"Volatility 25 Index",
+  R_10:"Volatility 10 Index"
+};
 
-  const marketNames = {
-    R_100: "Volatility 100 Index",
-    R_75: "Volatility 75 Index",
-    R_50: "Volatility 50 Index",
-    R_25: "Volatility 25 Index",
-    R_10: "Volatility 10 Index"
-  };
+let ws = null;
+let reconnectTimer = null;
+let pingTimer = null;
+let prices = [];
+let generation = 0;
+let decimals = 2;
 
-  function drawChart() {
-    const width = canvas.width;
-    const height = canvas.height;
+function drawChart(){
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0,0,w,h);
+  ctx.strokeStyle = "#263950";
+  ctx.lineWidth = 1;
 
-    ctx.clearRect(0, 0, width, height);
-
-    ctx.strokeStyle = "#263950";
-    ctx.lineWidth = 1;
-
-    for (let i = 1; i <= 3; i++) {
-      const y = i * height / 4;
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(width, y);
-      ctx.stroke();
-    }
-
-    if (prices.length < 2) {
-      ctx.fillStyle = "#aab8cb";
-      ctx.font = "16px Arial";
-      ctx.fillText("Waiting for market prices...", 18, 35);
-      return;
-    }
-
-    const min = Math.min(...prices);
-    const max = Math.max(...prices);
-    const range = max - min || 1;
-    const padding = 20;
-
+  for(let i=1;i<4;i++){
+    const y = h*i/4;
     ctx.beginPath();
-    ctx.strokeStyle = "#28d7a1";
-    ctx.lineWidth = 3;
-
-    prices.forEach(function (value, index) {
-      const x = padding +
-        index * (width - padding * 2) / (prices.length - 1);
-
-      const y = height - padding -
-        ((value - min) / range) * (height - padding * 2);
-
-      if (index === 0) {
-        ctx.moveTo(x, y);
-      } else {
-        ctx.lineTo(x, y);
-      }
-    });
-
+    ctx.moveTo(0,y);
+    ctx.lineTo(w,y);
     ctx.stroke();
   }
 
-  function addPrice(value, digits) {
-    const number = Number(value);
-
-    if (!Number.isFinite(number)) return;
-
-    prices.push(number);
-
-    if (prices.length > 100) {
-      prices.shift();
-    }
-
-    priceDisplay.textContent = number.toFixed(
-      Number.isInteger(digits) ? digits : 2
-    );
-
-    updateDisplay.textContent =
-      "Last updated: " + new Date().toLocaleTimeString();
-
-    drawChart();
+  if(prices.length < 2){
+    ctx.fillStyle = "#aab8cb";
+    ctx.font = "16px Arial";
+    ctx.fillText("Waiting for market prices...",18,35);
+    return;
   }
 
-  function sendRequest(request) {
-    if (socket && socket.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify(request));
-    }
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  const range = max-min || 1;
+  const pad = 20;
+
+  ctx.beginPath();
+  ctx.strokeStyle = "#28d7a1";
+  ctx.lineWidth = 3;
+
+  prices.forEach((v,i)=>{
+    const x = pad + i*(w-2*pad)/(prices.length-1);
+    const y = h-pad-((v-min)/range)*(h-2*pad);
+    if(i===0) ctx.moveTo(x,y);
+    else ctx.lineTo(x,y);
+  });
+
+  ctx.stroke();
+}
+
+function showPrice(value,pipSize){
+  const n = Number(value);
+  if(!Number.isFinite(n)) return;
+
+  if(Number.isInteger(pipSize) && pipSize >= 0 && pipSize <= 10){
+    decimals = pipSize;
   }
 
-  function connect() {
-    clearTimeout(reconnectTimer);
+  prices.push(n);
+  if(prices.length > 100) prices.shift();
 
-    const thisConnection = ++connectionNumber;
-    const symbol = marketSelect.value;
+  priceEl.textContent = n.toFixed(decimals);
+  updatedEl.textContent = "Last updated: " + new Date().toLocaleTimeString();
+  drawChart();
+}
 
-    status.textContent = "Connecting to public market data...";
-    priceDisplay.textContent = "Waiting for prices...";
-    updateDisplay.textContent = "Connecting...";
-    prices = [];
-    drawChart();
+function send(obj){
+  if(ws && ws.readyState === WebSocket.OPEN){
+    ws.send(JSON.stringify(obj));
+  }
+}
 
-    try {
-      socket = new WebSocket(ENDPOINT);
-    } catch (error) {
-      status.textContent = "Could not start connection. Retrying...";
-      scheduleReconnect();
+function cleanup(){
+  clearTimeout(reconnectTimer);
+  clearInterval(pingTimer);
+
+  if(ws){
+    const old = ws;
+    ws = null;
+    old.onclose = null;
+    try { old.close(); } catch(e) {}
+  }
+}
+
+function scheduleReconnect(myGeneration){
+  clearTimeout(reconnectTimer);
+  reconnectTimer = setTimeout(()=>{
+    if(myGeneration === generation) connect();
+  },10000);
+}
+
+function connect(){
+  cleanup();
+  const myGeneration = ++generation;
+  const symbol = marketEl.value;
+
+  prices = [];
+  decimals = 2;
+  priceEl.textContent = "Waiting for prices...";
+  updatedEl.textContent = "Connecting...";
+  statusEl.textContent = "Connecting to Deriv public market data...";
+  drawChart();
+
+  try{
+    ws = new WebSocket(ENDPOINT);
+  }catch(e){
+    statusEl.textContent = "Unable to start connection. Retrying...";
+    scheduleReconnect(myGeneration);
+    return;
+  }
+
+  ws.onopen = function(){
+    if(myGeneration !== generation) return;
+
+    statusEl.textContent = "Connected. Loading market history...";
+
+    send({
+      ticks_history:symbol,
+      count:50,
+      end:"latest",
+      style:"ticks",
+      req_id:1
+    });
+
+    pingTimer = setInterval(()=>{
+      send({ping:1});
+    },30000);
+  };
+
+  ws.onmessage = function(event){
+    if(myGeneration !== generation) return;
+
+    let data;
+    try{
+      data = JSON.parse(event.data);
+    }catch(e){
+      statusEl.textContent = "Could not read server response.";
       return;
     }
 
-    socket.onopen = function () {
-      if (thisConnection !== connectionNumber) return;
-
-      status.textContent = "Connected. Loading price history...";
-
-      sendRequest({
-        ticks_history: symbol,
-        count: 50,
-        end: "latest",
-        style: "ticks",
-        req_id: 1
-      });
-    };
-
-    socket.onmessage = function (event) {
-      if (thisConnection !== connectionNumber) return;
-
-      let data;
-
-      try {
-        data = JSON.parse(event.data);
-      } catch (error) {
-        status.textContent = "Unable to read server response.";
-        return;
-      }
-
-      if (data.error) {
-        status.textContent = "API error: " + data.error.message;
-        return;
-      }
-
-      if (data.history && data.history.prices) {
-        prices = data.history.prices
-          .map(Number)
-          .filter(Number.isFinite)
-          .slice(-100);
-
-        if (prices.length) {
-          const latest = prices[prices.length - 1];
-          addPrice(latest, data.pip_size);
-        }
-
-        drawChart();
-        status.textContent = "History loaded. Starting live feed...";
-
-        sendRequest({
-          ticks: symbol,
-          subscribe: 1,
-          req_id: 2
-        });
-
-        return;
-      }
-
-      if (data.msg_type === "tick" && data.tick) {
-        addPrice(data.tick.quote, data.tick.pip_size);
-        status.textContent = "Live market data connected.";
-      }
-    };
-
-    socket.onerror = function () {
-      if (thisConnection === connectionNumber) {
-        status.textContent = "Connection error. Checking connection...";
-      }
-    };
-
-    socket.onclose = function () {
-      if (thisConnection !== connectionNumber) return;
-
-      status.textContent = "Disconnected. Retrying in 10 seconds...";
-      scheduleReconnect();
-    };
-  }
-
-  function scheduleReconnect() {
-    clearTimeout(reconnectTimer);
-    reconnectTimer = setTimeout(connect, 10000);
-  }
-
-  marketSelect.addEventListener("change", function () {
-    marketName.textContent = marketNames[marketSelect.value] ||
-      marketSelect.value;
-
-    if (socket) {
-      socket.onclose = null;
-      socket.close();
+    if(data.error){
+      statusEl.textContent = "API error: " + data.error.message;
+      return;
     }
 
-    connect();
-  });
+    if(data.msg_type === "history" && data.history){
+      prices = (data.history.prices || [])
+        .map(Number)
+        .filter(Number.isFinite)
+        .slice(-100);
 
-  drawChart();
+      if(Number.isInteger(data.pip_size)){
+        decimals = data.pip_size;
+      }
+
+      if(prices.length){
+        priceEl.textContent = prices[prices.length-1].toFixed(decimals);
+        updatedEl.textContent = "Historical prices loaded.";
+      }
+
+      drawChart();
+      statusEl.textContent = "History loaded. Starting live feed...";
+
+      send({ticks:symbol,subscribe:1,req_id:2});
+      return;
+    }
+
+    if(data.msg_type === "tick" && data.tick){
+      showPrice(data.tick.quote,data.tick.pip_size);
+      statusEl.textContent = "Live market data connected.";
+    }
+
+    if(data.msg_type === "ping"){
+      statusEl.textContent = "Connected to Deriv.";
+    }
+  };
+
+  ws.onerror = function(){
+    if(myGeneration === generation){
+      statusEl.textContent = "Connection error. Check internet or app ID.";
+    }
+  };
+
+  ws.onclose = function(){
+    if(myGeneration !== generation) return;
+    clearInterval(pingTimer);
+    statusEl.textContent = "Disconnected. Retrying in 10 seconds...";
+    scheduleReconnect(myGeneration);
+  };
+}
+
+marketEl.addEventListener("change",function(){
+  marketNameEl.textContent = names[marketEl.value] || marketEl.value;
   connect();
+});
+
+connect();
 })();
 </script>
 </body>
