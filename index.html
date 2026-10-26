@@ -19,9 +19,9 @@ header p,.muted,.notice{color:#aab8cb;line-height:1.6}
 h2{font-size:20px}
 .button{display:inline-block;background:#28d7a1;color:#07151a;text-decoration:none;font-weight:bold;padding:13px 18px;border-radius:8px;margin:8px 5px 0 0}
 .secondary{background:#263950;color:white}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
 .small-card{background:#0b1727;border-radius:10px;padding:16px;overflow-wrap:anywhere}
-.status{color:#ffd166;line-height:1.5;overflow-wrap:anywhere}
+.status{color:#ffd166;line-height:1.6;overflow-wrap:anywhere;white-space:pre-wrap}
 .price{font-size:clamp(25px,6vw,36px);font-weight:bold;color:#28d7a1;margin:18px 0;overflow-wrap:anywhere}
 select{width:100%;padding:13px;background:#0b1727;color:white;border:1px solid #263950;border-radius:8px;margin:10px 0}
 canvas{width:100%;height:220px;display:block;background:#0b1727;border-radius:8px;margin-top:15px}
@@ -57,16 +57,16 @@ footer{text-align:center;color:#8495ab;font-size:12px;padding:20px 0}
 </div>
 <div class="small-card">
 <strong>Connection Status</strong>
-<p class="status" id="status">Connecting...</p>
+<p class="status" id="status">Starting connection...</p>
 </div>
 </div>
 
 <h2>Latest Market Price</h2>
 <div class="price" id="price">Waiting for prices...</div>
-<p class="muted" id="updated">Waiting for market data...</p>
+<p class="muted" id="updated">No price received yet.</p>
 <canvas id="chart" width="800" height="300"></canvas>
 
-<p class="notice">Public market data only. No trades are placed. Prices can change rapidly and do not guarantee profits.</p>
+<p class="notice">Public market data only. No trades are placed. Prices are not guaranteed profits or trading advice.</p>
 </section>
 
 <section class="panel">
@@ -74,7 +74,7 @@ footer{text-align:center;color:#8495ab;font-size:12px;padding:20px 0}
 <div class="grid">
 <div class="small-card">
 <strong>Account Balance</strong>
-<p class="muted">Account authorization not connected.</p>
+<p class="muted">Account authorization is not connected.</p>
 </div>
 <div class="small-card">
 <strong>Trading Signals</strong>
@@ -95,10 +95,9 @@ footer{text-align:center;color:#8495ab;font-size:12px;padding:20px 0}
 (function(){
 "use strict";
 
-/* Deriv's documented example/testing app ID.
-   Replace with your approved numeric app ID before production. */
 const APP_ID = 1089;
-const ENDPOINT = "wss://ws.derivws.com/websockets/v3?app_id=" + APP_ID;
+const ENDPOINT =
+  "wss://ws.derivws.com/websockets/v3?app_id=" + APP_ID;
 
 const statusEl = document.getElementById("status");
 const priceEl = document.getElementById("price");
@@ -108,7 +107,7 @@ const marketNameEl = document.getElementById("market-name");
 const canvas = document.getElementById("chart");
 const ctx = canvas.getContext("2d");
 
-const names = {
+const marketNames = {
   R_100:"Volatility 100 Index",
   R_75:"Volatility 75 Index",
   R_50:"Volatility 50 Index",
@@ -116,7 +115,7 @@ const names = {
   R_10:"Volatility 10 Index"
 };
 
-let ws = null;
+let socket = null;
 let reconnectTimer = null;
 let pingTimer = null;
 let prices = [];
@@ -124,8 +123,10 @@ let generation = 0;
 let decimals = 2;
 
 function drawChart(){
-  const w = canvas.width, h = canvas.height;
+  const w = canvas.width;
+  const h = canvas.height;
   ctx.clearRect(0,0,w,h);
+
   ctx.strokeStyle = "#263950";
   ctx.lineWidth = 1;
 
@@ -153,10 +154,11 @@ function drawChart(){
   ctx.strokeStyle = "#28d7a1";
   ctx.lineWidth = 3;
 
-  prices.forEach((v,i)=>{
-    const x = pad + i*(w-2*pad)/(prices.length-1);
-    const y = h-pad-((v-min)/range)*(h-2*pad);
-    if(i===0) ctx.moveTo(x,y);
+  prices.forEach(function(value,index){
+    const x = pad + index*(w-2*pad)/(prices.length-1);
+    const y = h-pad-((value-min)/range)*(h-2*pad);
+
+    if(index===0) ctx.moveTo(x,y);
     else ctx.lineTo(x,y);
   });
 
@@ -167,45 +169,47 @@ function showPrice(value,pipSize){
   const n = Number(value);
   if(!Number.isFinite(n)) return;
 
-  if(Number.isInteger(pipSize) && pipSize >= 0 && pipSize <= 10){
+  if(Number.isInteger(pipSize) && pipSize>=0 && pipSize<=10){
     decimals = pipSize;
   }
 
   prices.push(n);
-  if(prices.length > 100) prices.shift();
+  if(prices.length>100) prices.shift();
 
   priceEl.textContent = n.toFixed(decimals);
-  updatedEl.textContent = "Last updated: " + new Date().toLocaleTimeString();
+  updatedEl.textContent =
+    "Last updated: " + new Date().toLocaleTimeString();
+
   drawChart();
 }
 
-function send(obj){
-  if(ws && ws.readyState === WebSocket.OPEN){
-    ws.send(JSON.stringify(obj));
-  }
-}
-
-function cleanup(){
-  clearTimeout(reconnectTimer);
-  clearInterval(pingTimer);
-
-  if(ws){
-    const old = ws;
-    ws = null;
-    old.onclose = null;
-    try { old.close(); } catch(e) {}
+function sendRequest(data){
+  if(socket && socket.readyState===WebSocket.OPEN){
+    socket.send(JSON.stringify(data));
   }
 }
 
 function scheduleReconnect(myGeneration){
   clearTimeout(reconnectTimer);
-  reconnectTimer = setTimeout(()=>{
-    if(myGeneration === generation) connect();
+  reconnectTimer = setTimeout(function(){
+    if(myGeneration===generation) connect();
   },10000);
 }
 
 function connect(){
-  cleanup();
+  clearTimeout(reconnectTimer);
+  clearInterval(pingTimer);
+
+  if(socket){
+    const oldSocket = socket;
+    socket = null;
+    oldSocket.onclose = null;
+    oldSocket.onerror = null;
+    oldSocket.onmessage = null;
+    oldSocket.onopen = null;
+    try{oldSocket.close();}catch(e){}
+  }
+
   const myGeneration = ++generation;
   const symbol = marketEl.value;
 
@@ -213,23 +217,25 @@ function connect(){
   decimals = 2;
   priceEl.textContent = "Waiting for prices...";
   updatedEl.textContent = "Connecting...";
-  statusEl.textContent = "Connecting to Deriv public market data...";
+  statusEl.textContent = "Connecting to Deriv...";
   drawChart();
 
   try{
-    ws = new WebSocket(ENDPOINT);
-  }catch(e){
-    statusEl.textContent = "Unable to start connection. Retrying...";
+    socket = new WebSocket(ENDPOINT);
+  }catch(error){
+    statusEl.textContent =
+      "Connection setup failed: " + error.message;
     scheduleReconnect(myGeneration);
     return;
   }
 
-  ws.onopen = function(){
-    if(myGeneration !== generation) return;
+  socket.onopen = function(){
+    if(myGeneration!==generation) return;
 
-    statusEl.textContent = "Connected. Loading market history...";
+    statusEl.textContent =
+      "Connected. Requesting market history...";
 
-    send({
+    sendRequest({
       ticks_history:symbol,
       count:50,
       end:"latest",
@@ -237,28 +243,29 @@ function connect(){
       req_id:1
     });
 
-    pingTimer = setInterval(()=>{
-      send({ping:1});
+    pingTimer = setInterval(function(){
+      sendRequest({ping:1});
     },30000);
   };
 
-  ws.onmessage = function(event){
-    if(myGeneration !== generation) return;
+  socket.onmessage = function(event){
+    if(myGeneration!==generation) return;
 
     let data;
     try{
       data = JSON.parse(event.data);
-    }catch(e){
+    }catch(error){
       statusEl.textContent = "Could not read server response.";
       return;
     }
 
     if(data.error){
-      statusEl.textContent = "API error: " + data.error.message;
+      statusEl.textContent =
+        "API error: " + data.error.message;
       return;
     }
 
-    if(data.msg_type === "history" && data.history){
+    if(data.msg_type==="history" && data.history){
       prices = (data.history.prices || [])
         .map(Number)
         .filter(Number.isFinite)
@@ -269,46 +276,59 @@ function connect(){
       }
 
       if(prices.length){
-        priceEl.textContent = prices[prices.length-1].toFixed(decimals);
+        priceEl.textContent =
+          prices[prices.length-1].toFixed(decimals);
         updatedEl.textContent = "Historical prices loaded.";
       }
 
       drawChart();
-      statusEl.textContent = "History loaded. Starting live feed...";
 
-      send({ticks:symbol,subscribe:1,req_id:2});
+      statusEl.textContent =
+        "History loaded. Requesting live prices...";
+
+      sendRequest({
+        ticks:symbol,
+        subscribe:1,
+        req_id:2
+      });
       return;
     }
 
-    if(data.msg_type === "tick" && data.tick){
+    if(data.msg_type==="tick" && data.tick){
       showPrice(data.tick.quote,data.tick.pip_size);
       statusEl.textContent = "Live market data connected.";
     }
+  };
 
-    if(data.msg_type === "ping"){
-      statusEl.textContent = "Connected to Deriv.";
+  socket.onerror = function(){
+    if(myGeneration===generation){
+      statusEl.textContent =
+        "WebSocket error. Waiting for connection details...";
     }
   };
 
-  ws.onerror = function(){
-    if(myGeneration === generation){
-      statusEl.textContent = "Connection error. Check internet or app ID.";
-    }
-  };
+  socket.onclose = function(event){
+    if(myGeneration!==generation) return;
 
-  ws.onclose = function(){
-    if(myGeneration !== generation) return;
     clearInterval(pingTimer);
-    statusEl.textContent = "Disconnected. Retrying in 10 seconds...";
+
+    statusEl.textContent =
+      "Disconnected.\n" +
+      "Code: " + event.code + "\n" +
+      "Reason: " + (event.reason || "Not provided") +
+      "\nRetrying in 10 seconds...";
+
     scheduleReconnect(myGeneration);
   };
 }
 
 marketEl.addEventListener("change",function(){
-  marketNameEl.textContent = names[marketEl.value] || marketEl.value;
+  marketNameEl.textContent =
+    marketNames[marketEl.value] || marketEl.value;
   connect();
 });
 
+drawChart();
 connect();
 })();
 </script>
