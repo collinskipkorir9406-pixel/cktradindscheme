@@ -10,139 +10,81 @@
 
   <style>
     * { box-sizing: border-box; }
-
     body {
-      margin: 0;
-      padding: 16px;
-      background: #08111f;
-      color: #f3f6fc;
-      font-family: Arial, sans-serif;
+      margin: 0; padding: 16px; background: #08111f;
+      color: #f3f6fc; font-family: Arial, sans-serif;
     }
-
     .container { max-width: 900px; margin: auto; }
     header { text-align: center; padding: 24px 8px; }
     h1 { color: #28d7a1; }
-
-    header p, .muted, .notice {
-      color: #aab8cb;
-      line-height: 1.6;
-    }
-
+    header p, .muted, .notice { color: #aab8cb; line-height: 1.6; }
     .panel {
-      background: #111e30;
-      border: 1px solid #263950;
-      border-radius: 14px;
-      padding: 18px;
-      margin-bottom: 18px;
+      background: #111e30; border: 1px solid #263950;
+      border-radius: 14px; padding: 18px; margin-bottom: 18px;
     }
-
     h2 { font-size: 20px; }
-
     .button {
-      display: inline-block;
-      background: #28d7a1;
-      color: #07151a;
-      text-decoration: none;
-      font-weight: bold;
-      padding: 13px 18px;
-      border: 0;
-      border-radius: 8px;
-      margin: 8px 5px 0 0;
-      cursor: pointer;
-      font-size: 15px;
+      display: inline-block; background: #28d7a1; color: #07151a;
+      text-decoration: none; font-weight: bold; padding: 13px 18px;
+      border: 0; border-radius: 8px; margin: 8px 5px 0 0;
+      cursor: pointer; font-size: 15px;
     }
-
+    .button:disabled { opacity: .45; cursor: not-allowed; }
     .secondary { background: #263950; color: white; }
-
+    .danger { background: #a93245; color: white; }
     .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 14px;
     }
-
     .small-card {
-      background: #0b1727;
-      border-radius: 10px;
-      padding: 16px;
-      overflow-wrap: anywhere;
-      min-width: 0;
+      background: #0b1727; border-radius: 10px; padding: 16px;
+      overflow-wrap: anywhere; min-width: 0;
     }
-
     .status {
-      color: #ffd166;
-      line-height: 1.6;
-      overflow-wrap: anywhere;
-      white-space: pre-wrap;
+      color: #ffd166; line-height: 1.6;
+      overflow-wrap: anywhere; white-space: pre-wrap;
     }
-
     .price {
-      font-size: clamp(25px, 6vw, 36px);
-      font-weight: bold;
-      color: #28d7a1;
-      margin: 18px 0;
-      overflow-wrap: anywhere;
+      font-size: clamp(25px, 6vw, 36px); font-weight: bold;
+      color: #28d7a1; margin: 18px 0; overflow-wrap: anywhere;
     }
-
     .balance-amount {
-      color: #28d7a1;
-      font-size: clamp(22px, 5vw, 30px);
-      font-weight: bold;
-      margin: 14px 0 8px;
-      overflow-wrap: anywhere;
+      color: #28d7a1; font-size: clamp(22px, 5vw, 30px);
+      font-weight: bold; margin: 14px 0 8px; overflow-wrap: anywhere;
     }
-
     #real-balance { color: #f3f6fc; }
-
-    select {
-      width: 100%;
-      padding: 13px;
-      background: #0b1727;
-      color: white;
-      border: 1px solid #263950;
-      border-radius: 8px;
-      margin: 10px 0;
+    select, input {
+      width: 100%; padding: 13px; background: #0b1727; color: white;
+      border: 1px solid #263950; border-radius: 8px; margin: 10px 0;
     }
-
+    label { display: block; margin-top: 12px; }
     canvas {
-      width: 100%;
-      height: 220px;
-      display: block;
-      background: #0b1727;
-      border-radius: 8px;
-      margin-top: 15px;
+      width: 100%; height: 220px; display: block; background: #0b1727;
+      border-radius: 8px; margin-top: 15px;
     }
-
     .notice { font-size: 13px; }
-
-    footer {
-      text-align: center;
-      color: #8495ab;
-      font-size: 12px;
-      padding: 20px 0;
-    }
+    footer { text-align: center; color: #8495ab; font-size: 12px; padding: 20px 0; }
   </style>
 </head>
 
 <body>
 <main class="container">
-
   <header>
     <h1>CK Trading Bot</h1>
     <p>Your Trading Dashboard</p>
-    <p>Public market information and trading tools</p>
+    <p>Public market information and Demo trading tools</p>
 
     <button class="button" id="login-button" type="button">
       Log In to Deriv
     </button>
-
-    <p class="status" id="login-status" aria-live="polite">
-      Not signed in.
-    </p>
+    <button class="button secondary" id="logout-button" type="button">
+      Disconnect
+    </button>
+    <p class="status" id="login-status" aria-live="polite">Not signed in.</p>
   </header>
 
   <section class="panel">
     <h2>Market Overview</h2>
-
     <label for="market">Select market</label>
     <select id="market">
       <option value="1HZ100V">Volatility 100 (1s) Index</option>
@@ -155,74 +97,116 @@
     <div class="grid">
       <div class="small-card">
         <strong>Selected Market</strong>
-        <p class="muted" id="market-name">
-          Volatility 100 (1s) Index
-        </p>
+        <p class="muted" id="market-name">Volatility 100 (1s) Index</p>
       </div>
-
       <div class="small-card">
-        <strong>Connection Status</strong>
-        <p class="status" id="status">
-          Starting connection...
-        </p>
+        <strong>Public Data Status</strong>
+        <p class="status" id="status">Connecting...</p>
       </div>
     </div>
 
     <h2>Latest Market Price</h2>
     <div class="price" id="price">Waiting for prices...</div>
     <p class="muted" id="updated">No price received yet.</p>
-
     <canvas id="chart" width="800" height="300"></canvas>
+    <p class="notice">Public market data is informational and is not a trading signal.</p>
+  </section>
+
+  <section class="panel">
+    <h2>Account Balances</h2>
+    <div class="grid">
+      <div class="small-card">
+        <strong>DEMO ACCOUNT</strong>
+        <div class="balance-amount" id="demo-balance">—</div>
+        <p class="muted" id="demo-balance-status">Sign in to load your demo balance.</p>
+      </div>
+      <div class="small-card">
+        <strong>REAL ACCOUNT</strong>
+        <div class="balance-amount" id="real-balance">—</div>
+        <p class="muted" id="real-balance-status">Sign in to load your real balance.</p>
+      </div>
+    </div>
+    <p class="notice">Balances are displayed only when returned by Deriv. A missing balance is not treated as zero.</p>
+    <a class="button secondary" href="https://app.deriv.com/" target="_blank" rel="noopener noreferrer">Open Deriv</a>
+  </section>
+
+  <section class="panel" id="demo-trading-panel">
+    <h2>Demo Trading</h2>
+    <p class="notice">
+      Demo practice only. Real-account purchasing is not implemented in this version.
+      Multiplier contracts can lose the entire stake.
+    </p>
+
+    <div class="small-card">
+      <strong>Trading account</strong>
+      <p class="status" id="demo-account-status">Not connected to a Demo trading session.</p>
+    </div>
+
+    <label for="demo-contract">Contract type</label>
+    <select id="demo-contract">
+      <option value="MULTUP">Multiplier Up</option>
+      <option value="MULTDOWN">Multiplier Down</option>
+    </select>
+
+    <label for="demo-stake">Stake in your Demo account currency</label>
+    <input id="demo-stake" type="number" min="1" max="10" step="0.01" value="1">
+
+    <label for="demo-multiplier">Multiplier</label>
+    <select id="demo-multiplier">
+      <option value="10">10×</option>
+      <option value="20">20×</option>
+      <option value="30">30×</option>
+      <option value="40">40×</option>
+      <option value="50">50×</option>
+    </select>
+
+    <label for="demo-duration">Contract duration</label>
+    <select id="demo-duration">
+      <option value="1">1 second</option>
+      <option value="5">5 seconds</option>
+      <option value="10">10 seconds</option>
+      <option value="30">30 seconds</option>
+      <option value="60">60 seconds</option>
+    </select>
+
+    <button class="button" id="demo-connect" type="button" disabled>
+      Connect Demo Trading
+    </button>
+    <button class="button secondary" id="demo-get-price" type="button" disabled>
+      Get Demo Quote
+    </button>
+    <button class="button" id="demo-buy" type="button" disabled>
+      Buy Demo Trade
+    </button>
+
+    <p class="status" id="demo-trade-status" aria-live="polite">
+      Sign in first. No trade has been placed.
+    </p>
+
+    <div class="small-card">
+      <strong>Latest quote</strong>
+      <p id="demo-quote" class="muted">No quote received.</p>
+      <p id="demo-quote-expiry" class="muted"></p>
+    </div>
+
+    <div class="small-card">
+      <strong>Latest trade result</strong>
+      <p id="demo-trade-result" class="muted">No Demo trade placed.</p>
+    </div>
 
     <p class="notice">
-      Public market data only. No trades are placed.
-      Prices can change quickly and are not trading advice.
+      Each quote is temporary. The bot checks the account type and requests a fresh
+      quote before purchase. A browser confirmation is required for every purchase.
     </p>
   </section>
 
   <section class="panel">
-    <h2>Trading Dashboard</h2>
-
-    <div class="grid">
-
-      <div class="small-card">
-        <strong>DEMO ACCOUNT</strong>
-        <div class="balance-amount" id="demo-balance">—</div>
-        <p class="muted" id="demo-balance-status">
-          Sign in to load your demo balance.
-        </p>
-      </div>
-
-      <div class="small-card">
-        <strong>REAL ACCOUNT</strong>
-        <div class="balance-amount" id="real-balance">—</div>
-        <p class="muted" id="real-balance-status">
-          Sign in to load your real balance.
-        </p>
-      </div>
-
-      <div class="small-card">
-        <strong>Trading Signals</strong>
-        <p class="muted">Not connected.</p>
-      </div>
-
-      <div class="small-card">
-        <strong>Bot Status</strong>
-        <p class="muted">
-          Market-data testing only. Automated trading is disabled.
-        </p>
-      </div>
-
-    </div>
-
-    <a class="button secondary" href="https://app.deriv.com/">
-      Open Deriv
-    </a>
+    <h2>Automation</h2>
+    <p class="muted">Automated strategies are not enabled in this version.</p>
+    <p class="notice">We will add strategy rules and risk limits only after manual Demo trading is verified.</p>
   </section>
 
-  <footer>
-    CK Trading Bot | Independent third-party interface
-  </footer>
+  <footer>CK Trading Bot | Independent third-party interface</footer>
 </main>
 
 <script>
@@ -230,34 +214,37 @@
 
 (function () {
   const APP_ID = "34MKk0BSq1Hz7mnKlIjHN";
-
-  const REDIRECT_URI =
-    "https://collinskipkorir9406-pixel.github.io/cktradindscheme/";
-
-  const WORKER_URL =
-    "https://steep-snow-a539.collinskipkorir70.workers.dev";
-
+  const REDIRECT_URI = "https://collinskipkorir9406-pixel.github.io/cktradindscheme/";
+  const WORKER_URL = "https://steep-snow-a539.collinskipkorir70.workers.dev";
   const AUTH_URL = "https://auth.deriv.com/oauth2/auth";
+  const MARKET_ENDPOINT = "wss://api.derivws.com/trading/v1/options/ws/public";
 
-  const MARKET_ENDPOINT =
-    "wss://api.derivws.com/trading/v1/options/ws/public";
+  const $ = id => document.getElementById(id);
 
-  const loginButton = document.getElementById("login-button");
-  const loginStatus = document.getElementById("login-status");
-  const statusEl = document.getElementById("status");
-  const priceEl = document.getElementById("price");
-  const updatedEl = document.getElementById("updated");
-  const marketEl = document.getElementById("market");
-  const marketNameEl = document.getElementById("market-name");
-  const canvas = document.getElementById("chart");
+  const loginButton = $("login-button");
+  const logoutButton = $("logout-button");
+  const loginStatus = $("login-status");
+  const statusEl = $("status");
+  const priceEl = $("price");
+  const updatedEl = $("updated");
+  const marketEl = $("market");
+  const marketNameEl = $("market-name");
+  const canvas = $("chart");
   const ctx = canvas.getContext("2d");
 
-  const demoBalanceEl = document.getElementById("demo-balance");
-  const realBalanceEl = document.getElementById("real-balance");
-  const demoBalanceStatus =
-    document.getElementById("demo-balance-status");
-  const realBalanceStatus =
-    document.getElementById("real-balance-status");
+  const demoBalanceEl = $("demo-balance");
+  const realBalanceEl = $("real-balance");
+  const demoBalanceStatus = $("demo-balance-status");
+  const realBalanceStatus = $("real-balance-status");
+
+  const demoAccountStatus = $("demo-account-status");
+  const demoTradeStatus = $("demo-trade-status");
+  const demoQuoteEl = $("demo-quote");
+  const demoQuoteExpiryEl = $("demo-quote-expiry");
+  const demoTradeResult = $("demo-trade-result");
+  const demoConnectButton = $("demo-connect");
+  const demoGetPriceButton = $("demo-get-price");
+  const demoBuyButton = $("demo-buy");
 
   const marketNames = {
     "1HZ100V": "Volatility 100 (1s) Index",
@@ -267,52 +254,41 @@
     "1HZ10V": "Volatility 10 (1s) Index"
   };
 
-  let socket = null;
+  let publicSocket = null;
   let reconnectTimer = null;
   let generation = 0;
   let retryDelay = 5000;
   let prices = [];
   let decimals = 2;
 
-  // Keep account sockets and login state in memory only.
-  window.ckBalanceSockets = [];
-  window.ckDerivAccessToken = null;
+  let accessToken = null;
+  let demoAccount = null;
+  let demoSocket = null;
+  let requestCounter = 10;
+  let pendingRequests = new Map();
+  let latestProposal = null;
+  let activeContractId = null;
+  let balanceSockets = [];
+  let loginAttempt = 0;
 
   function base64Url(bytes) {
     let binary = "";
-
-    for (const byte of bytes) {
-      binary += String.fromCharCode(byte);
-    }
-
-    return btoa(binary)
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_")
-      .replace(/=+$/, "");
+    for (const byte of bytes) binary += String.fromCharCode(byte);
+    return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   }
 
   function randomString(length) {
-    return base64Url(
-      crypto.getRandomValues(new Uint8Array(length))
-    );
+    return base64Url(crypto.getRandomValues(new Uint8Array(length)));
   }
 
   async function createCodeChallenge(verifier) {
-    const digest = await crypto.subtle.digest(
-      "SHA-256",
-      new TextEncoder().encode(verifier)
-    );
-
+    const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
     return base64Url(new Uint8Array(digest));
   }
 
   async function beginLogin() {
     try {
-      if (!window.crypto || !crypto.subtle) {
-        throw new Error(
-          "Secure browser cryptography is unavailable."
-        );
-      }
+      if (!window.crypto || !crypto.subtle) throw new Error("Secure browser cryptography is unavailable.");
 
       const verifier = randomString(64);
       const challenge = await createCodeChallenge(verifier);
@@ -322,7 +298,6 @@
       sessionStorage.setItem("ck_oauth_state", state);
 
       const url = new URL(AUTH_URL);
-
       url.searchParams.set("response_type", "code");
       url.searchParams.set("client_id", APP_ID);
       url.searchParams.set("redirect_uri", REDIRECT_URI);
@@ -331,422 +306,496 @@
       url.searchParams.set("code_challenge", challenge);
       url.searchParams.set("code_challenge_method", "S256");
 
-      loginStatus.textContent =
-        "Opening Deriv authorization...";
-
+      loginStatus.textContent = "Opening Deriv authorization...";
       window.location.assign(url.toString());
-
     } catch (error) {
-      loginStatus.textContent =
-        "Could not start login: " + error.message;
+      loginStatus.textContent = "Could not start login: " + error.message;
     }
   }
 
   function formatMoney(value, currency) {
     const amount = Number(value);
-
-    if (!Number.isFinite(amount)) {
-      return "Unavailable";
-    }
-
+    if (!Number.isFinite(amount)) return "Unavailable";
     const code = currency || "USD";
-
     try {
       return new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: code,
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+        style: "currency", currency: code,
+        minimumFractionDigits: 2, maximumFractionDigits: 2
       }).format(amount);
     } catch (_) {
       return amount.toFixed(2) + " " + code;
     }
   }
 
-  function getApiError(result, fallback) {
-    if (result && result.errors &&
-        result.errors.length && result.errors[0].message) {
-      return result.errors[0].message;
-    }
-
-    return result && (
-      result.message ||
-      result.error_description ||
-      result.error
-    ) || fallback;
+  function apiError(result, fallback) {
+    if (result?.error?.message) return result.error.message;
+    if (result?.errors?.[0]?.message) return result.errors[0].message;
+    return result?.message || result?.error_description || fallback;
   }
 
-  async function loadAccountBalance(accessToken) {
-    demoBalanceEl.textContent = "—";
-    realBalanceEl.textContent = "—";
+  async function fetchJson(url, options) {
+    const response = await fetch(url, options);
+    let data;
+    try {
+      data = await response.json();
+    } catch (_) {
+      throw new Error("The server returned an unreadable response.");
+    }
+    if (!response.ok) throw new Error(apiError(data, "Request failed."));
+    return data;
+  }
 
-    demoBalanceStatus.textContent = "Loading demo account...";
-    realBalanceStatus.textContent = "Loading real account...";
-
-    // Close any previous account-specific connections.
-    window.ckBalanceSockets.forEach(ws => {
-      try {
-        ws.close();
-      } catch (_) {}
-    });
-
-    window.ckBalanceSockets = [];
-
-    const response = await fetch(
+  async function getAccounts(token) {
+    const result = await fetchJson(
       "https://api.derivws.com/trading/v1/options/accounts",
       {
         method: "GET",
         headers: {
-          "Authorization": "Bearer " + accessToken,
+          "Authorization": "Bearer " + token,
           "Accept": "application/json"
         }
       }
     );
 
-    let result;
+    const accounts = Array.isArray(result.data) ? result.data :
+      result.data ? [result.data] : [];
 
-    try {
-      result = await response.json();
-    } catch (_) {
-      throw new Error(
-        "The account API returned an unreadable response."
-      );
-    }
+    const demo = accounts.find(a => String(a.account_type || "").toLowerCase() === "demo");
+    const real = accounts.find(a => String(a.account_type || "").toLowerCase() === "real");
 
-    if (!response.ok) {
-      throw new Error(
-        getApiError(result, "Account request was rejected.")
-      );
-    }
-
-    const accounts = Array.isArray(result.data)
-      ? result.data
-      : result.data
-        ? [result.data]
-        : [];
-
-    if (!accounts.length) {
-      const message =
-        "No Options accounts were returned. Check your Deriv account and app permissions.";
-
-      demoBalanceEl.textContent = "Unavailable";
-      realBalanceEl.textContent = "Unavailable";
-      demoBalanceStatus.textContent = message;
-      realBalanceStatus.textContent = message;
-      return;
-    }
-
-    // Identify accounts by their actual type.
-    const demoAccount = accounts.find(account =>
-      String(account.account_type || "").toLowerCase() === "demo"
-    );
-
-    const realAccount = accounts.find(account =>
-      String(account.account_type || "").toLowerCase() === "real"
-    );
-
-    if (demoAccount) {
-      showAccount(
-        demoAccount,
-        demoBalanceEl,
-        demoBalanceStatus,
-        "Demo",
-        accessToken
-      );
+    if (demo) {
+      demoBalanceEl.textContent =
+        demo.balance == null ? "—" : formatMoney(demo.balance, demo.currency);
+      demoBalanceStatus.textContent = demo.balance == null ?
+        "Demo account found; waiting for a balance update." :
+        "Initial balance reported by Deriv.";
     } else {
       demoBalanceEl.textContent = "Unavailable";
-      demoBalanceStatus.textContent =
-        "No demo Options account was returned.";
+      demoBalanceStatus.textContent = "No Demo Options account returned.";
     }
 
-    if (realAccount) {
-      showAccount(
-        realAccount,
-        realBalanceEl,
-        realBalanceStatus,
-        "Real",
-        accessToken
-      );
+    if (real) {
+      realBalanceEl.textContent =
+        real.balance == null ? "—" : formatMoney(real.balance, real.currency);
+      realBalanceStatus.textContent = real.balance == null ?
+        "Real account found; waiting for a balance update." :
+        "Initial balance reported by Deriv.";
     } else {
       realBalanceEl.textContent = "Unavailable";
-      realBalanceStatus.textContent =
-        "No real Options account was returned.";
+      realBalanceStatus.textContent = "No Real Options account returned.";
     }
+
+    if (demo) startBalanceStream(demo, token, "Demo");
+    if (real) startBalanceStream(real, token, "Real");
+
+    return { demo, real };
   }
 
-  function showAccount(
-    account,
-    amountEl,
-    statusEl,
-    label,
-    accessToken
-  ) {
-    const currency = account.currency || "USD";
-
-    // Show an initial balance only if the API actually returned it.
-    if (account.balance !== undefined &&
-        account.balance !== null) {
-      amountEl.textContent =
-        formatMoney(account.balance, currency);
-
-      statusEl.textContent =
-        label + " account balance reported by Deriv.";
-    } else {
-      amountEl.textContent = "—";
-      statusEl.textContent =
-        "Account found. Requesting balance...";
-    }
-
-    if (!account.account_id) {
-      statusEl.textContent =
-        "Account found, but the account ID was not returned.";
-      return;
-    }
-
-    refreshLiveBalance(
-      account,
-      amountEl,
-      statusEl,
-      label,
-      accessToken
-    ).catch(error => {
-      statusEl.textContent =
-        label + " account found; live balance unavailable: " +
-        error.message;
-    });
-  }
-
-  async function refreshLiveBalance(
-    account,
-    amountEl,
-    statusEl,
-    label,
-    accessToken
-  ) {
-    const accountId = account.account_id;
-
-    const response = await fetch(
-      "https://api.derivws.com/trading/v1/options/accounts/" +
-        encodeURIComponent(accountId) + "/otp",
-      {
-        method: "POST",
-        headers: {
-          "Authorization": "Bearer " + accessToken,
-          "Accept": "application/json"
-        }
-      }
-    );
-
-    let result;
+  async function startBalanceStream(account, token, label) {
+    if (!account.account_id) return;
 
     try {
-      result = await response.json();
-    } catch (_) {
-      throw new Error(
-        "The account connection returned an unreadable response."
-      );
-    }
-
-    if (!response.ok) {
-      throw new Error(
-        getApiError(result, "Could not connect to this account.")
-      );
-    }
-
-    const wsUrl =
-      result.data && result.data.url
-        ? result.data.url
-        : null;
-
-    if (!wsUrl) {
-      throw new Error(
-        "Deriv did not return the account WebSocket URL."
-      );
-    }
-
-    const ws = new WebSocket(wsUrl);
-    window.ckBalanceSockets.push(ws);
-
-    ws.onopen = () => {
-      ws.send(JSON.stringify({
-        balance: 1,
-        subscribe: 1,
-        req_id: 1
-      }));
-    };
-
-    ws.onmessage = event => {
-      let data;
-
-      try {
-        data = JSON.parse(event.data);
-      } catch (_) {
-        return;
-      }
-
-      if (data.error) {
-        statusEl.textContent =
-          label + " balance update error: " +
-          data.error.message;
-        return;
-      }
-
-      if (data.msg_type === "balance" && data.balance) {
-        const balanceData = data.balance;
-
-        const amount =
-          balanceData.balance !== undefined
-            ? balanceData.balance
-            : null;
-
-        const currency =
-          balanceData.currency || account.currency || "USD";
-
-        if (amount !== null && Number.isFinite(Number(amount))) {
-          amountEl.textContent = formatMoney(amount, currency);
-
-          statusEl.textContent =
-            label + " balance · Live updates connected";
+      const result = await fetchJson(
+        "https://api.derivws.com/trading/v1/options/accounts/" +
+          encodeURIComponent(account.account_id) + "/otp",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer " + token,
+            "Accept": "application/json"
+          }
         }
-      }
-    };
+      );
 
-    ws.onerror = () => {
-      statusEl.textContent =
-        label + " account found; balance connection encountered an error.";
-    };
+      const wsUrl = result?.data?.url;
+      if (!wsUrl) throw new Error("No account WebSocket URL was returned.");
 
-    ws.onclose = () => {
-      if (statusEl.textContent.includes("Live updates connected")) {
-        statusEl.textContent =
-          label + " balance · Connection closed; last value retained.";
-      }
-    };
+      const ws = new WebSocket(wsUrl);
+      balanceSockets.push(ws);
+
+      ws.onopen = () => {
+        ws.send(JSON.stringify({ balance: 1, subscribe: 1, req_id: 1 }));
+      };
+
+      ws.onmessage = event => {
+        let data;
+        try { data = JSON.parse(event.data); } catch (_) { return; }
+
+        if (data.error) {
+          const status = label === "Demo" ? demoBalanceStatus : realBalanceStatus;
+          status.textContent = label + " balance error: " + data.error.message;
+          return;
+        }
+
+        if (data.msg_type === "balance" && data.balance) {
+          const value = data.balance.balance;
+          const currency = data.balance.currency || account.currency || "USD";
+          if (value == null || !Number.isFinite(Number(value))) return;
+
+          const amountEl = label === "Demo" ? demoBalanceEl : realBalanceEl;
+          const statusEl = label === "Demo" ? demoBalanceStatus : realBalanceStatus;
+          amountEl.textContent = formatMoney(value, currency);
+          statusEl.textContent = label + " balance · Live updates connected";
+        }
+      };
+    } catch (error) {
+      const status = label === "Demo" ? demoBalanceStatus : realBalanceStatus;
+      status.textContent = label + " balance unavailable: " + error.message;
+    }
   }
 
   async function handleOAuthCallback() {
     const params = new URLSearchParams(window.location.search);
-
     const code = params.get("code");
     const returnedState = params.get("state");
     const oauthError = params.get("error");
 
     if (oauthError) {
-      loginStatus.textContent =
-        "Deriv login was not completed: " +
+      loginStatus.textContent = "Deriv login was not completed: " +
         (params.get("error_description") || oauthError);
-
       cleanCallbackUrl();
       return;
     }
 
-    if (!code && !returnedState) {
-      return;
-    }
+    if (!code && !returnedState) return;
 
-    const savedState =
-      sessionStorage.getItem("ck_oauth_state");
-
-    const verifier =
-      sessionStorage.getItem("ck_pkce_verifier");
+    const savedState = sessionStorage.getItem("ck_oauth_state");
+    const verifier = sessionStorage.getItem("ck_pkce_verifier");
 
     if (!code || !returnedState || !savedState ||
         returnedState !== savedState || !verifier) {
-      loginStatus.textContent =
-        "Login could not be verified. Please start login again.";
-
+      loginStatus.textContent = "Login could not be verified. Please log in again.";
       sessionStorage.removeItem("ck_oauth_state");
       sessionStorage.removeItem("ck_pkce_verifier");
-
       cleanCallbackUrl();
       return;
     }
 
     sessionStorage.removeItem("ck_oauth_state");
-
-    loginStatus.textContent =
-      "Verifying authorization with Deriv...";
+    loginStatus.textContent = "Verifying authorization with Deriv...";
 
     try {
-      const response = await fetch(WORKER_URL, {
+      const result = await fetchJson(WORKER_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          code: code,
+          code,
           code_verifier: verifier,
           client_id: APP_ID,
           redirect_uri: REDIRECT_URI
         })
       });
 
-      let result;
-
-      try {
-        result = await response.json();
-      } catch (_) {
-        throw new Error(
-          "The authorization service returned an unreadable response."
-        );
-      }
-
       sessionStorage.removeItem("ck_pkce_verifier");
 
-      if (!response.ok || !result.access_token) {
-        throw new Error(
-          getApiError(result, "Token exchange failed.")
-        );
-      }
+      if (!result.access_token) throw new Error("No access token returned.");
 
-      // Token is held in memory only, not localStorage.
-      window.ckDerivAccessToken = result.access_token;
-
-      loginStatus.textContent =
-        "Authorization succeeded. Access token received.";
-
+      accessToken = result.access_token;
+      window.ckDerivAccessToken = null; // Do not expose the token as a global.
+      loginStatus.textContent = "Authorization succeeded. Loading accounts...";
       cleanCallbackUrl();
 
-      try {
-        await loadAccountBalance(result.access_token);
-      } catch (error) {
-        const message =
-          "Signed in, but accounts could not be loaded: " +
-          error.message;
+      const accounts = await getAccounts(accessToken);
+      demoAccount = accounts.demo || null;
 
-        demoBalanceStatus.textContent = message;
-        realBalanceStatus.textContent = message;
+      if (demoAccount) {
+        demoAccountStatus.textContent =
+          "Demo account found. Tap Connect Demo Trading to open its session.";
+        demoConnectButton.disabled = false;
+      } else {
+        demoAccountStatus.textContent = "No Demo account returned by Deriv.";
+        demoConnectButton.disabled = true;
       }
 
+      loginStatus.textContent = "Signed in to Deriv.";
     } catch (error) {
       sessionStorage.removeItem("ck_pkce_verifier");
-
-      loginStatus.textContent =
-        "Login exchange failed: " + error.message;
-
+      loginStatus.textContent = "Login failed: " + error.message;
       cleanCallbackUrl();
     }
   }
 
   function cleanCallbackUrl() {
-    window.history.replaceState(
-      {},
-      document.title,
-      window.location.pathname + window.location.hash
+    window.history.replaceState({}, document.title,
+      window.location.pathname + window.location.hash);
+  }
+
+  function request(ws, payload) {
+    return new Promise((resolve, reject) => {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        reject(new Error("The trading connection is not open."));
+        return;
+      }
+
+      const reqId = ++requestCounter;
+      const timer = setTimeout(() => {
+        pendingRequests.delete(reqId);
+        reject(new Error("Deriv did not respond in time."));
+      }, 15000);
+
+      pendingRequests.set(reqId, { resolve, reject, timer });
+      ws.send(JSON.stringify({ ...payload, req_id: reqId }));
+    });
+  }
+
+  async function connectDemoTrading() {
+    if (!accessToken || !demoAccount?.account_id) {
+      demoTradeStatus.textContent = "Log in and make sure a Demo account is available.";
+      return;
+    }
+
+    // Refuse to trade unless Deriv identified the account as Demo.
+    if (String(demoAccount.account_type || "").toLowerCase() !== "demo") {
+      demoTradeStatus.textContent = "Safety check failed: selected account is not identified as Demo.";
+      return;
+    }
+
+    demoConnectButton.disabled = true;
+    demoTradeStatus.textContent = "Requesting authenticated Demo session...";
+
+    try {
+      if (demoSocket) {
+        try { demoSocket.close(); } catch (_) {}
+        demoSocket = null;
+      }
+
+      const result = await fetchJson(
+        "https://api.derivws.com/trading/v1/options/accounts/" +
+          encodeURIComponent(demoAccount.account_id) + "/otp",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer " + accessToken,
+            "Accept": "application/json"
+          }
+        }
+      );
+
+      const wsUrl = result?.data?.url;
+      if (!wsUrl || !wsUrl.includes("/demo")) {
+        throw new Error("Deriv did not return a Demo WebSocket URL. No trades are allowed.");
+      }
+
+      demoSocket = new WebSocket(wsUrl);
+
+      demoSocket.onopen = () => {
+        demoTradeStatus.textContent = "Authenticated Demo session connected.";
+        demoAccountStatus.textContent = "Connected to Demo account.";
+        demoGetPriceButton.disabled = false;
+        demoConnectButton.disabled = false;
+      };
+
+      demoSocket.onmessage = event => {
+        let data;
+        try { data = JSON.parse(event.data); } catch (_) { return; }
+
+        if (data.req_id && pendingRequests.has(data.req_id)) {
+          const pending = pendingRequests.get(data.req_id);
+          clearTimeout(pending.timer);
+          pendingRequests.delete(data.req_id);
+
+          if (data.error) pending.reject(new Error(data.error.message));
+          else pending.resolve(data);
+          return;
+        }
+
+        if (data.error) {
+          demoTradeStatus.textContent = "Deriv error: " + data.error.message;
+          return;
+        }
+
+        if (data.msg_type === "proposal_open_contract" && data.proposal_open_contract) {
+          const c = data.proposal_open_contract;
+          const profit = c.profit == null ? "Unavailable" :
+            formatMoney(c.profit, demoAccount.currency);
+
+          demoTradeResult.textContent =
+            "Contract " + (c.contract_id || activeContractId || "") +
+            " · Status: " + (c.status || "pending") +
+            " · Profit/Loss: " + profit;
+
+          if (c.is_sold) {
+            demoTradeStatus.textContent = "Demo contract settled.";
+            activeContractId = null;
+          }
+        }
+      };
+
+      demoSocket.onerror = () => {
+        demoTradeStatus.textContent = "Demo WebSocket error. Reconnect and try again.";
+      };
+
+      demoSocket.onclose = () => {
+        demoGetPriceButton.disabled = true;
+        demoBuyButton.disabled = true;
+        demoAccountStatus.textContent = "Demo trading connection closed.";
+      };
+    } catch (error) {
+      demoTradeStatus.textContent = "Could not connect Demo trading: " + error.message;
+      demoConnectButton.disabled = false;
+    }
+  }
+
+  async function getDemoQuote() {
+    if (!demoSocket || demoSocket.readyState !== WebSocket.OPEN || !demoAccount) {
+      demoTradeStatus.textContent = "Connect the Demo account first.";
+      return;
+    }
+
+    if (String(demoAccount.account_type || "").toLowerCase() !== "demo") {
+      demoTradeStatus.textContent = "Safety check failed: not a Demo account.";
+      return;
+    }
+
+    const stake = Number($("demo-stake").value);
+    const multiplier = Number($("demo-multiplier").value);
+    const duration = Number($("demo-duration").value);
+
+    if (!Number.isFinite(stake) || stake < 1 || stake > 10) {
+      demoTradeStatus.textContent = "Enter a Demo stake between 1 and 10 units.";
+      return;
+    }
+
+    if (![10, 20, 30, 40, 50].includes(multiplier) ||
+        ![1, 5, 10, 30, 60].includes(duration)) {
+      demoTradeStatus.textContent = "Invalid multiplier or duration.";
+      return;
+    }
+
+    latestProposal = null;
+    demoBuyButton.disabled = true;
+    demoGetPriceButton.disabled = true;
+    demoTradeStatus.textContent = "Requesting a fresh Demo quote...";
+
+    try {
+      const response = await request(demoSocket, {
+        proposal: 1,
+        amount: stake,
+        basis: "stake",
+        contract_type: $("demo-contract").value,
+        currency: demoAccount.currency || "USD",
+        duration: duration,
+        duration_unit: "s",
+        multiplier: multiplier,
+        underlying_symbol: marketEl.value
+      });
+
+      if (!response.proposal?.id) throw new Error("Deriv returned no proposal ID.");
+
+      latestProposal = {
+        id: response.proposal.id,
+        askPrice: Number(response.proposal.ask_price),
+        stake,
+        currency: demoAccount.currency || "USD",
+        symbol: marketEl.value,
+        contractType: $("demo-contract").value,
+        createdAt: Date.now()
+      };
+
+      demoQuoteEl.textContent =
+        "Stake: " + formatMoney(stake, latestProposal.currency) +
+        " · Purchase price: " +
+        formatMoney(latestProposal.askPrice, latestProposal.currency);
+
+      demoQuoteExpiryEl.textContent =
+        "Market: " + (marketNames[marketEl.value] || marketEl.value) +
+        " · This quote is temporary; request another if it expires.";
+
+      demoTradeStatus.textContent = "Quote received. Review it before purchasing.";
+      demoBuyButton.disabled = false;
+    } catch (error) {
+      demoTradeStatus.textContent = "Quote failed: " + error.message;
+    } finally {
+      demoGetPriceButton.disabled = false;
+    }
+  }
+
+  async function buyDemoTrade() {
+    if (!latestProposal || !demoSocket ||
+        demoSocket.readyState !== WebSocket.OPEN || !demoAccount) {
+      demoTradeStatus.textContent = "Request a fresh quote first.";
+      return;
+    }
+
+    if (String(demoAccount.account_type || "").toLowerCase() !== "demo") {
+      demoTradeStatus.textContent = "Safety check failed: not a Demo account.";
+      return;
+    }
+
+    if (Date.now() - latestProposal.createdAt > 30000) {
+      latestProposal = null;
+      demoBuyButton.disabled = true;
+      demoTradeStatus.textContent = "Quote is older than 30 seconds. Request a fresh quote.";
+      return;
+    }
+
+    const proposal = latestProposal;
+    const confirmed = window.confirm(
+      "DEMO TRADE CONFIRMATION\n\n" +
+      "Account: DEMO\n" +
+      "Market: " + proposal.symbol + "\n" +
+      "Contract: " + proposal.contractType + "\n" +
+      "Stake: " + formatMoney(proposal.stake, proposal.currency) + "\n" +
+      "Maximum purchase price: " + formatMoney(proposal.askPrice, proposal.currency) +
+      "\n\nThis will place a Demo trade. Continue?"
     );
+
+    if (!confirmed) {
+      demoTradeStatus.textContent = "Purchase cancelled. No trade was sent.";
+      return;
+    }
+
+    demoBuyButton.disabled = true;
+    demoGetPriceButton.disabled = true;
+    demoTradeStatus.textContent = "Submitting confirmed Demo purchase...";
+
+    try {
+      // Recheck Demo account and connection immediately before purchase.
+      if (String(demoAccount.account_type || "").toLowerCase() !== "demo" ||
+          !demoSocket || demoSocket.readyState !== WebSocket.OPEN) {
+        throw new Error("Demo session changed or disconnected. No purchase sent.");
+      }
+
+      const response = await request(demoSocket, {
+        buy: proposal.id,
+        price: proposal.askPrice
+      });
+
+      if (!response.buy?.contract_id) {
+        throw new Error("Deriv did not confirm a contract ID.");
+      }
+
+      activeContractId = response.buy.contract_id;
+      demoTradeResult.textContent =
+        "Purchase accepted. Contract ID: " + activeContractId +
+        ". Waiting for contract updates.";
+
+      demoTradeStatus.textContent = "Demo purchase accepted by Deriv.";
+
+      await request(demoSocket, {
+        proposal_open_contract: 1,
+        contract_id: activeContractId,
+        subscribe: 1
+      });
+
+      // Update account balance subscriptions will reflect new balance if supported.
+      latestProposal = null;
+    } catch (error) {
+      demoTradeStatus.textContent = "Purchase failed or was not confirmed: " + error.message;
+    } finally {
+      demoGetPriceButton.disabled = false;
+    }
   }
 
   function drawChart() {
     const w = canvas.width;
     const h = canvas.height;
-
     ctx.clearRect(0, 0, w, h);
     ctx.strokeStyle = "#263950";
     ctx.lineWidth = 1;
 
     for (let i = 1; i < 4; i++) {
       const y = h * i / 4;
-
       ctx.beginPath();
       ctx.moveTo(0, y);
       ctx.lineTo(w, y);
@@ -770,197 +819,173 @@
     ctx.lineWidth = 3;
 
     prices.forEach((value, index) => {
-      const x =
-        pad + index * (w - 2 * pad) / (prices.length - 1);
-
-      const y =
-        h - pad - ((value - min) / range) * (h - 2 * pad);
-
-      if (index === 0) {
-        ctx.moveTo(x, y);
-      } else {
-        ctx.lineTo(x, y);
-      }
+      const x = pad + index * (w - 2 * pad) / (prices.length - 1);
+      const y = h - pad - ((value - min) / range) * (h - 2 * pad);
+      if (index === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
     });
-
     ctx.stroke();
   }
 
   function showPrice(value, pipSize) {
     const number = Number(value);
-
     if (!Number.isFinite(number)) return;
 
-    if (Number.isInteger(pipSize) &&
-        pipSize >= 0 && pipSize <= 10) {
+    if (Number.isInteger(pipSize) && pipSize >= 0 && pipSize <= 10) {
       decimals = pipSize;
     }
 
     prices.push(number);
-
-    if (prices.length > 100) {
-      prices.shift();
-    }
+    if (prices.length > 100) prices.shift();
 
     priceEl.textContent = number.toFixed(decimals);
-
-    updatedEl.textContent =
-      "Last updated: " + new Date().toLocaleTimeString();
-
+    updatedEl.textContent = "Last updated: " + new Date().toLocaleTimeString();
     drawChart();
   }
 
-  function stopConnection() {
+  function stopPublicConnection() {
     clearTimeout(reconnectTimer);
     reconnectTimer = null;
 
-    if (socket) {
-      const old = socket;
-      socket = null;
-
-      old.onopen = null;
-      old.onmessage = null;
-      old.onerror = null;
-      old.onclose = null;
-
-      try {
-        if (old.readyState === WebSocket.OPEN ||
-            old.readyState === WebSocket.CONNECTING) {
-          old.close();
-        }
-      } catch (_) {}
+    if (publicSocket) {
+      const old = publicSocket;
+      publicSocket = null;
+      old.onopen = old.onmessage = old.onerror = old.onclose = null;
+      try { old.close(); } catch (_) {}
     }
   }
 
-  function reconnect(myGeneration) {
+  function scheduleReconnect(myGeneration) {
     clearTimeout(reconnectTimer);
-
     reconnectTimer = setTimeout(() => {
-      if (myGeneration === generation) {
-        connect();
-      }
+      if (myGeneration === generation) connectPublicMarket();
     }, retryDelay);
-
     retryDelay = Math.min(retryDelay * 2, 30000);
   }
 
-  function connect() {
-    stopConnection();
-
+  function connectPublicMarket() {
+    stopPublicConnection();
     const myGeneration = ++generation;
     const symbol = marketEl.value;
 
     prices = [];
     decimals = 2;
-
     priceEl.textContent = "Waiting for prices...";
     updatedEl.textContent = "Connecting...";
-    statusEl.textContent =
-      "Connecting to Deriv public market data...";
-
+    statusEl.textContent = "Connecting to public market data...";
     drawChart();
 
     try {
-      socket = new WebSocket(MARKET_ENDPOINT);
+      publicSocket = new WebSocket(MARKET_ENDPOINT);
     } catch (error) {
-      statusEl.textContent =
-        "Connection could not start: " + error.message;
-
-      reconnect(myGeneration);
+      statusEl.textContent = "Could not start connection: " + error.message;
+      scheduleReconnect(myGeneration);
       return;
     }
 
-    socket.onopen = () => {
+    publicSocket.onopen = () => {
       if (myGeneration !== generation) return;
-
       retryDelay = 5000;
-
-      statusEl.textContent =
-        "Connected. Requesting market prices...";
-
-      socket.send(JSON.stringify({
-        ticks: symbol,
-        subscribe: 1,
-        req_id: 1
-      }));
+      publicSocket.send(JSON.stringify({ ticks: symbol, subscribe: 1, req_id: 1 }));
     };
 
-    socket.onmessage = event => {
+    publicSocket.onmessage = event => {
       if (myGeneration !== generation) return;
-
       let data;
-
-      try {
-        data = JSON.parse(event.data);
-      } catch (_) {
-        statusEl.textContent =
-          "Received an unreadable server response.";
-        return;
-      }
+      try { data = JSON.parse(event.data); } catch (_) { return; }
 
       if (data.error) {
-        statusEl.textContent =
-          "API error: " + data.error.message;
-        return;
-      }
-
-      if (data.errors && data.errors.length) {
-        statusEl.textContent =
-          "API error: " +
-          (data.errors[0].message || "Request rejected");
+        statusEl.textContent = "API error: " + data.error.message;
         return;
       }
 
       if (data.msg_type === "tick" && data.tick) {
         showPrice(data.tick.quote, data.tick.pip_size);
-
-        statusEl.textContent =
-          "Live market data connected.";
-        return;
-      }
-
-      if (data.msg_type) {
-        statusEl.textContent =
-          "Server response: " + data.msg_type;
-      } else {
-        statusEl.textContent =
-          "Connected; waiting for a price response.";
+        statusEl.textContent = "Live market data connected.";
       }
     };
 
-    socket.onerror = () => {
-      if (myGeneration === generation) {
-        statusEl.textContent =
-          "WebSocket error. Waiting to reconnect.";
-      }
+    publicSocket.onerror = () => {
+      if (myGeneration === generation) statusEl.textContent = "Market data error; reconnecting.";
     };
 
-    socket.onclose = event => {
+    publicSocket.onclose = event => {
       if (myGeneration !== generation) return;
-
-      statusEl.textContent =
-        "Disconnected. Code: " + event.code +
-        ". Reason: " + (event.reason || "Not provided") +
-        ". Retrying in " + (retryDelay / 1000) +
-        " seconds...";
-
-      reconnect(myGeneration);
+      statusEl.textContent = "Disconnected (code " + event.code + "). Reconnecting...";
+      scheduleReconnect(myGeneration);
     };
   }
 
+  function disconnect() {
+    loginAttempt++;
+    accessToken = null;
+    demoAccount = null;
+    latestProposal = null;
+    activeContractId = null;
+
+    if (demoSocket) {
+      try { demoSocket.close(); } catch (_) {}
+      demoSocket = null;
+    }
+
+    balanceSockets.forEach(ws => {
+      try { ws.close(); } catch (_) {}
+    });
+    balanceSockets = [];
+
+    pendingRequests.forEach(p => {
+      clearTimeout(p.timer);
+      p.reject(new Error("Disconnected."));
+    });
+    pendingRequests.clear();
+
+    demoConnectButton.disabled = true;
+    demoGetPriceButton.disabled = true;
+    demoBuyButton.disabled = true;
+    demoAccountStatus.textContent = "Not connected to a Demo trading session.";
+    demoTradeStatus.textContent = "Disconnected. No further trades can be submitted.";
+    loginStatus.textContent = "Disconnected. Log in again to use account features.";
+    demoBalanceEl.textContent = "—";
+    realBalanceEl.textContent = "—";
+    demoBalanceStatus.textContent = "Not connected.";
+    realBalanceStatus.textContent = "Not connected.";
+  }
+
   loginButton.addEventListener("click", beginLogin);
+  logoutButton.addEventListener("click", disconnect);
+  demoConnectButton.addEventListener("click", connectDemoTrading);
+  demoGetPriceButton.addEventListener("click", getDemoQuote);
+  demoBuyButton.addEventListener("click", buyDemoTrade);
 
   marketEl.addEventListener("change", () => {
-    marketNameEl.textContent =
-      marketNames[marketEl.value] || marketEl.value;
+    marketNameEl.textContent = marketNames[marketEl.value] || marketEl.value;
+    connectPublicMarket();
+  });
 
-    connect();
+  $("demo-stake").addEventListener("input", () => {
+    latestProposal = null;
+    demoBuyButton.disabled = true;
+  });
+  $("demo-multiplier").addEventListener("change", () => {
+    latestProposal = null;
+    demoBuyButton.disabled = true;
+  });
+  $("demo-duration").addEventListener("change", () => {
+    latestProposal = null;
+    demoBuyButton.disabled = true;
+  });
+  $("demo-contract").addEventListener("change", () => {
+    latestProposal = null;
+    demoBuyButton.disabled = true;
+  });
+  marketEl.addEventListener("change", () => {
+    latestProposal = null;
+    demoBuyButton.disabled = true;
   });
 
   drawChart();
-  connect();
+  connectPublicMarket();
   handleOAuthCallback();
-
 })();
 </script>
 </body>
