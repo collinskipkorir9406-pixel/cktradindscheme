@@ -10,23 +10,36 @@
   <style>
     * { box-sizing: border-box; }
     body {
-      margin: 0; padding: 16px; background: #08111f;
-      color: #f3f6fc; font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #08111f;
+      color: #f3f6fc;
+      font-family: Arial, sans-serif;
     }
     .container { max-width: 900px; margin: auto; }
     header { text-align: center; padding: 24px 8px; }
     h1 { color: #28d7a1; }
     header p, .muted, .notice { color: #aab8cb; line-height: 1.6; }
     .panel {
-      background: #111e30; border: 1px solid #263950;
-      border-radius: 14px; padding: 18px; margin-bottom: 18px;
+      background: #111e30;
+      border: 1px solid #263950;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 18px;
     }
     h2 { font-size: 20px; }
     .button {
-      display: inline-block; background: #28d7a1; color: #07151a;
-      text-decoration: none; font-weight: bold; padding: 13px 18px;
-      border: 0; border-radius: 8px; margin: 8px 5px 0 0;
-      cursor: pointer; font-size: 15px;
+      display: inline-block;
+      background: #28d7a1;
+      color: #07151a;
+      text-decoration: none;
+      font-weight: bold;
+      padding: 13px 18px;
+      border: 0;
+      border-radius: 8px;
+      margin: 8px 5px 0 0;
+      cursor: pointer;
+      font-size: 15px;
     }
     .secondary { background: #263950; color: white; }
     .grid {
@@ -35,29 +48,47 @@
       gap: 14px;
     }
     .small-card {
-      background: #0b1727; border-radius: 10px;
-      padding: 16px; overflow-wrap: anywhere;
+      background: #0b1727;
+      border-radius: 10px;
+      padding: 16px;
+      overflow-wrap: anywhere;
     }
     .status {
-      color: #ffd166; line-height: 1.6;
-      overflow-wrap: anywhere; white-space: pre-wrap;
+      color: #ffd166;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
     }
     .price {
-      font-size: clamp(25px, 6vw, 36px); font-weight: bold;
-      color: #28d7a1; margin: 18px 0; overflow-wrap: anywhere;
+      font-size: clamp(25px, 6vw, 36px);
+      font-weight: bold;
+      color: #28d7a1;
+      margin: 18px 0;
+      overflow-wrap: anywhere;
     }
     select {
-      width: 100%; padding: 13px; background: #0b1727; color: white;
-      border: 1px solid #263950; border-radius: 8px; margin: 10px 0;
+      width: 100%;
+      padding: 13px;
+      background: #0b1727;
+      color: white;
+      border: 1px solid #263950;
+      border-radius: 8px;
+      margin: 10px 0;
     }
     canvas {
-      width: 100%; height: 220px; display: block;
-      background: #0b1727; border-radius: 8px; margin-top: 15px;
+      width: 100%;
+      height: 220px;
+      display: block;
+      background: #0b1727;
+      border-radius: 8px;
+      margin-top: 15px;
     }
     .notice { font-size: 13px; }
     footer {
-      text-align: center; color: #8495ab;
-      font-size: 12px; padding: 20px 0;
+      text-align: center;
+      color: #8495ab;
+      font-size: 12px;
+      padding: 20px 0;
     }
   </style>
 </head>
@@ -67,7 +98,6 @@
     <h1>CK Trading Bot</h1>
     <p>Your Trading Dashboard</p>
     <p>Public market information and trading tools</p>
-
     <button class="button" id="login-button" type="button">
       Log In to Deriv
     </button>
@@ -140,7 +170,6 @@
 "use strict";
 
 (function () {
-  // OAuth configuration
   const APP_ID = "34MKk0BSq1Hz7mnKlIjHN";
   const REDIRECT_URI =
     "https://collinskipkorir9406-pixel.github.io/cktradindscheme/";
@@ -148,8 +177,7 @@
     "https://steep-snow-a539.collinskipkorir70.workers.dev";
   const AUTH_URL = "https://auth.deriv.com/oauth2/auth";
 
-  // Public market-data WebSocket
-  const ENDPOINT =
+  const MARKET_ENDPOINT =
     "wss://api.derivws.com/trading/v1/options/ws/public";
 
   const loginButton = document.getElementById("login-button");
@@ -188,22 +216,21 @@
   }
 
   function randomString(length) {
-    const bytes = crypto.getRandomValues(new Uint8Array(length));
-    return base64Url(bytes);
+    return base64Url(crypto.getRandomValues(new Uint8Array(length)));
   }
 
   async function createCodeChallenge(verifier) {
-    const data = new TextEncoder().encode(verifier);
-    const digest = await crypto.subtle.digest("SHA-256", data);
+    const digest = await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(verifier)
+    );
     return base64Url(new Uint8Array(digest));
   }
 
   async function beginLogin() {
     try {
       if (!window.crypto || !crypto.subtle) {
-        throw new Error(
-          "Secure browser cryptography is unavailable. Open the HTTPS website in your browser."
-        );
+        throw new Error("Secure browser cryptography is unavailable.");
       }
 
       const verifier = randomString(64);
@@ -229,6 +256,63 @@
     }
   }
 
+  async function loadAccountBalance(accessToken) {
+    accountStatus.textContent = "Loading account details...";
+
+    const response = await fetch(
+      "https://api.derivws.com/trading/v1/options/accounts",
+      {
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer " + accessToken,
+          "Accept": "application/json"
+        }
+      }
+    );
+
+    let result;
+    try {
+      result = await response.json();
+    } catch (_) {
+      throw new Error("The account API returned an unreadable response.");
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        result.message || result.error || "Account request was rejected."
+      );
+    }
+
+    const accounts = Array.isArray(result.data)
+      ? result.data
+      : result.data
+        ? [result.data]
+        : [];
+
+    if (!accounts.length) {
+      accountStatus.textContent =
+        "Login succeeded, but no account details were returned.";
+      return;
+    }
+
+    accountStatus.textContent = accounts.map(account => {
+      const balance = account.balance;
+      const currency = account.currency || "";
+      const type = account.account_type || "Account";
+
+      if (balance === undefined || balance === null) {
+        return type + ": Balance unavailable";
+      }
+
+      const numericBalance = Number(balance);
+      const formattedBalance = Number.isFinite(numericBalance)
+        ? numericBalance.toLocaleString()
+        : String(balance);
+
+      return type + ": " + formattedBalance + " " + currency;
+    }).join("\n");
+  }
+
   async function handleOAuthCallback() {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
@@ -248,7 +332,6 @@
     const savedState = sessionStorage.getItem("ck_oauth_state");
     const verifier = sessionStorage.getItem("ck_pkce_verifier");
 
-    // Validate state before sending the code to the Worker.
     if (!code || !returnedState || !savedState ||
         returnedState !== savedState || !verifier) {
       loginStatus.textContent =
@@ -259,7 +342,6 @@
       return;
     }
 
-    // Consume the state so this callback cannot be reused.
     sessionStorage.removeItem("ck_oauth_state");
     loginStatus.textContent = "Verifying authorization with Deriv...";
 
@@ -268,7 +350,7 @@
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          code: code,
+          code,
           code_verifier: verifier,
           client_id: APP_ID,
           redirect_uri: REDIRECT_URI
@@ -279,32 +361,39 @@
       sessionStorage.removeItem("ck_pkce_verifier");
 
       if (!response.ok || !result.access_token) {
-        const detail = result.error_description ||
-          result.error || result.message || "Token exchange failed.";
-        throw new Error(detail);
+        throw new Error(
+          result.error_description ||
+          result.error ||
+          result.message ||
+          "Token exchange failed."
+        );
       }
 
-      // Keep the short-lived token in memory only.
-      // Do not write it to localStorage or the URL.
-      loginStatus.textContent =
-        "Authorization succeeded. Access token received.";
-      accountStatus.textContent =
-        "Signed in for this page session. Account balance display is not yet connected.";
+      // Keep the access token in memory only.
       window.ckDerivAccessToken = result.access_token;
-
+      loginStatus.textContent = "Authorization succeeded. Access token received.";
       cleanCallbackUrl();
+
+      try {
+        await loadAccountBalance(result.access_token);
+      } catch (error) {
+        accountStatus.textContent =
+          "Signed in, but balance could not be loaded: " + error.message;
+      }
     } catch (error) {
       sessionStorage.removeItem("ck_pkce_verifier");
       loginStatus.textContent =
-        "Login exchange failed: " + error.message +
-        " Check the Worker configuration and try again.";
+        "Login exchange failed: " + error.message;
       cleanCallbackUrl();
     }
   }
 
   function cleanCallbackUrl() {
-    const cleanUrl = window.location.pathname + window.location.hash;
-    window.history.replaceState({}, document.title, cleanUrl);
+    window.history.replaceState(
+      {},
+      document.title,
+      window.location.pathname + window.location.hash
+    );
   }
 
   function drawChart() {
@@ -376,6 +465,7 @@
       old.onmessage = null;
       old.onerror = null;
       old.onclose = null;
+
       try {
         if (old.readyState === WebSocket.OPEN ||
             old.readyState === WebSocket.CONNECTING) {
@@ -406,7 +496,7 @@
     drawChart();
 
     try {
-      socket = new WebSocket(ENDPOINT);
+      socket = new WebSocket(MARKET_ENDPOINT);
     } catch (error) {
       statusEl.textContent = "Connection could not start: " + error.message;
       reconnect(myGeneration);
@@ -418,7 +508,6 @@
 
       retryDelay = 5000;
       statusEl.textContent = "Connected. Requesting market prices...";
-
       socket.send(JSON.stringify({
         ticks: symbol,
         subscribe: 1,
@@ -426,7 +515,7 @@
       }));
     };
 
-    socket.onmessage = (event) => {
+    socket.onmessage = event => {
       if (myGeneration !== generation) return;
 
       let data;
@@ -463,12 +552,11 @@
 
     socket.onerror = () => {
       if (myGeneration === generation) {
-        statusEl.textContent =
-          "WebSocket error. Check the close status below if disconnected.";
+        statusEl.textContent = "WebSocket error. Waiting to reconnect.";
       }
     };
 
-    socket.onclose = (event) => {
+    socket.onclose = event => {
       if (myGeneration !== generation) return;
 
       statusEl.textContent =
