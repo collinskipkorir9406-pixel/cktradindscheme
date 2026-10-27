@@ -8,812 +8,693 @@
   <meta name="deriv-site-verification"
     content="ded285725a66c864612bf8d91ba4de4b63642ce64f6dd2f14fed08d232275b4a">
 
-  <meta name="theme-color" content="#0b1220">
-  <meta name="description" content="CK Trading Bot - Deriv market prices, charts and account connection.">
-
-  <title>CK Trading Bot | Trading Workspace</title>
+  <title>CK Trading Bot</title>
+  <meta name="description" content="CK Trading Bot — live public market prices and a structured trading workspace.">
 
   <style>
     :root {
-      --bg: #0b1220;
-      --panel: #121c2e;
-      --panel2: #17243a;
-      --text: #eef4ff;
-      --muted: #9baac3;
-      --green: #26d998;
-      --red: #ff647c;
-      --blue: #5da9ff;
-      --border: #27364e;
+      color-scheme: dark;
+      --bg: #07111f;
+      --panel: #101d30;
+      --panel2: #14243a;
+      --text: #f3f7ff;
+      --muted: #9bacc5;
+      --blue: #4f8cff;
+      --green: #31d49a;
+      --red: #ff6b78;
+      --border: #263852;
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
       background: var(--bg);
       color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
     }
 
     header {
-      padding: 18px 16px;
+      padding: 22px 16px;
       border-bottom: 1px solid var(--border);
-      background: #0e1728;
+      background: #0b1728;
+    }
+
+    .wrap {
+      width: min(1100px, 100%);
+      margin: auto;
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+
+    .top {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       gap: 12px;
       flex-wrap: wrap;
     }
 
-    .brand { font-size: 22px; font-weight: 800; }
-    .brand span { color: var(--green); }
-    .subtitle { font-size: 11px; color: var(--muted); margin-top: 5px; }
-
-    .container {
-      max-width: 1200px;
-      margin: auto;
-      padding: 18px;
+    h1 {
+      font-size: 25px;
+      margin: 0 0 6px;
     }
+
+    h2 {
+      font-size: 18px;
+      margin: 0 0 14px;
+    }
+
+    p { line-height: 1.55; }
+
+    .muted { color: var(--muted); }
+
+    .small { font-size: 12px; }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 20px;
+      background: #172c48;
+      color: #9dc4ff;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    button {
+      border: 0;
+      border-radius: 9px;
+      background: var(--blue);
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+      padding: 12px 16px;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: #243750;
+      border: 1px solid #3a506d;
+    }
+
+    button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    main { padding-top: 22px; padding-bottom: 40px; }
 
     .panel {
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 16px;
+      padding: 18px;
+      margin-bottom: 18px;
       min-width: 0;
-    }
-
-    .topline {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    h2 { font-size: 17px; margin: 0 0 12px; }
-    h3 { font-size: 14px; margin: 0 0 10px; }
-
-    .muted { color: var(--muted); font-size: 13px; }
-    .status { font-size: 12px; color: var(--muted); }
-    .status::before {
-      content: "";
-      display: inline-block;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--muted);
-      margin-right: 7px;
-    }
-    .status.online::before { background: var(--green); }
-    .status.error::before { background: var(--red); }
-
-    button, select {
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      padding: 11px 14px;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    button { cursor: pointer; }
-    button:disabled { opacity: .5; cursor: not-allowed; }
-
-    .primary {
-      background: var(--green);
-      color: #062018;
-      border-color: var(--green);
-    }
-
-    .secondary {
-      background: var(--panel2);
-      color: var(--text);
-    }
-
-    .danger {
-      background: #381d2a;
-      color: #ff9eaf;
-      border-color: #663044;
-    }
-
-    select {
-      background: var(--panel2);
-      color: var(--text);
-      max-width: 100%;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
     }
 
     .market {
       background: var(--panel2);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 14px;
-      cursor: pointer;
+      padding: 16px;
       min-width: 0;
     }
 
-    .market.selected { border-color: var(--blue); }
-    .market-name { font-size: 12px; color: var(--muted); }
+    .market-name { font-weight: bold; }
+
     .price {
-      font-size: 21px;
-      font-weight: 800;
-      margin: 9px 0;
+      font-size: 25px;
+      font-weight: bold;
+      margin: 12px 0 5px;
+      overflow-wrap: anywhere;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 10px;
       overflow-wrap: anywhere;
     }
 
     .green { color: var(--green); }
     .red { color: var(--red); }
 
-    .chart-wrap {
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    canvas {
       width: 100%;
-      height: 260px;
-      position: relative;
-    }
-
-    canvas { width: 100%; height: 100%; display: block; }
-
-    .account-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 15px;
-    }
-
-    .stat {
-      background: var(--panel2);
-      padding: 14px;
+      height: 220px;
+      display: block;
+      background: #0b1728;
+      border: 1px solid var(--border);
       border-radius: 10px;
-      min-width: 0;
-    }
-
-    .stat-label { color: var(--muted); font-size: 12px; }
-    .stat-value {
-      font-size: 17px;
-      font-weight: 800;
-      margin-top: 8px;
-      overflow-wrap: anywhere;
-    }
-
-    .notice {
-      border: 1px solid #3b4a62;
-      border-radius: 10px;
-      background: #101b2d;
-      color: var(--muted);
-      padding: 12px;
-      font-size: 12px;
-      line-height: 1.6;
     }
 
     footer {
+      border-top: 1px solid var(--border);
+      padding: 20px 16px;
       text-align: center;
-      padding: 20px 14px;
       color: var(--muted);
       font-size: 12px;
     }
 
-    @media (max-width: 700px) {
-      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .account-grid { grid-template-columns: 1fr; }
-      .container { padding: 12px; }
-      .price { font-size: 18px; }
-      header { align-items: flex-start; }
+    .notice {
+      padding: 12px;
+      background: #17243a;
+      border-radius: 9px;
+      color: #c5d7f1;
+      font-size: 13px;
+      line-height: 1.5;
     }
 
-    @media (max-width: 390px) {
-      .grid { grid-template-columns: 1fr; }
+    a { color: #9dc4ff; }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 22px; }
+      .price { font-size: 22px; }
+      .panel { padding: 14px; }
     }
   </style>
 </head>
 
 <body>
-  <header>
+<header>
+  <div class="wrap top">
     <div>
-      <div class="brand">CK <span>TRADING BOT</span></div>
-      <div class="subtitle">STRUCTURED TRADING WORKSPACE · POWERED BY DERIV</div>
+      <h1>CK Trading Bot</h1>
+      <div class="muted small">POWERED BY DERIV · STRUCTURED TRADING WORKSPACE</div>
+    </div>
+    <span class="badge">PUBLIC MARKET DATA</span>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="panel">
+    <h2>Welcome to CK Trading Bot</h2>
+    <p class="muted">
+      View live market prices and recent price movement. Sign in through
+      Deriv to begin the account connection setup.
+    </p>
+
+    <div class="actions">
+      <button id="loginButton">Log In to Deriv</button>
+      <button id="refreshButton" class="secondary">Reconnect Markets</button>
+      <button id="logoutButton" class="secondary">Clear Local Login</button>
     </div>
 
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button id="loginBtn" class="primary">Log In to Deriv</button>
-      <button id="logoutBtn" class="danger" hidden>Disconnect</button>
+    <div id="loginStatus" class="status" role="status">
+      Not connected to a Deriv account.
     </div>
-  </header>
+  </section>
 
-  <main class="container">
-    <section class="panel">
-      <div class="topline">
-        <div>
-          <h2>Market connection</h2>
-          <div id="marketStatus" class="status">Connecting to live market data...</div>
-        </div>
-        <div class="muted">Live public prices</div>
-      </div>
-    </section>
+  <section class="panel">
+    <h2>Live Market Prices</h2>
+    <p class="muted small">
+      Prices are supplied by Deriv's public market feed. Market data does
+      not mean a trade has been placed.
+    </p>
 
-    <section class="panel">
-      <div class="topline">
-        <h2>Market watch</h2>
-        <span class="muted">Tap a market to view its chart</span>
-      </div>
+    <div id="marketStatus" class="status">Connecting to market data…</div>
+    <div id="markets" class="grid" style="margin-top:14px"></div>
+  </section>
 
-      <div id="marketGrid" class="grid">
-        <div class="market"><div class="market-name">Loading markets...</div></div>
-      </div>
-    </section>
+  <section class="panel">
+    <h2>Price Chart</h2>
+    <label for="chartMarket" class="muted small">Select market</label>
+    <div style="margin-top:8px;margin-bottom:14px">
+      <select id="chartMarket"
+        style="width:100%;max-width:360px;padding:12px;background:#14243a;color:white;border:1px solid #3a506d;border-radius:8px">
+        <option value="1HZ100V">Volatility 100 (1s) Index</option>
+        <option value="1HZ75V">Volatility 75 (1s) Index</option>
+        <option value="1HZ50V">Volatility 50 (1s) Index</option>
+        <option value="1HZ25V">Volatility 25 (1s) Index</option>
+        <option value="R_100">Volatility 100 Index</option>
+        <option value="R_75">Volatility 75 Index</option>
+        <option value="R_50">Volatility 50 Index</option>
+        <option value="R_25">Volatility 25 Index</option>
+        <option value="R_10">Volatility 10 Index</option>
+      </select>
+    </div>
 
-    <section class="panel">
-      <div class="topline">
-        <div>
-          <h2 id="chartTitle">Live price chart</h2>
-          <div id="chartPrice" class="muted">Waiting for prices...</div>
-        </div>
+    <canvas id="chart" width="1000" height="300"></canvas>
+    <div id="chartStatus" class="status">Waiting for price data…</div>
+  </section>
 
-        <select id="marketSelect" aria-label="Choose market">
-          <option value="1HZ100V">Volatility 100 (1s)</option>
-          <option value="1HZ75V">Volatility 75 (1s)</option>
-          <option value="1HZ50V">Volatility 50 (1s)</option>
-          <option value="1HZ25V">Volatility 25 (1s)</option>
-          <option value="R_100">Volatility 100</option>
-          <option value="R_75">Volatility 75</option>
-          <option value="R_50">Volatility 50</option>
-          <option value="R_25">Volatility 25</option>
-          <option value="R_10">Volatility 10</option>
-        </select>
-      </div>
+  <section class="panel">
+    <h2>Account and Safety</h2>
+    <div id="accountStatus" class="notice">
+      Account features are not connected. Public market prices can be viewed
+      without logging in.
+    </div>
+    <p class="muted small">
+      This page currently displays market information. It does not place
+      trades automatically and does not guarantee profits. Test any future
+      trading features on a demo account first.
+    </p>
+  </section>
+</main>
 
-      <div class="chart-wrap">
-        <canvas id="priceChart"></canvas>
-      </div>
-      <div class="muted">Illustrative tick-price line chart; this is not a prediction.</div>
-    </section>
+<footer>
+  CK Trading Bot · Independent third-party interface · Not an official Deriv website
+</footer>
 
-    <section class="panel">
-      <div class="topline">
-        <div>
-          <h2>Deriv account</h2>
-          <div id="accountStatus" class="status">Not connected</div>
-        </div>
-        <div id="accountCurrency" class="muted"></div>
-      </div>
+<script>
+"use strict";
 
-      <div class="account-grid">
-        <div class="stat">
-          <div class="stat-label">Account ID</div>
-          <div id="accountId" class="stat-value">—</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Balance</div>
-          <div id="accountBalance" class="stat-value">—</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Trading status</div>
-          <div id="tradingStatus" class="stat-value">Not started</div>
-        </div>
-      </div>
-    </section>
+/*
+ * CONFIGURATION
+ * Keep the redirect URI exactly the same as the URI registered with Deriv.
+ */
+const CLIENT_ID = "34JjnKJzecylG5kwmjaXm";
+const REDIRECT_URI =
+  "https://collinskipkorir9406-pixel.github.io/cktradindscheme/";
+const TOKEN_WORKER =
+  "https://steep-snow-a539.collinskipkorir70.workers.dev/";
 
-    <section class="panel">
-      <h2>Bot workspace</h2>
-      <div class="notice">
-        <strong>Market data is active independently of login.</strong>
-        This version displays live prices and charts and can show your Deriv
-        account after legacy OAuth login. It does not automatically place trades,
-        guarantee profits, or execute a trading strategy. Automated trading must
-        be added and tested separately before any real-money use.
-      </div>
-    </section>
+/*
+ * Public legacy market-data connection.
+ * This connection is separate from OAuth login.
+ */
+const MARKET_WS_URL =
+  "wss://ws.derivws.com/websockets/v3?app_id=1089";
 
-    <section class="panel">
-      <h2>Activity</h2>
-      <div id="activity" class="muted" aria-live="polite">
-        CK Trading Bot is starting.
-      </div>
-    </section>
-  </main>
+const MARKET_LIST = [
+  { symbol: "1HZ100V", name: "Volatility 100 (1s)" },
+  { symbol: "1HZ75V", name: "Volatility 75 (1s)" },
+  { symbol: "1HZ50V", name: "Volatility 50 (1s)" },
+  { symbol: "1HZ25V", name: "Volatility 25 (1s)" },
+  { symbol: "R_100", name: "Volatility 100" },
+  { symbol: "R_75", name: "Volatility 75" },
+  { symbol: "R_50", name: "Volatility 50" },
+  { symbol: "R_25", name: "Volatility 25" },
+  { symbol: "R_10", name: "Volatility 10" }
+];
 
-  <footer>
-    CK Trading Bot · Independent third-party interface ·
-    Trading involves risk and losses are possible.
-  </footer>
+const marketPrices = {};
+const chartHistory = {};
+let marketSocket = null;
+let reconnectTimer = null;
+let reconnectDelay = 2000;
+let manuallyClosed = false;
 
-  <script>
-    "use strict";
+const marketContainer = document.getElementById("markets");
+const marketStatus = document.getElementById("marketStatus");
+const chartStatus = document.getElementById("chartStatus");
+const chartSelect = document.getElementById("chartMarket");
+const canvas = document.getElementById("chart");
+const ctx = canvas.getContext("2d");
 
-    // CK Trading Bot configuration
-    const APP_ID = "34JjnKJzecylG5kwmjaXm";
-    const REDIRECT_URI =
-      "https://collinskipkorir9406-pixel.github.io/cktradindscheme/";
+function setText(id, message) {
+  document.getElementById(id).textContent = message;
+}
 
-    const WS_URL =
-      "wss://ws.derivws.com/websockets/v3?app_id=" + APP_ID;
+function makeMarketCards() {
+  marketContainer.innerHTML = "";
 
-    const MARKETS = [
-      { symbol: "1HZ100V", name: "Volatility 100 (1s)" },
-      { symbol: "1HZ75V",  name: "Volatility 75 (1s)" },
-      { symbol: "1HZ50V",  name: "Volatility 50 (1s)" },
-      { symbol: "1HZ25V",  name: "Volatility 25 (1s)" },
-      { symbol: "R_100",   name: "Volatility 100" },
-      { symbol: "R_75",    name: "Volatility 75" },
-      { symbol: "R_50",    name: "Volatility 50" },
-      { symbol: "R_25",    name: "Volatility 25" },
-      { symbol: "R_10",    name: "Volatility 10" }
-    ];
+  MARKET_LIST.forEach((market) => {
+    const card = document.createElement("article");
+    card.className = "market";
+    card.id = "card-" + market.symbol;
 
-    const prices = {};
-    const histories = {};
-    const previousPrices = {};
+    const name = document.createElement("div");
+    name.className = "market-name";
+    name.textContent = market.name;
 
-    let marketSocket = null;
-    let accountSocket = null;
-    let selectedSymbol = "1HZ100V";
-    let reconnectTimer = null;
-    let marketReconnectDelay = 2000;
-    let accountRequestId = 1;
-    let accountCurrency = "";
-    let loggedIn = false;
+    const price = document.createElement("div");
+    price.className = "price";
+    price.id = "price-" + market.symbol;
+    price.textContent = "Waiting…";
 
-    const $ = id => document.getElementById(id);
+    const time = document.createElement("div");
+    time.className = "status";
+    time.id = "time-" + market.symbol;
+    time.textContent = "Waiting for first tick";
 
-    function log(message) {
-      $("activity").textContent = message;
+    card.append(name, price, time);
+    marketContainer.appendChild(card);
+  });
+}
+
+function connectMarkets() {
+  manuallyClosed = false;
+
+  if (reconnectTimer) {
+    clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+  }
+
+  if (marketSocket) {
+    try {
+      marketSocket.onclose = null;
+      marketSocket.close();
+    } catch (_) {}
+  }
+
+  marketStatus.textContent = "Connecting to Deriv public market data…";
+
+  try {
+    marketSocket = new WebSocket(MARKET_WS_URL);
+  } catch (error) {
+    marketStatus.textContent = "Could not create market connection.";
+    scheduleReconnect();
+    return;
+  }
+
+  marketSocket.onopen = () => {
+    reconnectDelay = 2000;
+    marketStatus.textContent = "Connected. Requesting live prices…";
+
+    MARKET_LIST.forEach((market) => {
+      marketSocket.send(JSON.stringify({
+        ticks: market.symbol,
+        subscribe: 1
+      }));
+    });
+
+    marketSocket.send(JSON.stringify({
+      ticks_history: chartSelect.value,
+      count: 100,
+      end: "latest",
+      style: "ticks"
+    }));
+  };
+
+  marketSocket.onmessage = (event) => {
+    let data;
+
+    try {
+      data = JSON.parse(event.data);
+    } catch (_) {
+      return;
     }
 
-    function setStatus(elementId, message, kind = "") {
-      const element = $(elementId);
-      element.textContent = message;
-      element.className = "status" + (kind ? " " + kind : "");
+    if (data.error) {
+      marketStatus.textContent =
+        "Market feed error: " + (data.error.message || "Request rejected");
+      return;
     }
 
-    function marketName(symbol) {
-      const market = MARKETS.find(item => item.symbol === symbol);
-      return market ? market.name : symbol;
-    }
+    if (data.msg_type === "tick" && data.tick) {
+      const symbol = data.tick.symbol;
+      const quote = Number(data.tick.quote);
 
-    function formatPrice(value) {
-      if (value === undefined || value === null || !Number.isFinite(Number(value))) {
-        return "Waiting...";
-      }
-      return Number(value).toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 4
-      });
-    }
+      if (!Number.isFinite(quote)) return;
 
-    function renderMarkets() {
-      $("marketGrid").innerHTML = MARKETS.map(market => {
-        const price = prices[market.symbol];
-        const previous = previousPrices[market.symbol];
-        let movement = "";
-        let movementClass = "";
+      marketPrices[symbol] = quote;
 
-        if (price !== undefined && previous !== undefined) {
-          if (price > previous) {
-            movement = "Price rising";
-            movementClass = "green";
-          } else if (price < previous) {
-            movement = "Price falling";
-            movementClass = "red";
-          } else {
-            movement = "Price unchanged";
-          }
-        }
+      const priceEl = document.getElementById("price-" + symbol);
+      const timeEl = document.getElementById("time-" + symbol);
 
-        return `
-          <div class="market ${selectedSymbol === market.symbol ? "selected" : ""}"
-               data-symbol="${market.symbol}" tabindex="0" role="button"
-               aria-label="View ${market.name} chart">
-            <div class="market-name">${market.name}</div>
-            <div class="price">${formatPrice(price)}</div>
-            <div class="muted ${movementClass}">${movement || "Waiting for tick..."}</div>
-          </div>
-        `;
-      }).join("");
-
-      document.querySelectorAll(".market[data-symbol]").forEach(card => {
-        const choose = () => chooseMarket(card.dataset.symbol);
-        card.addEventListener("click", choose);
-        card.addEventListener("keydown", event => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            choose();
-          }
+      if (priceEl) {
+        priceEl.textContent = quote.toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 5
         });
-      });
-    }
+      }
 
-    function chooseMarket(symbol) {
-      if (!MARKETS.some(item => item.symbol === symbol)) return;
+      if (timeEl) {
+        timeEl.textContent = "Live · " +
+          new Date().toLocaleTimeString();
+      }
 
-      selectedSymbol = symbol;
-      $("marketSelect").value = symbol;
-      $("chartTitle").textContent = marketName(symbol);
-      updateChartCaption();
-      renderMarkets();
-      requestHistory(symbol);
+      if (!chartHistory[symbol]) chartHistory[symbol] = [];
+      chartHistory[symbol].push(quote);
+
+      if (chartHistory[symbol].length > 100) {
+        chartHistory[symbol].shift();
+      }
+
+      marketStatus.textContent = "Live market feed connected.";
       drawChart();
     }
 
-    function updateChartCaption() {
-      const value = prices[selectedSymbol];
-      $("chartPrice").textContent =
-        value === undefined ? "Waiting for live prices..." :
-        "Latest price: " + formatPrice(value);
+    if (data.msg_type === "history" && data.history &&
+        Array.isArray(data.history.prices)) {
+      const symbol = chartSelect.value;
+      chartHistory[symbol] = data.history.prices
+        .map(Number)
+        .filter(Number.isFinite)
+        .slice(-100);
+      drawChart();
     }
+  };
 
-    function requestHistory(symbol) {
-      if (!marketSocket || marketSocket.readyState !== WebSocket.OPEN) return;
+  marketSocket.onerror = () => {
+    marketStatus.textContent =
+      "Market connection error. Check internet and reconnect.";
+  };
 
-      marketSocket.send(JSON.stringify({
-        ticks_history: symbol,
-        count: 80,
-        end: "latest",
-        style: "ticks",
-        req_id: 500 + MARKETS.findIndex(item => item.symbol === symbol)
-      }));
+  marketSocket.onclose = () => {
+    if (!manuallyClosed) {
+      marketStatus.textContent =
+        "Market connection closed. Reconnecting…";
+      scheduleReconnect();
     }
-
-    function connectMarketData() {
-      if (marketSocket &&
-          (marketSocket.readyState === WebSocket.OPEN ||
-           marketSocket.readyState === WebSocket.CONNECTING)) return;
-
-      clearTimeout(reconnectTimer);
-      setStatus("marketStatus", "Connecting to Deriv...");
-
-      try {
-        marketSocket = new WebSocket(WS_URL);
-      } catch (error) {
-        setStatus("marketStatus", "Could not create market connection", "error");
-        scheduleMarketReconnect();
-        return;
-      }
-
-      marketSocket.onopen = () => {
-        marketReconnectDelay = 2000;
-        setStatus("marketStatus", "Connected · requesting live prices", "online");
-
-        // Subscribe to each market for live ticks.
-        MARKETS.forEach((market, index) => {
-          marketSocket.send(JSON.stringify({
-            ticks: market.symbol,
-            subscribe: 1,
-            req_id: index + 1
-          }));
-        });
-
-        requestHistory(selectedSymbol);
-      };
-
-      marketSocket.onmessage = event => {
-        let data;
-
-        try {
-          data = JSON.parse(event.data);
-        } catch (_) {
-          return;
-        }
-
-        if (data.error) {
-          // An unavailable symbol may fail while other markets still work.
-          console.warn("Deriv market response:", data.error.message);
-          return;
-        }
-
-        if (data.msg_type === "tick" && data.tick) {
-          const symbol = data.tick.symbol;
-          const quote = Number(data.tick.quote);
-
-          if (!Number.isFinite(quote)) return;
-
-          previousPrices[symbol] = prices[symbol];
-          prices[symbol] = quote;
-
-          if (!histories[symbol]) histories[symbol] = [];
-          histories[symbol].push(quote);
-
-          if (histories[symbol].length > 100) histories[symbol].shift();
-
-          renderMarkets();
-          if (symbol === selectedSymbol) {
-            updateChartCaption();
-            drawChart();
-          }
-
-          setStatus("marketStatus", "Live prices connected", "online");
-        }
-
-        if (data.msg_type === "history" && data.history &&
-            data.echo_req && data.echo_req.ticks_history) {
-          const symbol = data.echo_req.ticks_history;
-          const oldPrices = (data.history.prices || [])
-            .map(Number).filter(Number.isFinite);
-
-          if (oldPrices.length) {
-            histories[symbol] = oldPrices.slice(-100);
-            drawChart();
-          }
-        }
-      };
-
-      marketSocket.onerror = () => {
-        setStatus("marketStatus", "Market connection error", "error");
-      };
-
-      marketSocket.onclose = () => {
-        setStatus("marketStatus", "Market disconnected · reconnecting");
-        scheduleMarketReconnect();
-      };
-    }
-
-    function scheduleMarketReconnect() {
-      clearTimeout(reconnectTimer);
-      reconnectTimer = setTimeout(() => {
-        marketSocket = null;
-        connectMarketData();
-      }, marketReconnectDelay);
-
-      marketReconnectDelay = Math.min(marketReconnectDelay * 2, 30000);
-    }
-
-    function drawChart() {
-      const canvas = $("priceChart");
-      if (!canvas) return;
-
-      const rect = canvas.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
-
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = Math.round(rect.width * dpr);
-      canvas.height = Math.round(rect.height * dpr);
-
-      const ctx = canvas.getContext("2d");
-      ctx.scale(dpr, dpr);
-
-      const width = rect.width;
-      const height = rect.height;
-
-      ctx.clearRect(0, 0, width, height);
-
-      const values = (histories[selectedSymbol] || []).slice(-80);
-      if (prices[selectedSymbol] !== undefined) {
-        if (!values.length || values[values.length - 1] !== prices[selectedSymbol]) {
-          values.push(prices[selectedSymbol]);
-        }
-      }
-
-      ctx.strokeStyle = "#27364e";
-      ctx.lineWidth = 1;
-
-      for (let i = 1; i <= 4; i++) {
-        const y = (height / 5) * i;
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-        ctx.stroke();
-      }
-
-      if (values.length < 2) {
-        ctx.fillStyle = "#9baac3";
-        ctx.font = "13px Arial";
-        ctx.fillText("Waiting for chart data...", 12, 24);
-        return;
-      }
-
-      const min = Math.min(...values);
-      const max = Math.max(...values);
-      const range = max - min || Math.abs(max) * 0.00001 || 1;
-      const pad = 8;
-
-      ctx.beginPath();
-
-      values.forEach((value, index) => {
-        const x = pad + index * (width - pad * 2) / (values.length - 1);
-        const y = height - pad -
-          ((value - min) / range) * (height - pad * 2);
-
-        if (index === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      });
-
-      ctx.strokeStyle = "#26d998";
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      ctx.fillStyle = "#9baac3";
-      ctx.font = "11px Arial";
-      ctx.fillText("High " + formatPrice(max), 8, 14);
-      ctx.fillText("Low " + formatPrice(min), 8, height - 5);
-    }
-
-    function startLegacyLogin() {
-      // This app is configured for the legacy Deriv OAuth flow.
-      // It returns account details in URL parameters such as token1/acct1.
-      const loginUrl = new URL("https://oauth.deriv.com/oauth2/authorize");
-      loginUrl.searchParams.set("app_id", APP_ID);
-      loginUrl.searchParams.set("l", "EN");
-      loginUrl.searchParams.set("brand", "deriv");
-
-      window.location.assign(loginUrl.toString());
-    }
-
-    function processOAuthCallback() {
-      const params = new URLSearchParams(window.location.search);
-      const token = params.get("token1");
-      const accountId = params.get("acct1");
-      const currency = params.get("cur1") || "";
-
-      if (token && accountId) {
-        // This is the legacy token callback, not the OAuth2 "code" callback.
-        localStorage.setItem("ck_deriv_token", token);
-        localStorage.setItem("ck_deriv_account", accountId);
-        localStorage.setItem("ck_deriv_currency", currency);
-
-        // Remove authentication parameters from the visible address bar.
-        window.history.replaceState({}, document.title, REDIRECT_URI);
-
-        log("Deriv login details received. Connecting your account...");
-        connectAccount(token, accountId, currency);
-        return;
-      }
-
-      const error = params.get("error");
-      if (error) {
-        log("Deriv login was not completed: " + error);
-        window.history.replaceState({}, document.title, REDIRECT_URI);
-      }
-    }
-
-    function connectAccount(token, accountId, currency) {
-      if (accountSocket) {
-        try { accountSocket.close(); } catch (_) {}
-      }
-
-      setStatus("accountStatus", "Connecting account...");
-      $("accountId").textContent = accountId;
-      $("accountCurrency").textContent = currency ? "Currency: " + currency : "";
-      $("accountBalance").textContent = "Loading...";
-      $("loginBtn").hidden = true;
-      $("logoutBtn").hidden = false;
-
-      try {
-        accountSocket = new WebSocket(WS_URL);
-      } catch (_) {
-        setStatus("accountStatus", "Could not open account connection", "error");
-        return;
-      }
-
-      accountSocket.onopen = () => {
-        accountSocket.send(JSON.stringify({
-          authorize: token,
-          req_id: accountRequestId++
-        }));
-      };
-
-      accountSocket.onmessage = event => {
-        let data;
-
-        try { data = JSON.parse(event.data); }
-        catch (_) { return; }
-
-        if (data.error) {
-          setStatus("accountStatus", "Account authorization failed", "error");
-          $("accountBalance").textContent = "Unavailable";
-          $("tradingStatus").textContent = "Not connected";
-
-          // Don't repeatedly retry a token rejected by Deriv.
-          if (data.error.code === "InvalidToken" ||
-              data.error.code === "AuthorizationRequired") {
-            localStorage.removeItem("ck_deriv_token");
-            localStorage.removeItem("ck_deriv_account");
-            localStorage.removeItem("ck_deriv_currency");
-            $("loginBtn").hidden = false;
-            $("logoutBtn").hidden = true;
-          }
-
-          log("Deriv could not authorize this account. Please log in again if needed.");
-          return;
-        }
-
-        if (data.msg_type === "authorize" && data.authorize) {
-          loggedIn = true;
-          const auth = data.authorize;
-          const realAccountId = auth.loginid || accountId;
-          accountCurrency = auth.currency || currency || "";
-
-          $("accountId").textContent = realAccountId;
-          $("accountCurrency").textContent =
-            accountCurrency ? "Currency: " + accountCurrency : "";
-          $("accountBalance").textContent =
-            formatPrice(Number(auth.balance)) + " " + accountCurrency;
-
-          setStatus("accountStatus", "Deriv account connected", "online");
-          $("tradingStatus").textContent = "Manual setup only";
-          $("loginBtn").hidden = true;
-          $("logoutBtn").hidden = false;
-
-          log("Account connected successfully. No trades have been placed.");
-          accountSocket.send(JSON.stringify({
-            balance: 1,
-            subscribe: 1,
-            req_id: accountRequestId++
-          }));
-        }
-
-        if (data.msg_type === "balance" && data.balance) {
-          const amount = Number(data.balance.balance);
-          $("accountBalance").textContent =
-            formatPrice(amount) + " " + (data.balance.currency || accountCurrency);
-        }
-      };
-
-      accountSocket.onerror = () => {
-        setStatus("accountStatus", "Account connection error", "error");
-      };
-
-      accountSocket.onclose = () => {
-        if (loggedIn) {
-          setStatus("accountStatus", "Account connection closed");
-        }
-      };
-    }
-
-    function disconnectAccount() {
-      if (accountSocket) {
-        try { accountSocket.close(); } catch (_) {}
-        accountSocket = null;
-      }
-
-      localStorage.removeItem("ck_deriv_token");
-      localStorage.removeItem("ck_deriv_account");
-      localStorage.removeItem("ck_deriv_currency");
-
-      loggedIn = false;
-      $("accountId").textContent = "—";
-      $("accountBalance").textContent = "—";
-      $("accountCurrency").textContent = "";
-      $("tradingStatus").textContent = "Not started";
-      $("loginBtn").hidden = false;
-      $("logoutBtn").hidden = true;
-
-      setStatus("accountStatus", "Disconnected");
-      log("Deriv account disconnected on this device.");
-    }
-
-    $("loginBtn").addEventListener("click", startLegacyLogin);
-    $("logoutBtn").addEventListener("click", disconnectAccount);
-
-    $("marketSelect").addEventListener("change", event => {
-      chooseMarket(event.target.value);
+  };
+}
+
+function scheduleReconnect() {
+  if (manuallyClosed || reconnectTimer) return;
+
+  reconnectTimer = setTimeout(() => {
+    reconnectTimer = null;
+    reconnectDelay = Math.min(reconnectDelay * 2, 30000);
+    connectMarkets();
+  }, reconnectDelay);
+}
+
+function drawChart() {
+  const values = chartHistory[chartSelect.value] || [];
+  const width = canvas.width;
+  const height = canvas.height;
+
+  ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = "#0b1728";
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.strokeStyle = "#263852";
+  ctx.lineWidth = 1;
+
+  for (let i = 1; i < 5; i++) {
+    const y = (height / 5) * i;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(width, y);
+    ctx.stroke();
+  }
+
+  if (values.length < 2) {
+    ctx.fillStyle = "#9bacc5";
+    ctx.font = "18px Arial";
+    ctx.fillText("Waiting for price data…", 24, 40);
+    chartStatus.textContent = "Waiting for ticks for " + chartSelect.value;
+    return;
+  }
+
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 1;
+  const pad = 20;
+
+  ctx.strokeStyle = "#4f8cff";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+
+  values.forEach((value, index) => {
+    const x = pad + index * (width - 2 * pad) / (values.length - 1);
+    const y = height - pad -
+      ((value - min) / range) * (height - 2 * pad);
+
+    if (index === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+
+  ctx.stroke();
+
+  ctx.fillStyle = "#f3f7ff";
+  ctx.font = "16px Arial";
+  ctx.fillText("Latest: " + values[values.length - 1], 20, 25);
+
+  chartStatus.textContent =
+    values.length + " recent price points · " + chartSelect.value;
+}
+
+/* OAuth 2.0 login using PKCE and the existing Worker token exchange. */
+function base64Url(bytes) {
+  let binary = "";
+  bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
+
+  return btoa(binary)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+}
+
+function randomString(length) {
+  const alphabet =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
+  const bytes = crypto.getRandomValues(new Uint8Array(length));
+
+  return Array.from(bytes, (byte) =>
+    alphabet[byte % alphabet.length]
+  ).join("");
+}
+
+async function startOAuthLogin() {
+  if (!CLIENT_ID || CLIENT_ID === "YOUR_OAUTH2_CLIENT_ID") {
+    setText("loginStatus", "Set your registered Deriv OAuth 2.0 client ID first.");
+    return;
+  }
+
+  if (!window.crypto || !crypto.subtle) {
+    setText("loginStatus", "Secure browser cryptography is unavailable.");
+    return;
+  }
+
+  try {
+    const verifier = randomString(64);
+    const digest = await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(verifier)
+    );
+
+    const challenge = base64Url(new Uint8Array(digest));
+    const state = randomString(32);
+
+    sessionStorage.setItem("ck_pkce_verifier", verifier);
+    sessionStorage.setItem("ck_oauth_state", state);
+
+    const authUrl = new URL("https://auth.deriv.com/oauth2/auth");
+    authUrl.searchParams.set("response_type", "code");
+    authUrl.searchParams.set("client_id", CLIENT_ID);
+    authUrl.searchParams.set("redirect_uri", REDIRECT_URI);
+    authUrl.searchParams.set("scope", "trade");
+    authUrl.searchParams.set("state", state);
+    authUrl.searchParams.set("code_challenge", challenge);
+    authUrl.searchParams.set("code_challenge_method", "S256");
+
+    window.location.assign(authUrl.toString());
+  } catch (error) {
+    setText("loginStatus", "Could not start login: " + error.message);
+  }
+}
+
+async function processOAuthCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get("code");
+  const returnedState = params.get("state");
+  const oauthError = params.get("error");
+
+  if (oauthError) {
+    setText("loginStatus",
+      "Deriv login was not completed: " +
+      (params.get("error_description") || oauthError));
+    window.history.replaceState({}, document.title, REDIRECT_URI);
+    return;
+  }
+
+  if (!code) return;
+
+  setText("loginStatus", "Deriv returned a login code. Verifying securely…");
+
+  const expectedState = sessionStorage.getItem("ck_oauth_state");
+  const verifier = sessionStorage.getItem("ck_pkce_verifier");
+
+  if (!expectedState || returnedState !== expectedState || !verifier) {
+    setText("loginStatus",
+      "Login verification failed. Please start login again.");
+    window.history.replaceState({}, document.title, REDIRECT_URI);
+    return;
+  }
+
+  sessionStorage.removeItem("ck_oauth_state");
+
+  try {
+    const response = await fetch(TOKEN_WORKER, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        code: code,
+        code_verifier: verifier,
+        client_id: CLIENT_ID,
+        redirect_uri: REDIRECT_URI
+      })
     });
 
-    window.addEventListener("resize", drawChart);
+    const result = await response.json();
 
-    // Restore an existing legacy OAuth session on this device.
-    function restoreAccount() {
-      const token = localStorage.getItem("ck_deriv_token");
-      const accountId = localStorage.getItem("ck_deriv_account");
-      const currency = localStorage.getItem("ck_deriv_currency") || "";
+    sessionStorage.removeItem("ck_pkce_verifier");
+    window.history.replaceState({}, document.title, REDIRECT_URI);
 
-      if (token && accountId) {
-        connectAccount(token, accountId, currency);
-      }
+    if (!response.ok || !result.access_token) {
+      console.error("OAuth token exchange failed:", result);
+      setText("loginStatus",
+        "Token exchange failed. Check your OAuth client ID, redirect URI, and Worker logs.");
+      return;
     }
 
-    // Start public prices first; login is optional for market data.
-    renderMarkets();
-    chooseMarket(selectedSymbol);
-    connectMarketData();
-    processOAuthCallback();
+    /*
+     * Keep the token in sessionStorage for this browser tab only.
+     * Do not share it or paste it into messages.
+     */
+    sessionStorage.setItem("ck_access_token", result.access_token);
 
-    if (!localStorage.getItem("ck_deriv_token")) {
-      restoreAccount();
-    }
-  </script>
+    setText("loginStatus",
+      "OAuth login succeeded. Account API connection is not yet configured.");
+    setText("accountStatus",
+      "Login token received. This version does not yet fetch your account balance or place trades.");
+
+  } catch (error) {
+    console.error(error);
+    setText("loginStatus",
+      "Could not contact the token exchange Worker. Check the Worker and internet connection.");
+  }
+}
+
+document.getElementById("loginButton").addEventListener("click", startOAuthLogin);
+
+document.getElementById("refreshButton").addEventListener("click", () => {
+  connectMarkets();
+});
+
+document.getElementById("logoutButton").addEventListener("click", () => {
+  sessionStorage.removeItem("ck_access_token");
+  sessionStorage.removeItem("ck_pkce_verifier");
+  sessionStorage.removeItem("ck_oauth_state");
+
+  setText("loginStatus", "Local login session cleared.");
+  setText("accountStatus", "Account features are not connected.");
+});
+
+chartSelect.addEventListener("change", () => {
+  drawChart();
+
+  if (marketSocket && marketSocket.readyState === WebSocket.OPEN) {
+    marketSocket.send(JSON.stringify({
+      ticks_history: chartSelect.value,
+      count: 100,
+      end: "latest",
+      style: "ticks"
+    }));
+  }
+});
+
+makeMarketCards();
+drawChart();
+processOAuthCallback();
+connectMarkets();
+</script>
 </body>
 </html>
