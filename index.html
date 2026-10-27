@@ -393,10 +393,7 @@
     }
   }
 
-  function cleanUrl() {
-    history.replaceState({}, document.title, location.pathname + location.hash);
-  }
-
+  // Preserve Deriv's error code as well as its message.
   function request(ws, payload) {
     return new Promise((resolve, reject) => {
       if (!ws || ws.readyState !== WebSocket.OPEN) {
@@ -406,7 +403,11 @@
       const id = ++requestId;
       const timer = setTimeout(() => {
         pending.delete(id);
-        reject(Error("Deriv did not respond in time."));
+        const error = Error(
+          "Deriv did not respond in time. The purchase outcome may be uncertain."
+        );
+        error.code = "REQUEST_TIMEOUT";
+        reject(error);
       }, 15000);
 
       pending.set(id, { resolve, reject, timer });
@@ -469,13 +470,22 @@
           clearTimeout(p.timer);
           pending.delete(d.req_id);
 
-          if (d.error) p.reject(Error(d.error.message));
-          else p.resolve(d);
+          if (d.error) {
+            const error = Error(d.error.message || "Deriv returned an error.");
+            error.code = d.error.code || "DERIV_ERROR";
+            p.reject(error);
+          } else {
+            p.resolve(d);
+          }
           return;
         }
 
         if (d.error) {
-          setStatus("demo-trade-status", "Deriv error: " + d.error.message);
+          setStatus(
+            "demo-trade-status",
+            "Deriv error: " + (d.error.code || "No error code") +
+            " — " + (d.error.message || "Unknown error")
+          );
           return;
         }
 
@@ -500,7 +510,7 @@
       };
 
       demoSocket.onerror = () => {
-        setStatus("demo-trade-status", "Demo WebSocket error.");
+        setStatus("demo-trade-status", "Demo WebSocket error. Check the connection before retrying.");
       };
 
       demoSocket.onclose = () => {
@@ -583,7 +593,10 @@
       setStatus("demo-trade-status", "Quote received. Review before a Demo purchase.");
       $("demo-buy").disabled = false;
     } catch (e) {
-      setStatus("demo-trade-status", "Quote failed: " + e.message);
+      setStatus(
+        "demo-trade-status",
+        "Quote failed: " + (e.code || "ERROR") + " — " + e.message
+      );
     } finally {
       $("demo-get-price").disabled =
         !demoSocket || demoSocket.readyState !== WebSocket.OPEN;
@@ -631,7 +644,7 @@
     let contractId;
 
     try {
-      // Submit the purchase only once.
+      // Send one purchase request only. Do not auto-retry.
       const r = await request(demoSocket, {
         buy: q.id,
         price: q.ask
@@ -662,19 +675,20 @@
 
     } catch (e) {
       latestProposal = null;
+      $("demo-buy").disabled = true;
       setStatus(
         "demo-trade-status",
-        "Purchase outcome uncertain: " + e.message +
-        ". Check Deriv transaction history before trying again."
+        "Purchase outcome uncertain. Error code: " +
+        (e.code || "NO_CODE") + " — " +
+        (e.message || String(e)) +
+        ". Check Deriv transaction history before retrying."
       );
       return;
-
     } finally {
       $("demo-get-price").disabled =
         !demoSocket || demoSocket.readyState !== WebSocket.OPEN;
     }
 
-    // Monitor the contract separately from the purchase request.
     try {
       await request(demoSocket, {
         proposal_open_contract: 1,
@@ -691,7 +705,8 @@
       setStatus(
         "demo-trade-status",
         "Purchase was accepted (contract " + contractId +
-        "), but contract updates failed: " + e.message +
+        "), but contract updates failed: " +
+        (e.code || "NO_CODE") + " — " + e.message +
         ". Check Deriv for the current contract status."
       );
     }
