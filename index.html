@@ -15,18 +15,19 @@ header{background:#0b1728;border-bottom:1px solid var(--border);padding:20px 0}
 .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 h1{font-size:24px;margin:0 0 6px}
 h2{font-size:18px;margin:0 0 14px}
+h3{font-size:15px}
 p{line-height:1.5}
 .muted,.status{color:var(--muted)}
 .small{font-size:12px}
 .badge{padding:6px 10px;border-radius:20px;background:#172c48;color:#9dc4ff;font-size:12px}
 main{padding-top:22px;padding-bottom:35px}
 .panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:18px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
-.balance-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.balance-card{min-width:0;background:var(--inner);border:1px solid var(--border);border-radius:12px;padding:14px}
-.balance-card h3{font-size:14px;margin:0 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.balance-grid,.stats-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.stats-grid{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+.balance-card,.stat-card{min-width:0;background:var(--inner);border:1px solid var(--border);border-radius:12px;padding:14px}
+.balance-card h3{margin:0 0 12px}
 .balance-card .price{font-size:clamp(17px,4vw,25px);overflow-wrap:anywhere;margin:10px 0}
-@media(max-width:420px){.balance-grid{gap:8px}.balance-card{padding:10px}.balance-card h3{font-size:12px}}
 .market{padding:15px;background:var(--inner);border:1px solid var(--border);border-radius:11px}
 .market-name{font-weight:bold}
 .price{font-size:25px;font-weight:bold;margin:12px 0 5px;overflow-wrap:anywhere}
@@ -34,12 +35,21 @@ main{padding-top:22px;padding-bottom:35px}
 .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 button{border:0;border-radius:8px;padding:12px 15px;background:var(--blue);color:white;font-weight:bold;cursor:pointer}
 button.secondary{background:#243750;border:1px solid #3a506d}
+button.danger{background:#803340}
 button:disabled{opacity:.55;cursor:not-allowed}
-select,input{display:block;width:100%;max-width:380px;padding:12px;margin:7px 0 14px;background:var(--inner);color:white;border:1px solid #3a506d;border-radius:8px}
+select,input{display:block;width:100%;max-width:420px;padding:12px;margin:7px 0 14px;background:var(--inner);color:white;border:1px solid #3a506d;border-radius:8px}
 label{font-size:13px;color:#c5d7f1}
 .notice{padding:12px;border-radius:9px;background:#17243a;font-size:13px;line-height:1.5;overflow-wrap:anywhere}
-canvas{display:block;width:100%;height:220px;background:#0b1728;border:1px solid var(--border);border-radius:10px}
+canvas{display:block;width:100%;height:260px;background:#0b1728;border:1px solid var(--border);border-radius:10px}
+.stat-value{font-size:23px;font-weight:bold;margin-top:8px;overflow-wrap:anywhere}
+.table-wrap{width:100%;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:650px}
+th,td{text-align:left;padding:11px 9px;border-bottom:1px solid var(--border);white-space:nowrap}
+th{color:#c5d7f1}
+.positive{color:var(--green)}
+.negative{color:var(--red)}
 footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px solid var(--border);font-size:12px}
+@media(max-width:420px){.balance-grid{gap:8px}.balance-card,.stat-card{padding:10px}.balance-card h3{font-size:12px}}
 @media(max-width:480px){h1{font-size:22px}.panel{padding:14px}.price{font-size:22px}}
 </style>
 </head>
@@ -50,14 +60,14 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 <h1>CK Trading Bot</h1>
 <div class="muted small">POWERED BY DERIV · TRADING WORKSPACE</div>
 </div>
-<span class="badge">LIVE MARKET DATA</span>
+<span class="badge" id="headerStatus">CONNECTING MARKETS</span>
 </div>
 </header>
 
 <main class="wrap">
 <section class="panel">
 <h2>Welcome</h2>
-<p class="muted">Monitor public prices and connect your Deriv account.</p>
+<p class="muted">Monitor live prices, review trading results and connect your Deriv account.</p>
 <div class="actions">
 <button id="loginButton">Log In to Deriv</button>
 <button id="refreshButton" class="secondary">Reconnect Markets</button>
@@ -74,7 +84,7 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 
 <section class="panel">
 <h2>Price Chart</h2>
-<label for="chartMarket">Select market</label>
+<label for="chartMarket">Market</label>
 <select id="chartMarket">
 <option value="1HZ100V">Volatility 100 (1s)</option>
 <option value="1HZ75V">Volatility 75 (1s)</option>
@@ -86,8 +96,21 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 <option value="R_25">Volatility 25</option>
 <option value="R_10">Volatility 10</option>
 </select>
-<canvas id="chart" width="1000" height="300"></canvas>
-<div id="chartStatus" class="status">Waiting for ticks…</div>
+<label for="chartStyle">Chart style</label>
+<select id="chartStyle">
+<option value="line">Line chart</option>
+<option value="candles">Candlesticks</option>
+</select>
+<label for="chartInterval">Candle interval</label>
+<select id="chartInterval">
+<option value="60">1 minute</option>
+<option value="120">2 minutes</option>
+<option value="300">5 minutes</option>
+<option value="900">15 minutes</option>
+<option value="3600">1 hour</option>
+</select>
+<canvas id="chart" width="1000" height="320"></canvas>
+<div id="chartStatus" class="status">Waiting for price data…</div>
 </section>
 
 <section class="panel">
@@ -110,8 +133,7 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 
 <section class="panel">
 <h2>Manual Demo Trading</h2>
-<p class="muted small">Demo funds only. A quote is requested first, then you must confirm before a purchase is sent.</p>
-
+<p class="muted small">Demo funds only. Review the quote before confirming a purchase.</p>
 <label for="tradeMarket">Market</label>
 <select id="tradeMarket">
 <option value="1HZ100V">Volatility 100 (1s)</option>
@@ -124,16 +146,13 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 <option value="R_25">Volatility 25</option>
 <option value="R_10">Volatility 10</option>
 </select>
-
 <label for="tradeDirection">Direction</label>
 <select id="tradeDirection">
 <option value="MULTUP">Multiplier Up</option>
 <option value="MULTDOWN">Multiplier Down</option>
 </select>
-
 <label for="tradeStake">Stake amount (demo currency)</label>
 <input id="tradeStake" type="number" min="1" max="10" step="0.01" value="1">
-
 <label for="tradeMultiplier">Multiplier</label>
 <select id="tradeMultiplier">
 <option value="10">10×</option>
@@ -142,15 +161,14 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 <option value="50">50×</option>
 <option value="100">100×</option>
 </select>
-
 <button id="tradeButton" disabled>Connect Demo Account First</button>
-<div id="tradeStatus" class="status">No trade placed.</div>
+<div id="tradeStatus" class="status">No demo trade placed.</div>
 <div id="contractStatus" class="status"></div>
 </section>
 
 <section class="panel">
 <h2>Manual Real Trading</h2>
-
+<p class="muted small">Real-money trades can lose money. Check the account and quote carefully before confirming.</p>
 <label for="realTradeMarket">Market</label>
 <select id="realTradeMarket">
 <option value="1HZ100V">Volatility 100 (1s)</option>
@@ -163,16 +181,13 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 <option value="R_25">Volatility 25</option>
 <option value="R_10">Volatility 10</option>
 </select>
-
 <label for="realTradeDirection">Direction</label>
 <select id="realTradeDirection">
 <option value="MULTUP">Multiplier Up</option>
 <option value="MULTDOWN">Multiplier Down</option>
 </select>
-
 <label for="realTradeStake">Stake amount (real currency)</label>
 <input id="realTradeStake" type="number" min="1" max="10" step="0.01" value="1">
-
 <label for="realTradeMultiplier">Multiplier</label>
 <select id="realTradeMultiplier">
 <option value="10">10×</option>
@@ -181,16 +196,59 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 <option value="50">50×</option>
 <option value="100">100×</option>
 </select>
-
 <button id="realTradeButton" disabled>Connect Real Account First</button>
 <div id="realTradeStatus" class="status">Real trading is not connected.</div>
 <div id="realContractStatus" class="status"></div>
 </section>
 
 <section class="panel">
-<h2>Safety</h2>
+<h2>Session Statistics</h2>
+<div class="stats-grid">
+<div class="stat-card"><div class="muted small">Trades placed</div><div id="statTrades" class="stat-value">0</div></div>
+<div class="stat-card"><div class="muted small">Wins</div><div id="statWins" class="stat-value positive">0</div></div>
+<div class="stat-card"><div class="muted small">Losses</div><div id="statLosses" class="stat-value negative">0</div></div>
+<div class="stat-card"><div class="muted small">Recorded net P/L</div><div id="statPL" class="stat-value">0.00</div><div id="statCurrency" class="muted small">Session results</div></div>
+</div>
+<p class="muted small">Statistics include only trades recorded by this page during the current browser session. They are not a complete account statement.</p>
+</section>
+
+<section class="panel">
+<h2>Session Trading Limits</h2>
+<p class="muted small">These browser-side limits help prevent additional requests from this page after a threshold is reached. They are not broker-enforced guarantees and cannot stop trades placed elsewhere.</p>
+<label for="maxTrades">Maximum trade requests per session (1–100)</label>
+<input id="maxTrades" type="number" min="1" max="100" step="1" value="10">
+<label for="maxSessionLoss">Stop requesting trades at this session loss (currency amount)</label>
+<input id="maxSessionLoss" type="number" min="0" max="100000" step="0.01" value="10">
+<div class="actions">
+<button id="applyLimitsButton" class="secondary">Apply Limits</button>
+<button id="resetStatsButton" class="secondary">Reset Statistics</button>
+</div>
+<div id="limitStatus" class="status">Session limits are active using the displayed settings.</div>
+</section>
+
+<section class="panel">
+<h2>Trade History</h2>
+<p class="muted small">Shows trades initiated from this page in the current session. Results update when contract status messages arrive.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Time</th><th>Account</th><th>Market</th><th>Direction</th><th>Stake</th><th>Status</th><th>P/L</th></tr>
+</thead>
+<tbody id="historyBody">
+<tr><td colspan="7">No trades recorded this session.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="actions">
+<button id="clearHistoryButton" class="secondary">Clear Displayed History</button>
+</div>
+<div id="historyStatus" class="status">History is stored in this page's memory only.</div>
+</section>
+
+<section class="panel">
+<h2>Safety and Connection Notes</h2>
 <div class="notice">
-Independent third-party interface, not an official Deriv website. Check the selected account, market, stake and quote before every purchase. Never assume a purchase failed just because the connection dropped.
+CK Trading Bot is an independent third-party interface, not an official Deriv website. A lost connection does not prove a purchase failed. Check your Deriv account and contract history before retrying any uncertain order. Session statistics and browser-side limits are not guaranteed risk controls.
 </div>
 </section>
 </main>
@@ -219,6 +277,8 @@ const MARKET_LIST = [
 const $ = id => document.getElementById(id);
 const prices = {};
 const chartHistory = {};
+const candleHistory = {};
+const tradeHistory = [];
 
 let marketSocket = null, marketTimer = null, marketGeneration = 0;
 let tradeSocket = null, realSocket = null;
@@ -229,9 +289,19 @@ let realTradeBusy = false, realPendingProposal = false;
 let requestId = 100;
 let lastTradeRequestId = null, lastRealTradeRequestId = null;
 let sessionGeneration = 0;
+let sessionTradeCount = 0, sessionWins = 0, sessionLosses = 0, sessionPL = 0;
+let maxTrades = 10, maxSessionLoss = 10;
+let currentDemoTrade = null, currentRealTrade = null;
+let demoPurchaseUncertain = false, realPurchaseUncertain = false;
+let seenContracts = new Set();
 
-function show(id,message){
-  $(id).textContent = message;
+function show(id,message){$(id).textContent=message;}
+
+function money(value,currency){
+  const n=Number(value);
+  return Number.isFinite(n)
+    ? n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})+" "+(currency||"")
+    : "—";
 }
 
 function makeMarketCards(){
@@ -255,43 +325,51 @@ function makeMarketCards(){
   });
 }
 
+function requestChartHistory(){
+  if(!marketSocket||marketSocket.readyState!==WebSocket.OPEN)return;
+  const symbol=$("chartMarket").value;
+  const style=$("chartStyle").value;
+  const interval=Number($("chartInterval").value);
+  show("chartStatus","Requesting chart history…");
+  const request={
+    ticks_history:symbol,
+    count:100,
+    end:"latest",
+    style:style==="candles"?"candles":"ticks"
+  };
+  if(style==="candles")request.granularity=interval;
+  marketSocket.send(JSON.stringify(request));
+}
+
 function connectMarkets(){
   marketGeneration++;
   const generation=marketGeneration;
-
   if(marketTimer)clearTimeout(marketTimer);
   if(marketSocket){
     try{marketSocket.onclose=null;marketSocket.close();}catch(e){}
   }
-
   show("marketStatus","Connecting to public market data…");
+  $("headerStatus").textContent="CONNECTING MARKETS";
 
-  try{
-    marketSocket=new WebSocket(MARKET_WS_URL);
-  }catch(e){
+  try{marketSocket=new WebSocket(MARKET_WS_URL);}
+  catch(e){
     show("marketStatus","Market connection error.");
     return;
   }
 
   const socket=marketSocket;
-
   socket.onopen=()=>{
     if(generation!==marketGeneration)return;
     show("marketStatus","Connected. Requesting live prices…");
-    MARKET_LIST.forEach(m=>
-      socket.send(JSON.stringify({ticks:m.symbol,subscribe:1}))
-    );
-    socket.send(JSON.stringify({
-      ticks_history:$("chartMarket").value,
-      count:100,end:"latest",style:"ticks"
-    }));
+    $("headerStatus").textContent="MARKETS CONNECTED";
+    MARKET_LIST.forEach(m=>socket.send(JSON.stringify({ticks:m.symbol,subscribe:1})));
+    requestChartHistory();
   };
 
   socket.onmessage=event=>{
     if(generation!==marketGeneration)return;
     let d;
     try{d=JSON.parse(event.data);}catch(e){return;}
-
     if(d.error){
       show("marketStatus","Market API error: "+(d.error.message||"Request failed"));
       return;
@@ -300,87 +378,114 @@ function connectMarkets(){
     if(d.msg_type==="tick"&&d.tick){
       const t=d.tick,s=t.symbol,q=Number(t.quote);
       if(!s||!Number.isFinite(q))return;
-
       prices[s]=q;
-      if($("price-"+s)){
-        $("price-"+s).textContent=q.toLocaleString("en-US",{maximumFractionDigits:5});
-      }
-      if($("time-"+s)){
-        $("time-"+s).textContent="Live · "+
-          new Date(Number(t.epoch||Date.now()/1000)*1000).toLocaleTimeString();
-      }
-
+      if($("price-"+s))$("price-"+s).textContent=q.toLocaleString("en-US",{maximumFractionDigits:5});
+      if($("time-"+s))$("time-"+s).textContent="Live · "+new Date(Number(t.epoch||Date.now()/1000)*1000).toLocaleTimeString();
       if(!chartHistory[s])chartHistory[s]=[];
       chartHistory[s].push(q);
-      if(chartHistory[s].length>100)chartHistory[s].shift();
+      if(chartHistory[s].length>300)chartHistory[s].shift();
 
+      // Build approximate live OHLC candles from received ticks.
+      const interval=Number($("chartInterval").value);
+      const bucket=Math.floor(Number(t.epoch||Date.now()/1000)/interval)*interval;
+      if(!candleHistory[s])candleHistory[s]=[];
+      let cs=candleHistory[s];
+      let last=cs[cs.length-1];
+      if(!last||last.epoch!==bucket){
+        cs.push({epoch:bucket,open:q,high:q,low:q,close:q});
+        if(cs.length>300)cs.shift();
+      }else{
+        last.high=Math.max(last.high,q);
+        last.low=Math.min(last.low,q);
+        last.close=q;
+      }
       show("marketStatus","Live market feed connected · "+new Date().toLocaleTimeString());
       drawChart();
     }
 
-    if(d.msg_type==="history"&&d.history&&Array.isArray(d.history.prices)){
-      chartHistory[$("chartMarket").value]=
-        d.history.prices.map(Number).filter(Number.isFinite).slice(-100);
+    if(d.msg_type==="history"&&d.history){
+      const symbol=$("chartMarket").value;
+      if(Array.isArray(d.history.prices)){
+        chartHistory[symbol]=d.history.prices.map(Number).filter(Number.isFinite).slice(-300);
+      }
+      if(Array.isArray(d.history.candles)){
+        candleHistory[symbol]=d.history.candles.map(c=>({
+          epoch:Number(c.epoch),open:Number(c.open),high:Number(c.high),
+          low:Number(c.low),close:Number(c.close)
+        })).filter(c=>[c.epoch,c.open,c.high,c.low,c.close].every(Number.isFinite)).slice(-300);
+      }
       drawChart();
     }
   };
 
   socket.onerror=()=>{
-    if(generation===marketGeneration){
-      show("marketStatus","Market network error; waiting to reconnect.");
-    }
+    if(generation===marketGeneration)show("marketStatus","Market network error; waiting to reconnect.");
   };
 
   socket.onclose=e=>{
     if(generation!==marketGeneration)return;
+    $("headerStatus").textContent="MARKETS DISCONNECTED";
     show("marketStatus","Market connection closed ("+e.code+"). Reconnecting…");
-    marketTimer=setTimeout(()=>{
-      if(generation===marketGeneration)connectMarkets();
-    },5000);
+    marketTimer=setTimeout(()=>{if(generation===marketGeneration)connectMarkets();},5000);
   };
 }
 
 function drawChart(){
   const c=$("chart"),ctx=c.getContext("2d");
-  const v=chartHistory[$("chartMarket").value]||[];
+  const symbol=$("chartMarket").value;
+  const style=$("chartStyle").value;
   const w=c.width,h=c.height;
-
   ctx.clearRect(0,0,w,h);
-  ctx.fillStyle="#0b1728";
-  ctx.fillRect(0,0,w,h);
-  ctx.strokeStyle="#263852";
-
+  ctx.fillStyle="#0b1728";ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle="#263852";ctx.lineWidth=1;
   for(let i=1;i<5;i++){
-    ctx.beginPath();
-    ctx.moveTo(0,h*i/5);
-    ctx.lineTo(w,h*i/5);
-    ctx.stroke();
+    ctx.beginPath();ctx.moveTo(0,h*i/5);ctx.lineTo(w,h*i/5);ctx.stroke();
   }
 
-  if(v.length<2){
-    ctx.fillStyle="#9bacc5";
-    ctx.font="18px Arial";
-    ctx.fillText("Waiting for price data…",24,40);
-    show("chartStatus","Waiting for ticks for "+$("chartMarket").value);
+  if(style==="candles"){
+    const candles=candleHistory[symbol]||[];
+    if(candles.length<2){
+      ctx.fillStyle="#9bacc5";ctx.font="18px Arial";
+      ctx.fillText("Waiting for candle data…",24,40);
+      show("chartStatus","Candlestick history requires candle data from the market feed.");
+      return;
+    }
+    const all=candles.flatMap(x=>[x.high,x.low]);
+    const min=Math.min(...all),max=Math.max(...all),range=max-min||1,pad=25;
+    const step=(w-2*pad)/candles.length;
+    candles.forEach((v,i)=>{
+      const x=pad+i*step+step/2;
+      const y=n=>h-pad-((n-min)/range)*(h-2*pad);
+      const up=v.close>=v.open;
+      ctx.strokeStyle=up?"#31d49a":"#ff6b78";
+      ctx.fillStyle=ctx.strokeStyle;
+      ctx.beginPath();ctx.moveTo(x,y(v.high));ctx.lineTo(x,y(v.low));ctx.stroke();
+      const top=Math.min(y(v.open),y(v.close));
+      const body=Math.max(2,Math.abs(y(v.open)-y(v.close)));
+      ctx.fillRect(x-Math.max(2,step*.28),top,Math.max(3,step*.56),body);
+    });
+    show("chartStatus",candles.length+" candles · "+symbol+" · "+$("chartInterval").selectedOptions[0].textContent);
     return;
   }
 
+  const v=chartHistory[symbol]||[];
+  if(v.length<2){
+    ctx.fillStyle="#9bacc5";ctx.font="18px Arial";
+    ctx.fillText("Waiting for price data…",24,40);
+    show("chartStatus","Waiting for ticks for "+symbol);
+    return;
+  }
   const min=Math.min(...v),max=Math.max(...v),range=max-min||1,pad=24;
-  ctx.beginPath();
-  ctx.strokeStyle="#4f8cff";
-  ctx.lineWidth=3;
-
+  ctx.beginPath();ctx.strokeStyle="#4f8cff";ctx.lineWidth=3;
   v.forEach((n,i)=>{
     const x=pad+i*(w-2*pad)/(v.length-1);
     const y=h-pad-((n-min)/range)*(h-2*pad);
     if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
   });
-
   ctx.stroke();
-  ctx.fillStyle="#f3f7ff";
-  ctx.font="16px Arial";
+  ctx.fillStyle="#f3f7ff";ctx.font="16px Arial";
   ctx.fillText("Latest: "+v[v.length-1],20,25);
-  show("chartStatus",v.length+" price points · "+$("chartMarket").value);
+  show("chartStatus",v.length+" price points · "+symbol);
 }
 
 function randomString(length){
@@ -398,15 +503,11 @@ function base64Url(bytes){
 async function startLogin(){
   try{
     const verifier=randomString(64);
-    const digest=await crypto.subtle.digest(
-      "SHA-256",new TextEncoder().encode(verifier)
-    );
+    const digest=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(verifier));
     const challenge=base64Url(new Uint8Array(digest));
     const state=randomString(32);
-
     sessionStorage.setItem("ck_pkce_verifier",verifier);
     sessionStorage.setItem("ck_oauth_state",state);
-
     const url=new URL("https://auth.deriv.com/oauth2/auth");
     url.searchParams.set("response_type","code");
     url.searchParams.set("client_id",CLIENT_ID);
@@ -415,7 +516,6 @@ async function startLogin(){
     url.searchParams.set("state",state);
     url.searchParams.set("code_challenge",challenge);
     url.searchParams.set("code_challenge_method","S256");
-
     location.assign(url.toString());
   }catch(e){
     show("loginStatus","Could not start login. Check browser security settings.");
@@ -425,37 +525,27 @@ async function startLogin(){
 function safeOAuthError(result,status){
   const bits=[];
   if(result&&typeof result.error==="string")bits.push(result.error.slice(0,100));
-  if(result&&typeof result.provider_error==="string"){
-    bits.push(result.provider_error.slice(0,100));
-  }
-  return bits.length
-    ? "Token exchange failed (HTTP "+status+"): "+bits.join(" — ")
-    : "Token exchange failed (HTTP "+status+"). Check Worker and app settings.";
+  if(result&&typeof result.provider_error==="string")bits.push(result.provider_error.slice(0,100));
+  return bits.length?"Token exchange failed (HTTP "+status+"): "+bits.join(" — "):
+    "Token exchange failed (HTTP "+status+"). Check Worker and app settings.";
 }
 
 async function processOAuthCallback(){
   const params=new URLSearchParams(location.search);
-  const code=params.get("code");
-  const state=params.get("state");
-  const oauthError=params.get("error");
-
+  const code=params.get("code"),state=params.get("state"),oauthError=params.get("error");
   if(oauthError){
-    show("loginStatus","Deriv login error: "+
-      (params.get("error_description")||oauthError).slice(0,180));
+    show("loginStatus","Deriv login error: "+(params.get("error_description")||oauthError).slice(0,180));
     history.replaceState({},document.title,REDIRECT_URI);
     sessionStorage.removeItem("ck_oauth_state");
     sessionStorage.removeItem("ck_pkce_verifier");
     return;
   }
-
   if(!code){
     show("loginStatus","Not connected. Log in to connect your accounts.");
     return;
   }
-
   const savedState=sessionStorage.getItem("ck_oauth_state");
   const verifier=sessionStorage.getItem("ck_pkce_verifier");
-
   if(!savedState||state!==savedState||!verifier){
     show("loginStatus","Login verification failed. Start a fresh login.");
     history.replaceState({},document.title,REDIRECT_URI);
@@ -463,35 +553,21 @@ async function processOAuthCallback(){
     sessionStorage.removeItem("ck_pkce_verifier");
     return;
   }
-
   sessionStorage.removeItem("ck_oauth_state");
   show("loginStatus","Exchanging authorization code…");
-
   try{
     const response=await fetch(TOKEN_WORKER,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        code,
-        code_verifier:verifier,
-        client_id:CLIENT_ID,
-        redirect_uri:REDIRECT_URI
-      })
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({code,code_verifier:verifier,client_id:CLIENT_ID,redirect_uri:REDIRECT_URI})
     });
-
     let result;
-    try{result=await response.json();}
-    catch(e){result={error:"Worker returned a non-JSON response"};}
-
+    try{result=await response.json();}catch(e){result={error:"Worker returned a non-JSON response"};}
     sessionStorage.removeItem("ck_pkce_verifier");
     history.replaceState({},document.title,REDIRECT_URI);
-
-    if(!response.ok||!result||typeof result.access_token!=="string"||
-       !result.access_token){
+    if(!response.ok||!result||typeof result.access_token!=="string"||!result.access_token){
       show("loginStatus",safeOAuthError(result,response.status));
       return;
     }
-
     sessionStorage.setItem("ck_access_token",result.access_token);
     await connectAccounts(result.access_token);
   }catch(e){
@@ -501,82 +577,52 @@ async function processOAuthCallback(){
   }
 }
 
+function resetTradingState(){
+  tradeBusy=false;pendingProposal=false;realTradeBusy=false;realPendingProposal=false;
+  currentDemoTrade=null;currentRealTrade=null;
+  lastTradeRequestId=null;lastRealTradeRequestId=null;
+  demoPurchaseUncertain=false;realPurchaseUncertain=false;
+}
+
 async function connectAccounts(accessToken){
   const generation=++sessionGeneration;
   show("loginStatus","Looking up your Deriv accounts…");
   show("accountStatus","Looking up demo account…");
   show("realStatus","Looking up real account…");
-
-  $("tradeButton").disabled=true;
-  $("realTradeButton").disabled=true;
+  $("tradeButton").disabled=true;$("realTradeButton").disabled=true;
+  resetTradingState();
 
   try{
-    const response=await fetch(
-      "https://api.derivws.com/trading/v1/options/accounts",
-      {headers:{Authorization:"Bearer "+accessToken}}
-    );
-
+    const response=await fetch("https://api.derivws.com/trading/v1/options/accounts",{
+      headers:{Authorization:"Bearer "+accessToken}
+    });
     const result=await response.json();
     if(generation!==sessionGeneration)return;
-    if(!response.ok){
-      throw new Error("Account lookup failed (HTTP "+response.status+").");
-    }
-
+    if(!response.ok)throw new Error("Account lookup failed (HTTP "+response.status+").");
     const data=result.data;
     const accounts=Array.isArray(data)?data:(data?.accounts||data?.items||[]);
+    const accountType=a=>String(a.account_type||a.type||a.account_type_name||"").toLowerCase();
+    const demo=accounts.find(a=>accountType(a).includes("demo"));
+    const real=accounts.find(a=>accountType(a).includes("real"));
 
-    const accountType=a=>String(
-      a.account_type||a.type||a.account_type_name||""
-    ).toLowerCase();
+    if(real)connectRealBalance(real,accessToken,generation);
+    else show("realStatus","No real account was identified in the returned account list.");
 
-    const demo=accounts.find(a=>
-      accountType(a)==="demo"||accountType(a).includes("demo")
-    );
-    const real=accounts.find(a=>
-      accountType(a)==="real"||accountType(a).includes("real")
-    );
-
-    if(real){
-      connectRealBalance(real,accessToken,generation);
-    }else{
-      show("realStatus","No real account was identified in the returned account list.");
-      $("realTradeButton").disabled=true;
-    }
-
-    if(!demo){
-      throw new Error("No demo account was identified. No trade was placed.");
-    }
-
+    if(!demo)throw new Error("No demo account was identified. No trade was placed.");
     demoAccountId=demo.account_id||demo.id||"";
     demoCurrency=demo.currency||"USD";
+    if(!demoAccountId)throw new Error("Demo account ID was missing.");
 
-    if(!demoAccountId){
-      throw new Error("Demo account ID was missing.");
-    }
-
-    show("accountStatus","Requesting demo account connection…");
-
-    const otpResponse=await fetch(
-      "https://api.derivws.com/trading/v1/options/accounts/"+
-      encodeURIComponent(demoAccountId)+"/otp",
-      {
-        method:"POST",
-        headers:{Authorization:"Bearer "+accessToken}
-      }
-    );
-
+    const otpResponse=await fetch("https://api.derivws.com/trading/v1/options/accounts/"+
+      encodeURIComponent(demoAccountId)+"/otp",{
+      method:"POST",headers:{Authorization:"Bearer "+accessToken}
+    });
     const otpResult=await otpResponse.json();
     if(generation!==sessionGeneration)return;
-
-    if(!otpResponse.ok||!otpResult.data?.url){
+    if(!otpResponse.ok||!otpResult.data?.url)
       throw new Error("Demo connection request failed (HTTP "+otpResponse.status+").");
-    }
 
-    if(tradeSocket){
-      tradeSocket.onclose=null;
-      try{tradeSocket.close();}catch(e){}
-    }
-
+    if(tradeSocket){tradeSocket.onclose=null;try{tradeSocket.close();}catch(e){}}
     const socket=new WebSocket(otpResult.data.url);
     tradeSocket=socket;
 
@@ -584,78 +630,60 @@ async function connectAccounts(accessToken){
       if(socket!==tradeSocket||generation!==sessionGeneration)return;
       socket.send(JSON.stringify({balance:1,subscribe:1,req_id:++requestId}));
     };
-
     socket.onmessage=event=>{
       if(socket!==tradeSocket||generation!==sessionGeneration)return;
-      let m;
-      try{m=JSON.parse(event.data);}catch(e){return;}
-
+      let m;try{m=JSON.parse(event.data);}catch(e){return;}
       if(m.error){
         show("tradeStatus","Demo API error: "+(m.error.message||"Request failed"));
         if(m.req_id===lastTradeRequestId){
-          tradeBusy=false;
-          pendingProposal=false;
+          tradeBusy=false;pendingProposal=false;currentDemoTrade=null;
           $("tradeButton").disabled=false;
         }
         return;
       }
-
       if(m.msg_type==="balance"&&m.balance){
         demoCurrency=m.balance.currency||demoCurrency;
-        $("accountBalance").textContent=Number(m.balance.balance).toLocaleString(
-          undefined,{minimumFractionDigits:2,maximumFractionDigits:2}
-        );
+        $("accountBalance").textContent=money(m.balance.balance,"");
         show("accountCurrency","Demo currency: "+demoCurrency);
         show("accountStatus","Demo account connected.");
-        show("loginStatus","Demo account connected; real account connection is checked separately.");
-        $("tradeButton").disabled=false;
-        $("tradeButton").textContent="Request Demo Trade Quote";
-        show("tradeStatus","Connected. Request a demo quote when ready.");
-      }
-
-      if(m.msg_type==="proposal"&&m.proposal){
-        if(m.req_id===lastTradeRequestId)confirmAndBuyDemo(m.proposal);
-      }
-
-      if(m.msg_type==="buy"&&m.buy&&m.req_id===lastTradeRequestId){
-        tradeBusy=false;
-        pendingProposal=false;
-        show("tradeStatus","Demo purchase accepted. Contract ID: "+
-          (m.buy.contract_id||"received"));
-        $("tradeButton").disabled=false;
-        $("tradeButton").textContent="Request Demo Trade Quote";
-        socket.send(JSON.stringify({balance:1,subscribe:1,req_id:++requestId}));
-        if(m.buy.contract_id){
-          socket.send(JSON.stringify({
-            proposal_open_contract:1,
-            contract_id:m.buy.contract_id,
-            subscribe:1,
-            req_id:++requestId
-          }));
+        show("loginStatus","Demo account connected; real connection checked separately.");
+        if(!demoPurchaseUncertain){
+          $("tradeButton").disabled=false;
+          $("tradeButton").textContent="Request Demo Trade Quote";
         }
       }
-
-      if(m.msg_type==="proposal_open_contract"&&m.proposal_open_contract){
-        const c=m.proposal_open_contract;
-        show("contractStatus","Contract "+c.contract_id+" · Status: "+
-          (c.status||"open")+
-          (c.profit!==undefined?" · P/L: "+c.profit:""));
+      if(m.msg_type==="proposal"&&m.proposal&&m.req_id===lastTradeRequestId)
+        confirmAndBuyDemo(m.proposal);
+      if(m.msg_type==="buy"&&m.buy&&m.req_id===lastTradeRequestId){
+        tradeBusy=false;pendingProposal=false;demoPurchaseUncertain=false;
+        if(currentDemoTrade){
+          currentDemoTrade.contractId=String(m.buy.contract_id||"");
+          currentDemoTrade.status="Purchase accepted";
+          renderHistory();
+        }
+        show("tradeStatus","Demo purchase accepted. Contract ID: "+(m.buy.contract_id||"received"));
+        $("tradeButton").disabled=false;$("tradeButton").textContent="Request Demo Trade Quote";
+        socket.send(JSON.stringify({balance:1,subscribe:1,req_id:++requestId}));
+        if(m.buy.contract_id)socket.send(JSON.stringify({
+          proposal_open_contract:1,contract_id:m.buy.contract_id,subscribe:1,req_id:++requestId
+        }));
       }
+      if(m.msg_type==="proposal_open_contract"&&m.proposal_open_contract)
+        updateContract(m.proposal_open_contract,"DEMO");
     };
-
     socket.onerror=()=>{
-      if(socket===tradeSocket){
-        show("tradeStatus","Demo connection error. Do not retry an uncertain purchase automatically.");
-      }
+      if(socket===tradeSocket)show("tradeStatus","Demo connection error. Check account activity before retrying.");
     };
-
     socket.onclose=e=>{
       if(socket!==tradeSocket)return;
-      $("tradeButton").disabled=true;
-      $("tradeButton").textContent="Log In to Reconnect";
-      show("accountStatus","Demo account connection closed ("+e.code+").");
-      tradeBusy=false;
-      pendingProposal=false;
+      $("tradeButton").disabled=true;$("tradeButton").textContent="Log In to Reconnect";
+      show("accountStatus","Demo connection closed ("+e.code+").");
+      if(tradeBusy&&currentDemoTrade){
+        currentDemoTrade.status="Connection lost — check account";
+        demoPurchaseUncertain=true;renderHistory();
+        show("tradeStatus","Connection lost during a trade request. Check your Deriv account before retrying.");
+      }
+      tradeBusy=false;pendingProposal=false;
     };
   }catch(e){
     if(generation!==sessionGeneration)return;
@@ -668,120 +696,82 @@ async function connectAccounts(accessToken){
 async function connectRealBalance(account,accessToken,generation){
   realAccountId=account.account_id||account.id||"";
   realCurrency=account.currency||"USD";
-
-  if(!realAccountId){
-    show("realStatus","Real account ID is missing.");
-    return;
-  }
-
+  if(!realAccountId){show("realStatus","Real account ID is missing.");return;}
   show("realStatus","Requesting real account connection…");
   $("realTradeButton").disabled=true;
-
   try{
-    const response=await fetch(
-      "https://api.derivws.com/trading/v1/options/accounts/"+
-      encodeURIComponent(realAccountId)+"/otp",
-      {
-        method:"POST",
-        headers:{Authorization:"Bearer "+accessToken}
-      }
-    );
-
+    const response=await fetch("https://api.derivws.com/trading/v1/options/accounts/"+
+      encodeURIComponent(realAccountId)+"/otp",{
+      method:"POST",headers:{Authorization:"Bearer "+accessToken}
+    });
     const result=await response.json();
     if(generation!==sessionGeneration)return;
-
-    if(!response.ok||!result.data?.url){
+    if(!response.ok||!result.data?.url)
       throw new Error("Real account connection failed (HTTP "+response.status+").");
-    }
-
-    if(realSocket){
-      realSocket.onclose=null;
-      try{realSocket.close();}catch(e){}
-    }
-
+    if(realSocket){realSocket.onclose=null;try{realSocket.close();}catch(e){}}
     const socket=new WebSocket(result.data.url);
     realSocket=socket;
-
     socket.onopen=()=>{
       if(socket!==realSocket||generation!==sessionGeneration)return;
       socket.send(JSON.stringify({balance:1,subscribe:1,req_id:++requestId}));
     };
-
     socket.onmessage=event=>{
       if(socket!==realSocket||generation!==sessionGeneration)return;
-      let m;
-      try{m=JSON.parse(event.data);}catch(e){return;}
-
+      let m;try{m=JSON.parse(event.data);}catch(e){return;}
       if(m.error){
         show("realStatus","Real account API error: "+(m.error.message||"Request failed"));
         if(m.req_id===lastRealTradeRequestId){
-          realTradeBusy=false;
-          realPendingProposal=false;
+          realTradeBusy=false;realPendingProposal=false;currentRealTrade=null;
           $("realTradeButton").disabled=false;
-          $("realTradeButton").textContent="Request Real Trade Quote";
         }
         return;
       }
-
       if(m.msg_type==="balance"&&m.balance){
         realCurrency=m.balance.currency||realCurrency;
-        $("realBalance").textContent=Number(m.balance.balance).toLocaleString(
-          undefined,{minimumFractionDigits:2,maximumFractionDigits:2}
-        );
+        $("realBalance").textContent=money(m.balance.balance,"");
         show("realCurrency","Real currency: "+realCurrency);
         show("realStatus","Real account connected.");
-        $("realTradeButton").disabled=false;
-        $("realTradeButton").textContent="Request Real Trade Quote";
-      }
-
-      if(m.msg_type==="proposal"&&m.proposal){
-        if(m.req_id===lastRealTradeRequestId)confirmAndBuyReal(m.proposal);
-      }
-
-      if(m.msg_type==="buy"&&m.buy&&m.req_id===lastRealTradeRequestId){
-        realTradeBusy=false;
-        realPendingProposal=false;
-        show("realTradeStatus","Deriv accepted the purchase request. Contract ID: "+
-          (m.buy.contract_id||"received")+
-          ". Check contract status and account balance.");
-        $("realTradeButton").disabled=false;
-        $("realTradeButton").textContent="Request Real Trade Quote";
-
-        socket.send(JSON.stringify({balance:1,subscribe:1,req_id:++requestId}));
-
-        if(m.buy.contract_id){
-          socket.send(JSON.stringify({
-            proposal_open_contract:1,
-            contract_id:m.buy.contract_id,
-            subscribe:1,
-            req_id:++requestId
-          }));
+        if(!realPurchaseUncertain){
+          $("realTradeButton").disabled=false;
+          $("realTradeButton").textContent="Request Real Trade Quote";
         }
       }
-
-      if(m.msg_type==="proposal_open_contract"&&m.proposal_open_contract){
-        const c=m.proposal_open_contract;
-        show("realContractStatus","Contract "+c.contract_id+" · Status: "+
-          (c.status||"open")+
-          (c.profit!==undefined?" · P/L: "+c.profit:""));
+      if(m.msg_type==="proposal"&&m.proposal&&m.req_id===lastRealTradeRequestId)
+        confirmAndBuyReal(m.proposal);
+      if(m.msg_type==="buy"&&m.buy&&m.req_id===lastRealTradeRequestId){
+        realTradeBusy=false;realPendingProposal=false;realPurchaseUncertain=false;
+        if(currentRealTrade){
+          currentRealTrade.contractId=String(m.buy.contract_id||"");
+          currentRealTrade.status="Purchase accepted";
+          renderHistory();
+        }
+        show("realTradeStatus","Purchase accepted. Contract ID: "+(m.buy.contract_id||"received")+
+          ". Check your contract status and account balance.");
+        $("realTradeButton").disabled=false;$("realTradeButton").textContent="Request Real Trade Quote";
+        socket.send(JSON.stringify({balance:1,subscribe:1,req_id:++requestId}));
+        if(m.buy.contract_id)socket.send(JSON.stringify({
+          proposal_open_contract:1,contract_id:m.buy.contract_id,subscribe:1,req_id:++requestId
+        }));
       }
+      if(m.msg_type==="proposal_open_contract"&&m.proposal_open_contract)
+        updateContract(m.proposal_open_contract,"REAL");
     };
-
     socket.onerror=()=>{
       if(socket===realSocket){
         show("realStatus","Real connection error.");
         $("realTradeButton").disabled=true;
       }
     };
-
     socket.onclose=e=>{
       if(socket!==realSocket)return;
-      $("realTradeButton").disabled=true;
-      $("realTradeButton").textContent="Reconnect Real Account";
+      $("realTradeButton").disabled=true;$("realTradeButton").textContent="Reconnect Real Account";
       show("realStatus","Real account disconnected ("+e.code+").");
-      show("realTradeStatus","Disconnected. Check account activity before attempting another trade.");
-      realTradeBusy=false;
-      realPendingProposal=false;
+      if(realTradeBusy&&currentRealTrade){
+        currentRealTrade.status="Connection lost — check account";
+        realPurchaseUncertain=true;renderHistory();
+        show("realTradeStatus","Connection lost during a trade request. Check Deriv account activity before retrying.");
+      }
+      realTradeBusy=false;realPendingProposal=false;
     };
   }catch(e){
     if(generation!==sessionGeneration)return;
@@ -790,203 +780,239 @@ async function connectRealBalance(account,accessToken,generation){
   }
 }
 
+function canRequestTrade(){
+  if(sessionTradeCount>=maxTrades){
+    show("limitStatus","Session trade limit reached. Increase the limit deliberately or start a new session.");
+    return false;
+  }
+  if(sessionPL<=-Math.abs(maxSessionLoss)){
+    show("limitStatus","Session loss threshold reached. New trade requests are blocked.");
+    return false;
+  }
+  return true;
+}
+
+function validateTrade(stake,direction,multiplier,statusId,currency){
+  if(!Number.isFinite(stake)||stake<1||stake>10){
+    show(statusId,"Enter a stake between 1 and 10 "+currency+".");
+    return false;
+  }
+  if(!["MULTUP","MULTDOWN"].includes(direction)||![10,20,40,50,100].includes(multiplier)){
+    show(statusId,"Invalid trade selection.");
+    return false;
+  }
+  if(!canRequestTrade())return false;
+  return true;
+}
+
+function lockTradeControls(isReal,locked){
+  const ids=isReal?
+    ["realTradeMarket","realTradeDirection","realTradeStake","realTradeMultiplier"]:
+    ["tradeMarket","tradeDirection","tradeStake","tradeMultiplier"];
+  ids.forEach(id=>$(id).disabled=locked);
+}
+
+function makeTradeSnapshot(isReal){
+  return isReal?{
+    account:"REAL",accountId:realAccountId,currency:realCurrency,
+    symbol:$("realTradeMarket").value,direction:$("realTradeDirection").value,
+    stake:Number($("realTradeStake").value),multiplier:Number($("realTradeMultiplier").value),
+    createdAt:Date.now(),contractId:"",status:"Quote requested",pl:null
+  }:{
+    account:"DEMO",accountId:demoAccountId,currency:demoCurrency,
+    symbol:$("tradeMarket").value,direction:$("tradeDirection").value,
+    stake:Number($("tradeStake").value),multiplier:Number($("tradeMultiplier").value),
+    createdAt:Date.now(),contractId:"",status:"Quote requested",pl:null
+  };
+}
+
+function addTrade(trade){
+  tradeHistory.unshift(trade);
+  sessionTradeCount++;
+  renderHistory();
+  updateStats();
+}
+
+function updateContract(contract,account){
+  const id=String(contract.contract_id||"");
+  if(!id)return;
+  const item=tradeHistory.find(t=>t.account===account&&t.contractId===id);
+  if(!item)return;
+  item.status=contract.status||item.status;
+  if(contract.profit!==undefined&&Number.isFinite(Number(contract.profit))){
+    const p=Number(contract.profit);
+    if(item.pl===null){
+      item.pl=p;
+      sessionPL+=p;
+      if(p>0)sessionWins++;
+      else if(p<0)sessionLosses++;
+    }else{
+      sessionPL+=p-item.pl;
+      item.pl=p;
+    }
+  }
+  renderHistory();
+  updateStats();
+  if(sessionPL<=-Math.abs(maxSessionLoss)){
+    show("limitStatus","Session loss threshold reached. New trade requests are blocked.");
+  }
+  if(account==="DEMO"){
+    show("contractStatus","Contract "+id+" · "+item.status+
+      (item.pl!==null?" · P/L: "+money(item.pl,item.currency):""));
+  }else{
+    show("realContractStatus","Contract "+id+" · "+item.status+
+      (item.pl!==null?" · P/L: "+money(item.pl,item.currency):""));
+  }
+}
+
+function renderHistory(){
+  const body=$("historyBody");
+  body.replaceChildren();
+  if(!tradeHistory.length){
+    const row=document.createElement("tr"),cell=document.createElement("td");
+    cell.colSpan=7;cell.textContent="No trades recorded this session.";
+    row.appendChild(cell);body.appendChild(row);return;
+  }
+  tradeHistory.slice(0,100).forEach(t=>{
+    const row=document.createElement("tr");
+    const vals=[
+      new Date(t.createdAt).toLocaleTimeString(),
+      t.account,t.symbol,t.direction,
+      money(t.stake,t.currency),t.status,
+      t.pl===null?"—":money(t.pl,t.currency)
+    ];
+    vals.forEach((v,i)=>{
+      const cell=document.createElement("td");
+      cell.textContent=v;
+      if(i===6&&t.pl!==null)cell.className=t.pl>0?"positive":t.pl<0?"negative":"";
+      row.appendChild(cell);
+    });
+    body.appendChild(row);
+  });
+  show("historyStatus","Showing up to 100 recent records from this browser session.");
+}
+
+function updateStats(){
+  $("statTrades").textContent=String(sessionTradeCount);
+  $("statWins").textContent=String(sessionWins);
+  $("statLosses").textContent=String(sessionLosses);
+  $("statPL").textContent=money(sessionPL,"");
+  $("statCurrency").textContent="Mixed account currencies may make this total misleading.";
+}
+
 $("tradeButton").addEventListener("click",()=>{
   if(!tradeSocket||tradeSocket.readyState!==WebSocket.OPEN){
-    show("tradeStatus","Demo account is not connected. Log in again.");
-    return;
+    show("tradeStatus","Demo account is not connected. Log in again.");return;
   }
-  if(tradeBusy)return;
-
-  const stake=Number($("tradeStake").value);
-  const symbol=$("tradeMarket").value;
-  const direction=$("tradeDirection").value;
-  const multiplier=Number($("tradeMultiplier").value);
-
-  if(!Number.isFinite(stake)||stake<1||stake>10){
-    show("tradeStatus","Enter a demo stake between 1 and 10.");
-    return;
-  }
-  if(!["MULTUP","MULTDOWN"].includes(direction)||
-     ![10,20,40,50,100].includes(multiplier)){
-    show("tradeStatus","Invalid demo trade selection.");
-    return;
-  }
-
-  tradeBusy=true;
-  pendingProposal=true;
+  if(tradeBusy||demoPurchaseUncertain)return;
+  const snapshot=makeTradeSnapshot(false);
+  if(!validateTrade(snapshot.stake,snapshot.direction,snapshot.multiplier,"tradeStatus",demoCurrency))return;
+  tradeBusy=true;pendingProposal=true;currentDemoTrade=snapshot;
+  lockTradeControls(false,true);
   $("tradeButton").disabled=true;
-  show("tradeStatus","Requesting demo quote…");
+  show("tradeStatus","Requesting demo quote for "+snapshot.symbol+"…");
   lastTradeRequestId=++requestId;
-
   tradeSocket.send(JSON.stringify({
-    proposal:1,
-    amount:stake,
-    basis:"stake",
-    contract_type:direction,
-    currency:demoCurrency,
-    multiplier,
-    underlying_symbol:symbol,
+    proposal:1,amount:snapshot.stake,basis:"stake",
+    contract_type:snapshot.direction,currency:snapshot.currency,
+    multiplier:snapshot.multiplier,underlying_symbol:snapshot.symbol,
     req_id:lastTradeRequestId
   }));
 });
 
 function confirmAndBuyDemo(proposal){
-  if(!tradeBusy||!pendingProposal)return;
-
-  const askPrice=Number(proposal.ask_price);
+  if(!tradeBusy||!pendingProposal||!currentDemoTrade)return;
+  const t=currentDemoTrade,askPrice=Number(proposal.ask_price);
   if(!proposal.id||!Number.isFinite(askPrice)||askPrice<=0){
-    tradeBusy=false;
-    pendingProposal=false;
-    $("tradeButton").disabled=false;
-    show("tradeStatus","Invalid demo quote. No purchase was sent.");
-    return;
+    tradeBusy=false;pendingProposal=false;currentDemoTrade=null;
+    lockTradeControls(false,false);$("tradeButton").disabled=false;
+    show("tradeStatus","Invalid demo quote. No purchase was sent.");return;
   }
-
-  const stake=Number($("tradeStake").value);
-  const symbol=$("tradeMarket").value;
-  const direction=$("tradeDirection").value;
-  const multiplier=Number($("tradeMultiplier").value);
-
   const approved=confirm(
-    "DEMO TRADE CONFIRMATION\n\nMarket: "+symbol+
-    "\nDirection: "+direction+
-    "\nMultiplier: "+multiplier+"x"+
-    "\nStake: "+stake+" "+demoCurrency+
-    "\nQuoted purchase price: "+askPrice+" "+demoCurrency+
+    "DEMO TRADE CONFIRMATION\n\nMarket: "+t.symbol+
+    "\nDirection: "+t.direction+"\nMultiplier: "+t.multiplier+"x"+
+    "\nStake: "+t.stake+" "+t.currency+
+    "\nQuoted purchase price: "+askPrice+" "+t.currency+
     "\n\nPlace this demo trade?"
   );
-
   if(!approved){
-    tradeBusy=false;
-    pendingProposal=false;
-    $("tradeButton").disabled=false;
-    show("tradeStatus","Cancelled. No purchase was sent.");
-    return;
+    tradeBusy=false;pendingProposal=false;currentDemoTrade=null;
+    lockTradeControls(false,false);$("tradeButton").disabled=false;
+    show("tradeStatus","Cancelled. No purchase was sent.");return;
   }
-
   if(!tradeSocket||tradeSocket.readyState!==WebSocket.OPEN){
-    tradeBusy=false;
-    pendingProposal=false;
-    show("tradeStatus","Connection lost. Check account activity before retrying.");
+    tradeBusy=false;pendingProposal=false;
+    demoPurchaseUncertain=true;
+    show("tradeStatus","Connection lost before confirmation could be sent. Check account activity.");
     return;
   }
-
+  t.status="Purchase submitted";t.quote=askPrice;
+  addTrade(t);
+  pendingProposal=false;
   show("tradeStatus","Submitting confirmed demo purchase…");
   lastTradeRequestId=++requestId;
-  tradeSocket.send(JSON.stringify({
-    buy:proposal.id,
-    price:askPrice,
-    req_id:lastTradeRequestId
-  }));
+  tradeSocket.send(JSON.stringify({buy:proposal.id,price:askPrice,req_id:lastTradeRequestId}));
 }
 
 $("realTradeButton").addEventListener("click",()=>{
   if(!realSocket||realSocket.readyState!==WebSocket.OPEN){
-    show("realTradeStatus","Real account is not connected.");
-    return;
+    show("realTradeStatus","Real account is not connected.");return;
   }
-  if(realTradeBusy)return;
-
-  const stake=Number($("realTradeStake").value);
-  const symbol=$("realTradeMarket").value;
-  const direction=$("realTradeDirection").value;
-  const multiplier=Number($("realTradeMultiplier").value);
-
-  if(!Number.isFinite(stake)||stake<1||stake>10){
-    show("realTradeStatus","For this version, enter a real stake between 1 and 10 "+
-      realCurrency+". This limit does not guarantee the trade is affordable or accepted.");
-    return;
-  }
-
-  if(!["MULTUP","MULTDOWN"].includes(direction)||
-     ![10,20,40,50,100].includes(multiplier)){
-    show("realTradeStatus","Invalid real trade selection.");
-    return;
-  }
-
+  if(realTradeBusy||realPurchaseUncertain)return;
+  const snapshot=makeTradeSnapshot(true);
+  if(!validateTrade(snapshot.stake,snapshot.direction,snapshot.multiplier,"realTradeStatus",realCurrency))return;
   if(!confirm(
-    "REAL-MONEY QUOTE REQUEST\n\n"+
-    "Real account: "+realAccountId+
-    "\nMarket: "+symbol+
-    "\nDirection: "+direction+
-    "\nMultiplier: "+multiplier+"x"+
-    "\nStake: "+stake+" "+realCurrency+
+    "REAL-MONEY QUOTE REQUEST\n\nAccount: "+snapshot.accountId+
+    "\nMarket: "+snapshot.symbol+"\nDirection: "+snapshot.direction+
+    "\nMultiplier: "+snapshot.multiplier+"x\nStake: "+snapshot.stake+" "+snapshot.currency+
     "\n\nThis requests a quote only. A second confirmation is required before purchase."
   )){
-    show("realTradeStatus","Quote request cancelled.");
-    return;
+    show("realTradeStatus","Quote request cancelled.");return;
   }
-
-  realTradeBusy=true;
-  realPendingProposal=true;
+  realTradeBusy=true;realPendingProposal=true;currentRealTrade=snapshot;
+  lockTradeControls(true,true);
   $("realTradeButton").disabled=true;
   show("realTradeStatus","Requesting real-account quote…");
   lastRealTradeRequestId=++requestId;
-
   realSocket.send(JSON.stringify({
-    proposal:1,
-    amount:stake,
-    basis:"stake",
-    contract_type:direction,
-    currency:realCurrency,
-    multiplier,
-    underlying_symbol:symbol,
+    proposal:1,amount:snapshot.stake,basis:"stake",
+    contract_type:snapshot.direction,currency:snapshot.currency,
+    multiplier:snapshot.multiplier,underlying_symbol:snapshot.symbol,
     req_id:lastRealTradeRequestId
   }));
 });
 
 function confirmAndBuyReal(proposal){
-  if(!realTradeBusy||!realPendingProposal)return;
-
-  const askPrice=Number(proposal.ask_price);
+  if(!realTradeBusy||!realPendingProposal||!currentRealTrade)return;
+  const t=currentRealTrade,askPrice=Number(proposal.ask_price);
   if(!proposal.id||!Number.isFinite(askPrice)||askPrice<=0){
-    realTradeBusy=false;
-    realPendingProposal=false;
-    $("realTradeButton").disabled=false;
-    show("realTradeStatus","Invalid quote. No purchase was sent.");
-    return;
+    realTradeBusy=false;realPendingProposal=false;currentRealTrade=null;
+    lockTradeControls(true,false);$("realTradeButton").disabled=false;
+    show("realTradeStatus","Invalid quote. No purchase was sent.");return;
   }
-
-  const stake=Number($("realTradeStake").value);
-  const symbol=$("realTradeMarket").value;
-  const direction=$("realTradeDirection").value;
-  const multiplier=Number($("realTradeMultiplier").value);
-
   const approved=confirm(
-    "FINAL REAL-MONEY PURCHASE CONFIRMATION\n\n"+
-    "REAL ACCOUNT: "+realAccountId+
-    "\nMarket: "+symbol+
-    "\nDirection: "+direction+
-    "\nMultiplier: "+multiplier+"x"+
-    "\nStake: "+stake+" "+realCurrency+
-    "\nQuoted purchase price: "+askPrice+" "+realCurrency+
+    "FINAL REAL-MONEY PURCHASE CONFIRMATION\n\nREAL ACCOUNT: "+t.accountId+
+    "\nMarket: "+t.symbol+"\nDirection: "+t.direction+
+    "\nMultiplier: "+t.multiplier+"x\nStake: "+t.stake+" "+t.currency+
+    "\nQuoted purchase price: "+askPrice+" "+t.currency+
     "\n\nA real-money purchase may lose money. Confirm purchase?"
   );
-
   if(!approved){
-    realTradeBusy=false;
-    realPendingProposal=false;
-    $("realTradeButton").disabled=false;
-    show("realTradeStatus","Cancelled. No purchase was sent.");
-    return;
+    realTradeBusy=false;realPendingProposal=false;currentRealTrade=null;
+    lockTradeControls(true,false);$("realTradeButton").disabled=false;
+    show("realTradeStatus","Cancelled. No purchase was sent.");return;
   }
-
   if(!realSocket||realSocket.readyState!==WebSocket.OPEN){
-    realTradeBusy=false;
-    realPendingProposal=false;
-    $("realTradeButton").disabled=true;
-    show("realTradeStatus","Connection lost before purchase. Check account activity before retrying.");
+    realTradeBusy=false;realPendingProposal=false;realPurchaseUncertain=true;
+    show("realTradeStatus","Connection lost before purchase. Check your account before retrying.");
     return;
   }
-
+  t.status="Purchase submitted";t.quote=askPrice;
+  addTrade(t);
+  realPendingProposal=false;
   show("realTradeStatus","Sending confirmed purchase request…");
   lastRealTradeRequestId=++requestId;
-
-  realSocket.send(JSON.stringify({
-    buy:proposal.id,
-    price:askPrice,
-    req_id:lastRealTradeRequestId
-  }));
+  realSocket.send(JSON.stringify({buy:proposal.id,price:askPrice,req_id:lastRealTradeRequestId}));
 }
 
 $("loginButton").addEventListener("click",startLogin);
@@ -994,41 +1020,17 @@ $("refreshButton").addEventListener("click",connectMarkets);
 
 $("logoutButton").addEventListener("click",()=>{
   sessionGeneration++;
-
   sessionStorage.removeItem("ck_access_token");
   sessionStorage.removeItem("ck_pkce_verifier");
   sessionStorage.removeItem("ck_oauth_state");
-
-  if(tradeSocket){
-    tradeSocket.onclose=null;
-    try{tradeSocket.close();}catch(e){}
-    tradeSocket=null;
-  }
-  if(realSocket){
-    realSocket.onclose=null;
-    try{realSocket.close();}catch(e){}
-    realSocket=null;
-  }
-
-  demoAccountId="";
-  realAccountId="";
-  demoCurrency="USD";
-  realCurrency="USD";
-  tradeBusy=false;
-  pendingProposal=false;
-  realTradeBusy=false;
-  realPendingProposal=false;
-  lastTradeRequestId=null;
-  lastRealTradeRequestId=null;
-
-  $("tradeButton").disabled=true;
-  $("tradeButton").textContent="Connect Demo Account First";
-  $("realTradeButton").disabled=true;
-  $("realTradeButton").textContent="Connect Real Account First";
-
-  $("accountBalance").textContent="—";
-  $("realBalance").textContent="—";
-
+  if(tradeSocket){tradeSocket.onclose=null;try{tradeSocket.close();}catch(e){}tradeSocket=null;}
+  if(realSocket){realSocket.onclose=null;try{realSocket.close();}catch(e){}realSocket=null;}
+  demoAccountId="";realAccountId="";demoCurrency="USD";realCurrency="USD";
+  resetTradingState();
+  $("tradeButton").disabled=true;$("tradeButton").textContent="Connect Demo Account First";
+  $("realTradeButton").disabled=true;$("realTradeButton").textContent="Connect Real Account First";
+  lockTradeControls(false,false);lockTradeControls(true,false);
+  $("accountBalance").textContent="—";$("realBalance").textContent="—";
   show("realCurrency","Connect to load real balance.");
   show("realStatus","Logged out of this bot session.");
   show("accountCurrency","Connect to load demo balance.");
@@ -1036,24 +1038,41 @@ $("logoutButton").addEventListener("click",()=>{
   show("loginStatus","Logged out of this bot session.");
   show("tradeStatus","No new demo purchase requested.");
   show("realTradeStatus","Logged out. No new real purchase can be requested.");
-  show("contractStatus","");
-  show("realContractStatus","");
+  show("contractStatus","");show("realContractStatus","");
 });
 
-$("chartMarket").addEventListener("change",()=>{
-  drawChart();
-  if(marketSocket&&marketSocket.readyState===WebSocket.OPEN){
-    marketSocket.send(JSON.stringify({
-      ticks_history:$("chartMarket").value,
-      count:100,
-      end:"latest",
-      style:"ticks"
-    }));
+$("chartMarket").addEventListener("change",requestChartHistory);
+$("chartStyle").addEventListener("change",()=>{drawChart();requestChartHistory();});
+$("chartInterval").addEventListener("change",()=>{candleHistory[$("chartMarket").value]=[];drawChart();requestChartHistory();});
+
+$("applyLimitsButton").addEventListener("click",()=>{
+  const mt=Number($("maxTrades").value),ml=Number($("maxSessionLoss").value);
+  if(!Number.isInteger(mt)||mt<1||mt>100||!Number.isFinite(ml)||ml<0||ml>100000){
+    show("limitStatus","Enter a whole-number trade limit from 1 to 100 and a loss threshold from 0 to 100000.");
+    return;
   }
+  maxTrades=mt;maxSessionLoss=ml;
+  show("limitStatus","Limits applied: "+maxTrades+" trade requests; loss threshold "+money(maxSessionLoss,"")+".");
+});
+
+$("resetStatsButton").addEventListener("click",()=>{
+  if(!confirm("Reset session statistics and clear displayed history? This does not close open contracts or change your Deriv account."))return;
+  tradeHistory.length=0;sessionTradeCount=0;sessionWins=0;sessionLosses=0;sessionPL=0;
+  renderHistory();updateStats();
+  show("limitStatus","Statistics reset. Any open contracts remain open in your Deriv account.");
+});
+
+$("clearHistoryButton").addEventListener("click",()=>{
+  if(!confirm("Clear this page's displayed trade history and reset its session statistics? This does not affect Deriv account records."))return;
+  tradeHistory.length=0;sessionTradeCount=0;sessionWins=0;sessionLosses=0;sessionPL=0;
+  renderHistory();updateStats();
+  show("historyStatus","Displayed history cleared. This does not delete Deriv account records.");
 });
 
 makeMarketCards();
 drawChart();
+renderHistory();
+updateStats();
 connectMarkets();
 processOAuthCallback();
 </script>
