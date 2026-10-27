@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,8 +13,11 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica
 header{background:rgba(4,13,29,.96);border-bottom:1px solid #1b3554;padding:18px 0;position:sticky;top:0;z-index:5;backdrop-filter:blur(12px)}
 .wrap{width:min(1100px,100%);margin:auto;padding:0 16px}
 .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-h1{font-size:24px;margin:0 0 6px}h2{font-size:18px;margin:0 0 14px}
-p{line-height:1.5}.muted,.status{color:var(--muted)}.small{font-size:12px}
+h1{font-size:24px;margin:0 0 6px}
+h2{font-size:18px;margin:0 0 14px}
+p{line-height:1.5}
+.muted,.status{color:var(--muted)}
+.small{font-size:12px}
 .badge{padding:6px 10px;border-radius:20px;background:#172c48;color:#9dc4ff;font-size:12px}
 main{padding-top:22px;padding-bottom:90px;background:radial-gradient(ellipse at 50% 36%,rgba(14,74,111,.22),transparent 50%),linear-gradient(180deg,#061022 0%,#030a16 100%);min-height:80vh}
 .panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:18px}
@@ -24,7 +28,8 @@ main{padding-top:22px;padding-bottom:90px;background:radial-gradient(ellipse at 
 .balance-card .price{font-size:clamp(17px,4vw,25px);overflow-wrap:anywhere;margin:10px 0}
 @media(max-width:420px){.balance-grid{gap:8px}.balance-card{padding:10px}.balance-card h3{font-size:12px}}
 .market{padding:15px;background:var(--inner);border:1px solid var(--border);border-radius:11px}
-.market-name{font-weight:bold}.price{font-size:25px;font-weight:bold;margin:12px 0 5px;overflow-wrap:anywhere}
+.market-name{font-weight:bold}
+.price{font-size:25px;font-weight:bold;margin:12px 0 5px;overflow-wrap:anywhere}
 .status{font-size:13px;line-height:1.5;margin-top:10px;overflow-wrap:anywhere}
 .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 button{border:0;border-radius:8px;padding:12px 15px;background:var(--blue);color:white;font-weight:bold;cursor:pointer}
@@ -39,24 +44,36 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 .eyebrow{font-size:11px;letter-spacing:2px;font-weight:800;color:#91a9c5;text-transform:uppercase;margin:10px 0 28px}
 .hero-title{font-size:clamp(28px,6vw,48px);line-height:1.16;letter-spacing:-1px;color:#6ce7f5;margin:0 auto 22px;max-width:720px}
 .hero-quote{color:#a9b8cb;font-size:clamp(15px,3.5vw,21px);font-style:italic;margin:0 auto 26px;max-width:650px}
-.hero .actions{justify-content:center}.hero .status{max-width:600px;margin:12px auto 0}
+.hero .actions{justify-content:center}
+.hero .status{max-width:600px;margin:12px auto 0}
 .feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:18px 0 24px}
 .feature-card{position:relative;text-align:left;display:flex;flex-direction:column;min-height:210px;padding:18px;background:linear-gradient(145deg,rgba(15,36,60,.97),rgba(5,15,29,.98));border:1px solid #263e59;border-radius:20px;color:var(--text);box-shadow:inset 0 2px 0 rgba(96,177,255,.12);transition:transform .18s,border-color .18s;cursor:pointer;width:100%}
 .feature-card:hover,.feature-card:focus-visible{transform:translateY(-3px);border-color:#42cde0;outline:none}
-.feature-card.gold{box-shadow:inset 0 2px 0 rgba(255,218,35,.45)}.feature-card.cyan{box-shadow:inset 0 2px 0 rgba(22,226,245,.45)}.feature-card.purple{box-shadow:inset 0 2px 0 rgba(185,122,255,.5)}
+.feature-card.gold{box-shadow:inset 0 2px 0 rgba(255,218,35,.45)}
+.feature-card.cyan{box-shadow:inset 0 2px 0 rgba(22,226,245,.45)}
+.feature-card.purple{box-shadow:inset 0 2px 0 rgba(185,122,255,.5)}
 .card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:22px}
 .card-number{font-size:12px;letter-spacing:1px;padding:6px 9px;border:1px solid #29415c;border-radius:7px;color:#b5c5d8}
 .card-icon{display:grid;place-items:center;width:52px;height:52px;border-radius:50%;font-size:24px;color:#74caff;background:#0a1c32;border:1px solid #315a83;box-shadow:0 0 0 5px rgba(65,139,218,.08)}
-.gold .card-icon{color:#ffdc29;border-color:#8d7a19}.cyan .card-icon{color:#22e0f1;border-color:#168c9b}.purple .card-icon{color:#c49aff;border-color:#7554a2}
-.feature-card h3{font-size:18px;margin:0 0 9px}.feature-card p{font-size:14px;color:#9eafc5;line-height:1.5;margin:0 0 18px}
+.gold .card-icon{color:#ffdc29;border-color:#8d7a19}
+.cyan .card-icon{color:#22e0f1;border-color:#168c9b}
+.purple .card-icon{color:#c49aff;border-color:#7554a2}
+.feature-card h3{font-size:18px;margin:0 0 9px}
+.feature-card p{font-size:14px;color:#9eafc5;line-height:1.5;margin:0 0 18px}
 .card-link{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:12px;border-top:1px solid #20354d;font-size:12px;font-weight:800;letter-spacing:.7px;color:#75b7ff}
-.gold .card-link{color:#ffdc29}.cyan .card-link{color:#20ddeb}.purple .card-link{color:#c49aff}
+.gold .card-link{color:#ffdc29}
+.cyan .card-link{color:#20ddeb}
+.purple .card-link{color:#c49aff}
 .card-arrow{display:grid;place-items:center;width:32px;height:32px;border:1px solid currentColor;border-radius:50%;font-size:20px}
 #accountDashboard[hidden]{display:none!important}
 .ai-fab{position:fixed;right:18px;bottom:24px;z-index:20;width:68px;height:68px;border-radius:50%;padding:0;background:radial-gradient(circle at 35% 25%,#d9a7ff,#9149c8 60%,#4e247b);border:2px solid rgba(232,190,255,.8);box-shadow:0 0 22px rgba(185,93,255,.55);font-size:28px;color:white}
 .ai-dot{position:absolute;width:11px;height:11px;right:7px;top:7px;border-radius:50%;background:#31d49a;border:2px solid #182139}
 .ai-help{position:fixed;right:16px;bottom:102px;width:min(320px,calc(100vw - 32px));z-index:19;background:#101d30;border:1px solid #395274;border-radius:16px;padding:17px;box-shadow:0 12px 40px #0009}
-.ai-help[hidden]{display:none!important}.ai-help h3{margin:0 0 8px}.ai-help p{font-size:13px;color:var(--muted)}
+.ai-help[hidden]{display:none!important}
+.ai-help h3{margin:0 0 8px}
+.ai-help p{font-size:13px;color:var(--muted)}
+.premium-choice{width:100%;margin-top:8px;text-align:left}
+.premium-bot h3{margin-top:0}
 @media(max-width:480px){h1{font-size:22px}.panel{padding:14px}.price{font-size:22px}.feature-grid{gap:10px}.feature-card{padding:14px;min-height:205px;border-radius:16px}.feature-card h3{font-size:16px}.card-icon{width:44px;height:44px}.ai-fab{width:60px;height:60px;right:14px;bottom:18px}}
 </style>
 </head>
@@ -74,26 +91,36 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 <h2 class="hero-title">Center for automations</h2>
 <p class="hero-quote">“Protect your capital. Every trade starts with a plan.”</p>
 <div class="actions">
-<button id="loginButton">Log In and Trade</button>
-<button id="refreshButton" class="secondary">Refresh Live Markets</button>
-<button id="logoutButton" class="secondary">Log Out</button>
+<button id="loginButton" type="button">Log In and Trade</button>
+<button id="refreshButton" class="secondary" type="button">Refresh Live Markets</button>
+<button id="logoutButton" class="secondary" type="button">Log Out</button>
 </div>
 <div id="loginStatus" class="status">Not connected to an account. Log in to access account tools.</div>
 </section>
+
 <section class="feature-grid" aria-label="Trading tools">
 <button class="feature-card" id="loadBotCard" type="button">
-<div class="card-top"><span class="card-number">01</span><span class="card-icon">♧</span></div><h3>Load Bot</h3><p>Open your trading workspace and configure your strategy.</p><div class="card-link"><span>Choose a bot</span><span class="card-arrow">↗</span></div>
+<div class="card-top"><span class="card-number">01</span><span class="card-icon">♧</span></div>
+<h3>Load Bot</h3><p>Open your trading workspace and configure your strategy.</p>
+<div class="card-link"><span>Choose a bot</span><span class="card-arrow">↗</span></div>
 </button>
 <button class="feature-card gold" id="premiumCard" type="button">
-<div class="card-top"><span class="card-number">02</span><span class="card-icon">◇</span></div><h3>Premium Bots</h3><p>Explore strategy ideas and future premium tools.</p><div class="card-link"><span>Explore premium bots</span><span class="card-arrow">↗</span></div>
+<div class="card-top"><span class="card-number">02</span><span class="card-icon">◇</span></div>
+<h3>Premium Bots</h3><p>Explore Nexus Flow, Volt Sprint, and Apex Signal.</p>
+<div class="card-link"><span>Explore premium bots</span><span class="card-arrow">↗</span></div>
 </button>
 <button class="feature-card cyan" id="speedBotCard" type="button">
-<div class="card-top"><span class="card-number">03</span><span class="card-icon">◴</span></div><h3>Speed Bot</h3><p>Prepare automation settings with clear risk controls.</p><div class="card-link"><span>Launch Speed Bot</span><span class="card-arrow">↗</span></div>
+<div class="card-top"><span class="card-number">03</span><span class="card-icon">◴</span></div>
+<h3>Speed Bot</h3><p>Prepare automation settings with clear risk controls.</p>
+<div class="card-link"><span>Launch Speed Bot</span><span class="card-arrow">↗</span></div>
 </button>
 <button class="feature-card purple" id="manualCard" type="button">
-<div class="card-top"><span class="card-number">04</span><span class="card-icon">☷</span></div><h3>Manual Trading</h3><p>Use the demo trading controls with your own decisions.</p><div class="card-link"><span>Start manual trading</span><span class="card-arrow">↗</span></div>
+<div class="card-top"><span class="card-number">04</span><span class="card-icon">☷</span></div>
+<h3>Manual Trading</h3><p>Use the demo trading controls with your own decisions.</p>
+<div class="card-link"><span>Start manual trading</span><span class="card-arrow">↗</span></div>
 </button>
 </section>
+
 <section class="panel">
 <h2>Live Market Prices</h2>
 <div id="marketStatus" class="status">Connecting to public market data…</div>
@@ -123,22 +150,20 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 <h2>Account Balances</h2>
 <div class="balance-grid">
   <div class="balance-card">
-    <h3>REAL ACCOUNT</h3>
-    <div class="price" id="realBalance">—</div>
+    <h3>REAL ACCOUNT</h3><div class="price" id="realBalance">—</div>
     <div id="realCurrency" class="muted small">Connect to load real balance.</div>
     <div id="realStatus" class="status">Read-only balance display.</div>
   </div>
   <div class="balance-card">
-    <h3>DEMO ACCOUNT</h3>
-    <div class="price" id="accountBalance">—</div>
+    <h3>DEMO ACCOUNT</h3><div class="price" id="accountBalance">—</div>
     <div id="accountCurrency" class="muted small">Connect to load demo balance.</div>
     <div id="accountStatus" class="status">Log in to connect your demo account.</div>
   </div>
 </div>
 <p class="muted small">Choose the active account below. If Deriv returns a REAL account, login asks whether to connect it; you can always choose DEMO for practice. REAL trades can lose money and require separate confirmation.</p>
 <div class="actions">
-  <button type="button" id="useDemoAccount" class="secondary">Use DEMO for Practice</button>
-  <button type="button" id="useRealAccount">Switch to REAL Money</button>
+<button type="button" id="useDemoAccount" class="secondary">Use DEMO for Practice</button>
+<button type="button" id="useRealAccount">Switch to REAL Money</button>
 </div>
 <div id="activeAccountStatus" class="status">Active trading account: choose DEMO practice or REAL money after login.</div>
 </section>
@@ -148,30 +173,15 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 <p class="muted small">Check the active account status before every trade. REAL mode can lose money. No purchase is sent without your confirmation.</p>
 <label for="tradeMarket">Market</label>
 <select id="tradeMarket">
-<option value="1HZ100V">Volatility 100 (1s)</option>
-<option value="1HZ75V">Volatility 75 (1s)</option>
-<option value="1HZ50V">Volatility 50 (1s)</option>
-<option value="1HZ25V">Volatility 25 (1s)</option>
-<option value="R_100">Volatility 100</option>
-<option value="R_75">Volatility 75</option>
-<option value="R_50">Volatility 50</option>
-<option value="R_25">Volatility 25</option>
-<option value="R_10">Volatility 10</option>
+<option value="1HZ100V">Volatility 100 (1s)</option><option value="1HZ75V">Volatility 75 (1s)</option><option value="1HZ50V">Volatility 50 (1s)</option><option value="1HZ25V">Volatility 25 (1s)</option><option value="R_100">Volatility 100</option><option value="R_75">Volatility 75</option><option value="R_50">Volatility 50</option><option value="R_25">Volatility 25</option><option value="R_10">Volatility 10</option>
 </select>
 <label for="tradeDirection">Direction</label>
-<select id="tradeDirection">
-<option value="MULTUP">Multiplier Up</option>
-<option value="MULTDOWN">Multiplier Down</option>
-</select>
+<select id="tradeDirection"><option value="MULTUP">Multiplier Up</option><option value="MULTDOWN">Multiplier Down</option></select>
 <label for="tradeStake">Stake amount (account currency; 1–10 limit in this test version)</label>
 <input id="tradeStake" type="number" min="1" max="10" step="0.01" value="1">
 <label for="tradeMultiplier">Multiplier</label>
-<select id="tradeMultiplier">
-<option value="10">10×</option><option value="20">20×</option>
-<option value="40">40×</option><option value="50">50×</option>
-<option value="100">100×</option>
-</select>
-<button id="tradeButton" disabled>Log In to Connect Account</button>
+<select id="tradeMultiplier"><option value="10">10×</option><option value="20">20×</option><option value="40">40×</option><option value="50">50×</option><option value="100">100×</option></select>
+<button id="tradeButton" type="button" disabled>Log In to Connect Account</button>
 <div id="tradeStatus" class="status">No trade placed.</div>
 <div id="contractStatus" class="status"></div>
 </section>
@@ -180,33 +190,59 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 <section class="panel" id="cardWorkspace" hidden>
 <h2 id="workspaceTitle">Trading Workspace</h2>
 <p id="workspaceDescription" class="muted">Choose a workspace.</p>
+
 <div id="loadBotPanel" hidden>
-  <h3>Load Bot · Demo Configuration</h3>
-  <label for="botMarket">Market</label>
-  <select id="botMarket"><option value="1HZ100V">Volatility 100 (1s)</option><option value="1HZ75V">Volatility 75 (1s)</option><option value="1HZ50V">Volatility 50 (1s)</option><option value="1HZ25V">Volatility 25 (1s)</option><option value="R_100">Volatility 100</option><option value="R_75">Volatility 75</option><option value="R_50">Volatility 50</option><option value="R_25">Volatility 25</option><option value="R_10">Volatility 10</option></select>
-  <label for="botDirection">Direction</label>
-  <select id="botDirection"><option value="MULTUP">Multiplier Up</option><option value="MULTDOWN">Multiplier Down</option></select>
-  <label for="botStake">Demo stake (1–10)</label><input id="botStake" type="number" min="1" max="10" step="0.01" value="1">
-  <label for="botMultiplier">Multiplier</label><select id="botMultiplier"><option value="10">10×</option><option value="20">20×</option><option value="40">40×</option><option value="50">50×</option><option value="100">100×</option></select>
-  <button type="button" id="applyBotSettings">Apply settings to Manual Demo Trading</button>
-  <p id="botSettingsStatus" class="status">Settings are not applied yet. This panel does not start automated trades.</p>
+<h3>Load Bot · Demo Configuration</h3>
+<label for="botMarket">Market</label>
+<select id="botMarket"><option value="1HZ100V">Volatility 100 (1s)</option><option value="1HZ75V">Volatility 75 (1s)</option><option value="1HZ50V">Volatility 50 (1s)</option><option value="1HZ25V">Volatility 25 (1s)</option><option value="R_100">Volatility 100</option><option value="R_75">Volatility 75</option><option value="R_50">Volatility 50</option><option value="R_25">Volatility 25</option><option value="R_10">Volatility 10</option></select>
+<label for="botDirection">Direction</label>
+<select id="botDirection"><option value="MULTUP">Multiplier Up</option><option value="MULTDOWN">Multiplier Down</option></select>
+<label for="botStake">Demo stake (1–10)</label><input id="botStake" type="number" min="1" max="10" step="0.01" value="1">
+<label for="botMultiplier">Multiplier</label>
+<select id="botMultiplier"><option value="10">10×</option><option value="20">20×</option><option value="40">40×</option><option value="50">50×</option><option value="100">100×</option></select>
+<button type="button" id="applyBotSettings">Apply settings to Manual Demo Trading</button>
+<p id="botSettingsStatus" class="status">Settings are not applied yet. This panel does not start automated trades.</p>
 </div>
+
 <div id="premiumPanel" hidden>
-  <h3>Strategy Library · Demo Only</h3>
-  <label for="premiumStrategy">Choose a strategy idea</label>
-  <select id="premiumStrategy"><option value="trend">Trend-following study</option><option value="reversal">Reversal study</option><option value="conservative">Conservative-entry study</option></select>
-  <div class="notice" id="premiumDescription">Trend-following study: review price direction before making a manual demo decision.</div>
-  <button type="button" id="usePremiumSettings">Use default demo settings in Load Bot</button>
-  <p class="status">These are educational strategy templates, not proven signals, paid bots, or guaranteed-profit systems.</p>
+<h3>Premium Bots</h3>
+<p class="muted">Explore three strategy tools for market analysis. Demo practice only; profits are never guaranteed.</p>
+
+<div class="market premium-bot">
+<h3>🌊 Nexus Flow</h3>
+<p>Study market direction and observe price trends before making a manual demo decision.</p>
+<button type="button" class="premium-choice" data-strategy="nexus">Explore Nexus Flow</button>
 </div>
+
+<div class="market premium-bot" style="margin-top:12px">
+<h3>⚡ Volt Sprint</h3>
+<p>Monitor price momentum and short-term market movements before deciding whether to practise.</p>
+<button type="button" class="premium-choice" data-strategy="volt">Explore Volt Sprint</button>
+</div>
+
+<div class="market premium-bot" style="margin-top:12px">
+<h3>📈 Apex Signal</h3>
+<p>Review price behaviour and technical-analysis ideas before making a manual demo decision.</p>
+<button type="button" class="premium-choice" data-strategy="apex">Explore Apex Signal</button>
+</div>
+
+<div class="notice" id="premiumDescription" style="margin-top:14px">
+Select a bot above to view its description.
+</div>
+
+<button type="button" id="usePremiumSettings" style="margin-top:12px">Prepare Demo Settings</button>
+<p class="status">These are educational strategy concepts, not verified third-party bots or guaranteed trading signals. They do not place automatic trades.</p>
+</div>
+
 <div id="speedPanel" hidden>
-  <h3>Speed Bot · Automation Controls</h3>
-  <div class="notice">This version includes a demo monitor only. It does not submit automatic trades. Do not treat the monitor as an active trading bot.</div>
-  <label for="speedInterval">Monitor interval (seconds)</label><input id="speedInterval" type="number" min="2" max="60" value="5">
-  <label><input id="speedDemoOnly" type="checkbox" checked style="display:inline;width:auto"> Confirm demo-only testing</label>
-  <div class="actions"><button type="button" id="speedStart">Start Monitor</button><button type="button" class="secondary" id="speedPause">Pause</button><button type="button" class="secondary" id="speedStop">Stop</button></div>
-  <p id="speedStatus" class="status">Status: Stopped</p>
+<h3>Speed Bot · Automation Controls</h3>
+<div class="notice">This version includes a demo monitor only. It does not submit automatic trades. Do not treat the monitor as an active trading bot.</div>
+<label for="speedInterval">Monitor interval (seconds)</label><input id="speedInterval" type="number" min="2" max="60" value="5">
+<label><input id="speedDemoOnly" type="checkbox" checked style="display:inline;width:auto"> Confirm demo-only testing</label>
+<div class="actions"><button type="button" id="speedStart">Start Monitor</button><button type="button" class="secondary" id="speedPause">Pause</button><button type="button" class="secondary" id="speedStop">Stop</button></div>
+<p id="speedStatus" class="status">Status: Stopped</p>
 </div>
+
 <div class="actions"><button type="button" class="secondary" id="closeCardWorkspace">Close Workspace</button></div>
 </section>
 
@@ -215,9 +251,11 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 <div class="notice">Independent third-party interface, not an official Deriv website. This version is intended for demo testing. Trading involves risk; never use real funds while testing.</div>
 </section>
 </main>
+
 <div class="ai-help" id="aiHelp" hidden>
 <h3>CK AI Assistant</h3>
-<p>I can help you navigate the workspace and explain trading controls. I cannot guarantee profits or provide an automatic winning strategy.</p><button type="button" id="aiLoginHelp" class="secondary">Login help</button>
+<p>I can help you navigate the workspace and explain trading controls. I cannot guarantee profits or provide an automatic winning strategy.</p>
+<button type="button" id="aiLoginHelp" class="secondary">Login help</button>
 <button type="button" id="aiClose" class="secondary">Close</button>
 </div>
 <button class="ai-fab" id="aiButton" type="button" aria-label="Open CK AI Assistant">AI<span class="ai-dot"></span></button>
@@ -257,11 +295,21 @@ function show(id, message) { $(id).textContent = message; }
 function makeMarketCards() {
   $("markets").replaceChildren();
   MARKET_LIST.forEach(m => {
-    const card = document.createElement("div"); card.className = "market";
-    const name = document.createElement("div"); name.className = "market-name"; name.textContent = m.name;
-    const price = document.createElement("div"); price.className = "price"; price.id = "price-" + m.symbol; price.textContent = "Waiting…";
-    const time = document.createElement("div"); time.className = "status"; time.id = "time-" + m.symbol; time.textContent = "Waiting for first tick";
-    card.append(name, price, time); $("markets").appendChild(card);
+    const card = document.createElement("div");
+    card.className = "market";
+    const name = document.createElement("div");
+    name.className = "market-name";
+    name.textContent = m.name;
+    const price = document.createElement("div");
+    price.className = "price";
+    price.id = "price-" + m.symbol;
+    price.textContent = "Waiting…";
+    const time = document.createElement("div");
+    time.className = "status";
+    time.id = "time-" + m.symbol;
+    time.textContent = "Waiting for first tick";
+    card.append(name, price, time);
+    $("markets").appendChild(card);
   });
 }
 
@@ -269,7 +317,9 @@ function connectMarkets() {
   marketGeneration++;
   const generation = marketGeneration;
   if (marketTimer) clearTimeout(marketTimer);
-  if (marketSocket) { try { marketSocket.onclose = null; marketSocket.close(); } catch(e) {} }
+  if (marketSocket) {
+    try { marketSocket.onclose = null; marketSocket.close(); } catch(e) {}
+  }
   show("marketStatus", "Connecting to public market data…");
   try { marketSocket = new WebSocket(MARKET_WS_URL); }
   catch(e) { show("marketStatus", "Market connection error."); return; }
@@ -282,8 +332,12 @@ function connectMarkets() {
   };
   socket.onmessage = event => {
     if (generation !== marketGeneration) return;
-    let d; try { d = JSON.parse(event.data); } catch(e) { return; }
-    if (d.error) { show("marketStatus", "Market API error: " + (d.error.message || "Request failed")); return; }
+    let d;
+    try { d = JSON.parse(event.data); } catch(e) { return; }
+    if (d.error) {
+      show("marketStatus", "Market API error: " + (d.error.message || "Request failed"));
+      return;
+    }
     if (d.msg_type === "tick" && d.tick) {
       const t = d.tick, s = t.symbol, q = Number(t.quote);
       if (!s || !Number.isFinite(q)) return;
@@ -291,7 +345,8 @@ function connectMarkets() {
       if ($("price-" + s)) $("price-" + s).textContent = q.toLocaleString("en-US",{maximumFractionDigits:5});
       if ($("time-" + s)) $("time-" + s).textContent = "Live · " + new Date(Number(t.epoch || Date.now()/1000)*1000).toLocaleTimeString();
       if (!chartHistory[s]) chartHistory[s] = [];
-      chartHistory[s].push(q); if (chartHistory[s].length > 100) chartHistory[s].shift();
+      chartHistory[s].push(q);
+      if (chartHistory[s].length > 100) chartHistory[s].shift();
       show("marketStatus", "Live market feed connected · " + new Date().toLocaleTimeString());
       drawChart();
     }
@@ -300,30 +355,50 @@ function connectMarkets() {
       drawChart();
     }
   };
-  socket.onerror = () => { if (generation === marketGeneration) show("marketStatus", "Market network error; waiting to reconnect."); };
+  socket.onerror = () => {
+    if (generation === marketGeneration) show("marketStatus", "Market network error; waiting to reconnect.");
+  };
   socket.onclose = e => {
     if (generation !== marketGeneration) return;
     show("marketStatus", "Market connection closed (" + e.code + "). Reconnecting…");
-    marketTimer = setTimeout(() => { if (generation === marketGeneration) connectMarkets(); }, 5000);
+    marketTimer = setTimeout(() => {
+      if (generation === marketGeneration) connectMarkets();
+    }, 5000);
   };
 }
 
 function drawChart() {
   const c = $("chart"), ctx = c.getContext("2d"), v = chartHistory[$("chartMarket").value] || [];
   const w = c.width, h = c.height;
-  ctx.clearRect(0,0,w,h); ctx.fillStyle = "#0b1728"; ctx.fillRect(0,0,w,h); ctx.strokeStyle = "#263852";
-  for (let i=1;i<5;i++) { ctx.beginPath(); ctx.moveTo(0,h*i/5); ctx.lineTo(w,h*i/5); ctx.stroke(); }
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle = "#0b1728";
+  ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle = "#263852";
+  for (let i=1;i<5;i++) {
+    ctx.beginPath();
+    ctx.moveTo(0,h*i/5);
+    ctx.lineTo(w,h*i/5);
+    ctx.stroke();
+  }
   if (v.length < 2) {
-    ctx.fillStyle = "#9bacc5"; ctx.font = "18px Arial"; ctx.fillText("Waiting for price data…",24,40);
-    show("chartStatus", "Waiting for ticks for " + $("chartMarket").value); return;
+    ctx.fillStyle = "#9bacc5";
+    ctx.font = "18px Arial";
+    ctx.fillText("Waiting for price data…",24,40);
+    show("chartStatus", "Waiting for ticks for " + $("chartMarket").value);
+    return;
   }
   const min = Math.min(...v), max = Math.max(...v), range = max-min || 1, pad = 24;
-  ctx.beginPath(); ctx.strokeStyle = "#4f8cff"; ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.strokeStyle = "#4f8cff";
+  ctx.lineWidth = 3;
   v.forEach((n,i) => {
     const x = pad + i*(w-2*pad)/(v.length-1), y = h-pad-((n-min)/range)*(h-2*pad);
     if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
   });
-  ctx.stroke(); ctx.fillStyle = "#f3f7ff"; ctx.font = "16px Arial"; ctx.fillText("Latest: " + v[v.length-1],20,25);
+  ctx.stroke();
+  ctx.fillStyle = "#f3f7ff";
+  ctx.font = "16px Arial";
+  ctx.fillText("Latest: " + v[v.length-1],20,25);
   show("chartStatus", v.length + " price points · " + $("chartMarket").value);
 }
 
@@ -332,8 +407,10 @@ function randomString(length) {
   const bytes = crypto.getRandomValues(new Uint8Array(length));
   return Array.from(bytes, b => chars[b % chars.length]).join("");
 }
+
 function base64Url(bytes) {
-  let binary = ""; bytes.forEach(b => binary += String.fromCharCode(b));
+  let binary = "";
+  bytes.forEach(b => binary += String.fromCharCode(b));
   return btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/g,"");
 }
 
@@ -398,13 +475,8 @@ async function processOAuthCallback() {
     const response = await fetch(TOKEN_WORKER, {
       method: "POST",
       headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({
-        code,
-        code_verifier: verifier,
-        redirect_uri: REDIRECT_URI
-      })
+      body: JSON.stringify({code,code_verifier:verifier,redirect_uri:REDIRECT_URI})
     });
-
     let result;
     try { result = await response.json(); }
     catch(e) { result = {error:"Worker returned a non-JSON response"}; }
@@ -426,7 +498,9 @@ async function processOAuthCallback() {
     console.error("OAuth Worker request failed:", e && e.name ? e.name : "Network error");
     show("loginStatus", "Could not contact the token exchange Worker. Check the connection and try a fresh login.");
   }
-}async function connectRealBalance(account, accessToken) {
+}
+
+async function connectRealBalance(account, accessToken) {
   show("realStatus", "Connecting to real account for balance only…");
   const realId = account.account_id || account.id;
   if (!realId) { show("realStatus", "Real account ID was not supplied by Deriv."); return; }
@@ -576,7 +650,9 @@ async function connectAccountByType(type, requireConfirmation = true) {
       if (m.error) {
         console.error("Deriv account API error:", {code:m.error.code || "API_ERROR", message:m.error.message || "Request failed", req_id:m.req_id || null});
         show("tradeStatus", "Deriv API error: " + (m.error.message || "Request failed"));
-        if (m.req_id && m.req_id === lastTradeRequestId) { tradeBusy = false; pendingProposal = false; $("tradeButton").disabled = false; }
+        if (m.req_id && m.req_id === lastTradeRequestId) {
+          tradeBusy = false; pendingProposal = false; $("tradeButton").disabled = false;
+        }
         return;
       }
       if (m.msg_type === "balance" && m.balance) {
@@ -605,7 +681,9 @@ async function connectAccountByType(type, requireConfirmation = true) {
         show("contractStatus", "Contract " + c.contract_id + " · Status: " + (c.status || "open") + (c.profit !== undefined ? " · P/L: " + c.profit : ""));
       }
     };
-    socket.onerror = () => { if (socket === tradeSocket) show("tradeStatus", "Account WebSocket error. Check the connection and log in again if needed."); };
+    socket.onerror = () => {
+      if (socket === tradeSocket) show("tradeStatus", "Account WebSocket error. Check the connection and log in again if needed.");
+    };
     socket.onclose = e => {
       if (socket !== tradeSocket) return;
       $("tradeButton").disabled = true;
@@ -623,16 +701,19 @@ async function connectAccountByType(type, requireConfirmation = true) {
 
 $("tradeButton").addEventListener("click", () => {
   if (!tradeSocket || tradeSocket.readyState !== WebSocket.OPEN) {
-    show("tradeStatus", "Account WebSocket is not open. Log in again."); return;
+    show("tradeStatus", "Account WebSocket is not open. Log in again.");
+    return;
   }
   if (tradeBusy) return;
   const stake = Number($("tradeStake").value), symbol = $("tradeMarket").value;
   const direction = $("tradeDirection").value, multiplier = Number($("tradeMultiplier").value);
   if (!Number.isFinite(stake) || stake < 1 || stake > 10) {
-    show("tradeStatus", "For this test version, enter a stake between 1 and 10 in the selected account currency."); return;
+    show("tradeStatus", "For this test version, enter a stake between 1 and 10 in the selected account currency.");
+    return;
   }
   if (!["MULTUP","MULTDOWN"].includes(direction) || ![10,20,40,50,100].includes(multiplier)) {
-    show("tradeStatus", "Invalid trade selection."); return;
+    show("tradeStatus", "Invalid trade selection.");
+    return;
   }
   tradeBusy = true; pendingProposal = true; $("tradeButton").disabled = true;
   show("tradeStatus", "Requesting a " + (activeAccountType === "real" ? "REAL-money" : "demo") + " quote…");
@@ -648,7 +729,8 @@ function confirmAndBuy(proposal) {
   const askPrice = Number(proposal.ask_price);
   if (!proposal.id || !Number.isFinite(askPrice) || askPrice <= 0) {
     tradeBusy = false; pendingProposal = false; $("tradeButton").disabled = false;
-    show("tradeStatus", "Invalid quote returned. No purchase was sent."); return;
+    show("tradeStatus", "Invalid quote returned. No purchase was sent.");
+    return;
   }
   const stake = Number($("tradeStake").value), symbol = $("tradeMarket").value;
   const direction = $("tradeDirection").value, multiplier = Number($("tradeMultiplier").value);
@@ -662,7 +744,8 @@ function confirmAndBuy(proposal) {
   );
   if (!approved) {
     tradeBusy = false; pendingProposal = false; $("tradeButton").disabled = false;
-    show("tradeStatus", "Trade cancelled. No purchase was sent."); return;
+    show("tradeStatus", "Trade cancelled. No purchase was sent.");
+    return;
   }
   show("tradeStatus", "Submitting confirmed " + (activeAccountType === "real" ? "REAL-money" : "demo") + " trade…");
   lastTradeRequestId = ++requestId;
@@ -671,6 +754,7 @@ function confirmAndBuy(proposal) {
 
 $("loginButton").addEventListener("click", startLogin);
 $("refreshButton").addEventListener("click", connectMarkets);
+
 $("logoutButton").addEventListener("click", () => {
   sessionStorage.removeItem("ck_access_token");
   sessionStorage.removeItem("ck_pkce_verifier");
@@ -679,7 +763,8 @@ $("logoutButton").addEventListener("click", () => {
   if (realSocket) { realSocket.onclose = null; try { realSocket.close(); } catch(e) {} realSocket = null; }
   demoAccountId = ""; availableAccounts = []; currentAccessToken = ""; activeAccountId = ""; activeAccountType = "demo"; activeCurrency = "USD";
   tradeBusy = false; pendingProposal = false;
-  $("tradeButton").disabled = true; $("tradeButton").textContent = "Log In to Connect Account";
+  $("tradeButton").disabled = true;
+  $("tradeButton").textContent = "Log In to Connect Account";
   $("accountBalance").textContent = "—";
   $("realBalance").textContent = "—";
   show("realCurrency", "Connect to load real balance.");
@@ -691,6 +776,7 @@ $("logoutButton").addEventListener("click", () => {
   show("tradeStatus", "No new trade placed.");
   show("contractStatus", "");
 });
+
 $("useDemoAccount").addEventListener("click", () => connectAccountByType("demo", false));
 $("useRealAccount").addEventListener("click", () => connectAccountByType("real", true));
 
@@ -703,13 +789,14 @@ $("chartMarket").addEventListener("change", () => {
 
 let speedMonitorTimer = null;
 let speedMonitorState = "Stopped";
+
 function openCardWorkspace(name) {
   const panel = $("cardWorkspace");
   ["loadBotPanel","premiumPanel","speedPanel"].forEach(id => $(id).hidden = true);
   panel.hidden = false;
   const info = {
     load: ["Load Bot", "Configure demo parameters and then optionally apply them to Manual Demo Trading."],
-    premium: ["Premium Bots", "Browse educational strategy templates. No strategy is guaranteed to make a profit."],
+    premium: ["Premium Bots", "Browse Nexus Flow, Volt Sprint, and Apex Signal. These are educational strategy concepts, not automated trading systems."],
     speed: ["Speed Bot", "The monitor can be started and stopped, but automated trade execution is not enabled."],
     manual: ["Manual Trading", "Choose DEMO or REAL account mode. Every trade quote requires explicit confirmation."]
   };
@@ -731,16 +818,19 @@ function openCardWorkspace(name) {
   }
   panel.scrollIntoView({behavior:"smooth",block:"start"});
 }
+
 $("loadBotCard").addEventListener("click", () => openCardWorkspace("load"));
 $("premiumCard").addEventListener("click", () => openCardWorkspace("premium"));
 $("speedBotCard").addEventListener("click", () => openCardWorkspace("speed"));
 $("manualCard").addEventListener("click", () => openCardWorkspace("manual"));
 $("closeCardWorkspace").addEventListener("click", () => { $("cardWorkspace").hidden = true; });
+
 $("applyBotSettings").addEventListener("click", () => {
   const stake = Number($("botStake").value);
   const multiplier = Number($("botMultiplier").value);
   if (!Number.isFinite(stake) || stake < 1 || stake > 10) {
-    show("botSettingsStatus", "Enter a demo stake between 1 and 10."); return;
+    show("botSettingsStatus", "Enter a demo stake between 1 and 10.");
+    return;
   }
   $("tradeMarket").value = $("botMarket").value;
   $("tradeDirection").value = $("botDirection").value;
@@ -748,33 +838,47 @@ $("applyBotSettings").addEventListener("click", () => {
   $("tradeMultiplier").value = String(multiplier);
   show("botSettingsStatus", "Settings applied to Manual Demo Trading. No trade has been placed.");
 });
-function updatePremiumDescription() {
-  const descriptions = {
-    trend: "Trend-following study: review recent price direction before making a manual demo decision.",
-    reversal: "Reversal study: observe possible price turning points; reversals are uncertain and may fail.",
-    conservative: "Conservative-entry study: use smaller demo stakes and review risk before any manual trade."
-  };
-  $("premiumDescription").textContent = descriptions[$("premiumStrategy").value];
-}
-$("premiumStrategy").addEventListener("change", updatePremiumDescription);
+
+/* Premium Bots: descriptions for the three strategy concepts. */
+const premiumDescriptions = {
+  nexus: "Nexus Flow: study recent price direction and trends. Use market observations to support manual demo decisions.",
+  volt: "Volt Sprint: observe short-term momentum and price movement. Momentum can change quickly and is uncertain.",
+  apex: "Apex Signal: review technical-analysis ideas and price behaviour. This tool does not guarantee accurate signals."
+};
+
+document.querySelectorAll(".premium-choice").forEach(button => {
+  button.addEventListener("click", () => {
+    const strategy = button.dataset.strategy;
+    show("premiumDescription", premiumDescriptions[strategy] || "Select a strategy to learn more.");
+  });
+});
+
 $("usePremiumSettings").addEventListener("click", () => {
   $("botMarket").value = $("tradeMarket").value;
   $("botDirection").value = "MULTUP";
   $("botStake").value = "1";
   $("botMultiplier").value = "10";
   openCardWorkspace("load");
-  show("botSettingsStatus", "Default demo settings prepared. Review and apply them; no trade has been placed.");
+  show("botSettingsStatus", "Demo settings prepared. Review the settings before applying. No trade has been placed.");
 });
+
 function stopSpeedMonitor(message) {
   if (speedMonitorTimer) clearInterval(speedMonitorTimer);
   speedMonitorTimer = null;
   speedMonitorState = message || "Stopped";
   show("speedStatus", "Status: " + speedMonitorState + ". No automatic trades are placed.");
 }
+
 $("speedStart").addEventListener("click", () => {
   const seconds = Number($("speedInterval").value);
-  if (!$("speedDemoOnly").checked) { show("speedStatus", "Enable demo-only testing first."); return; }
-  if (!Number.isInteger(seconds) || seconds < 2 || seconds > 60) { show("speedStatus", "Choose an interval from 2 to 60 seconds."); return; }
+  if (!$("speedDemoOnly").checked) {
+    show("speedStatus", "Enable demo-only testing first.");
+    return;
+  }
+  if (!Number.isInteger(seconds) || seconds < 2 || seconds > 60) {
+    show("speedStatus", "Choose an interval from 2 to 60 seconds.");
+    return;
+  }
   if (speedMonitorTimer) clearInterval(speedMonitorTimer);
   speedMonitorState = "Monitoring demo market data";
   show("speedStatus", "Status: " + speedMonitorState + ". Automatic trading is not connected.");
@@ -784,11 +888,16 @@ $("speedStart").addEventListener("click", () => {
     show("speedStatus", "Status: Monitoring " + symbol + " · latest price: " + (Number.isFinite(latest) ? latest : "waiting for data") + ". No automatic trades are placed.");
   }, seconds * 1000);
 });
+
 $("speedPause").addEventListener("click", () => stopSpeedMonitor("Paused"));
 $("speedStop").addEventListener("click", () => stopSpeedMonitor("Stopped"));
 $("aiButton").addEventListener("click", () => { $("aiHelp").hidden = !$("aiHelp").hidden; });
 $("aiClose").addEventListener("click", () => { $("aiHelp").hidden = true; });
-$("aiLoginHelp").addEventListener("click", () => { $("aiHelp").hidden = true; show("loginStatus", "Tap Log In and Trade, finish Deriv authorization, then return here. DEMO is selected first; switch to REAL only when you are ready to risk real funds."); window.scrollTo({top:0,behavior:"smooth"}); });
+$("aiLoginHelp").addEventListener("click", () => {
+  $("aiHelp").hidden = true;
+  show("loginStatus", "Tap Log In and Trade, finish Deriv authorization, then return here. DEMO is selected first; switch to REAL only when you are ready to risk real funds.");
+  window.scrollTo({top:0,behavior:"smooth"});
+});
 
 makeMarketCards();
 drawChart();
