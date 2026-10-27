@@ -3,510 +3,230 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="deriv-site-verification" content="ded285725a66c864612bf8d91ba4de4b63642ce64f6dd2f14fed08d232275b4a">
   <meta name="theme-color" content="#08111f">
-  <title>CK Trading Bot | TraderScheme</title>
-
+  <title>CK Trading Bot</title>
   <style>
     :root {
-      --bg:#08111f;
-      --panel:#101c2d;
-      --panel2:#142238;
-      --border:#26364d;
-      --text:#eef4ff;
-      --muted:#9aabc3;
-      --green:#25d99a;
-      --red:#ff6578;
-      --blue:#6ca8ff;
-      --yellow:#ffd166;
+      color-scheme: dark;
+      --bg:#08111f; --panel:#111e30; --border:#2b3b52;
+      --text:#eef4ff; --muted:#9cabc0; --green:#25d99a;
+      --blue:#75aaff; --red:#ff7888;
     }
-
     * { box-sizing:border-box; }
-
     body {
-      margin:0;
+      margin:0; background:var(--bg); color:var(--text);
       font-family:Arial,Helvetica,sans-serif;
-      background:var(--bg);
-      color:var(--text);
     }
-
-    button,select,input { font:inherit; }
-
-    button {
-      border:0;
-      border-radius:10px;
-      padding:12px 16px;
-      font-weight:700;
-      cursor:pointer;
-    }
-
-    button:disabled { opacity:.55; cursor:not-allowed; }
-
-    .primary { background:var(--green); color:#06150f; }
-    .secondary { background:#233650; color:var(--text); }
-    .danger { background:#492434; color:#fff; }
-
     header {
-      padding:18px 5%;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:16px;
-      flex-wrap:wrap;
-      background:#0c1727;
-      border-bottom:1px solid var(--border);
+      padding:20px; background:#0d192a; border-bottom:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; flex-wrap:wrap;
     }
-
     .brand { font-size:22px; font-weight:800; }
     .brand span { color:var(--green); }
-    .subtitle { color:var(--muted); font-size:12px; margin-top:5px; }
-
-    .header-actions { display:flex; gap:10px; flex-wrap:wrap; }
-
-    main { max-width:1200px; margin:auto; padding:24px 16px 80px; }
-
-    .hero {
-      padding:30px 24px;
-      background:linear-gradient(135deg,#142c43,#101b2b);
-      border:1px solid var(--border);
-      border-radius:18px;
-      margin-bottom:20px;
+    main { max-width:950px; margin:auto; padding:22px 15px 50px; }
+    .card {
+      background:var(--panel); border:1px solid var(--border);
+      border-radius:15px; padding:20px; margin-bottom:16px;
     }
-
-    h1 { font-size:clamp(26px,5vw,42px); margin:0 0 12px; }
+    h1 { font-size:clamp(26px,5vw,38px); margin:0 0 12px; }
     h2 { font-size:19px; margin:0 0 16px; }
     p { line-height:1.55; }
     .muted { color:var(--muted); }
     .small { font-size:12px; }
-
-    .grid {
-      display:grid;
-      grid-template-columns:repeat(12,minmax(0,1fr));
-      gap:16px;
-    }
-
-    .card {
-      background:var(--panel);
-      border:1px solid var(--border);
-      border-radius:15px;
-      padding:18px;
-      min-width:0;
-    }
-
-    .span-12 { grid-column:span 12; }
-    .span-8 { grid-column:span 8; }
-    .span-6 { grid-column:span 6; }
-    .span-4 { grid-column:span 4; }
-
-    .metric { font-size:26px; font-weight:800; margin:10px 0; }
     .green { color:var(--green); }
-    .red { color:var(--red); }
-    .yellow { color:var(--yellow); }
-
-    .row {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
+    .balance {
+      font-size:clamp(30px,7vw,44px); font-weight:800;
+      overflow-wrap:anywhere; margin:15px 0;
     }
-
+    button,select {
+      font:inherit; padding:13px; border-radius:9px;
+      border:1px solid var(--border); width:100%; margin:6px 0;
+    }
+    button { cursor:pointer; font-weight:700; }
+    button:disabled { opacity:.6; cursor:wait; }
+    .primary { background:var(--green); color:#06150f; border:0; }
+    .secondary { background:#22344c; color:var(--text); }
+    select { background:#091525; color:var(--text); }
     .status {
-      padding:10px 12px;
-      border-radius:9px;
-      background:#0a1422;
-      color:var(--muted);
-      font-size:13px;
-      overflow-wrap:anywhere;
-      margin-top:12px;
+      padding:12px; margin-top:12px; border-radius:9px;
+      background:#091525; color:var(--muted);
+      overflow-wrap:anywhere; font-size:13px; line-height:1.5;
     }
-
-    .status.error { color:#ff9aaa; }
-    .status.success { color:var(--green); }
-
-    .market-list { display:grid; gap:10px; }
-
-    .market {
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      padding:12px;
-      border-radius:10px;
-      background:#0b1625;
-      align-items:center;
+    .error { color:#ff9aaa; }
+    .success { color:var(--green); }
+    .row {
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; flex-wrap:wrap;
     }
-
-    .market strong { display:block; margin-bottom:5px; }
-    .market small { color:var(--muted); }
-
-    canvas {
-      width:100%;
-      height:260px;
-      display:block;
-      background:#0a1422;
-      border-radius:10px;
-    }
-
-    select,input {
-      width:100%;
-      padding:12px;
-      border-radius:9px;
-      border:1px solid var(--border);
-      background:#0a1422;
-      color:var(--text);
-      margin:7px 0 13px;
-    }
-
-    .button-row { display:flex; gap:10px; flex-wrap:wrap; }
-    .button-row button { flex:1; }
-
-    .notice {
-      border-left:3px solid var(--yellow);
-      padding:10px 12px;
-      background:#211d18;
-      color:#f6dca2;
-      font-size:13px;
-      line-height:1.5;
-      border-radius:4px 9px 9px 4px;
-    }
-
-    .footer {
-      text-align:center;
-      padding:24px;
-      color:var(--muted);
-      font-size:12px;
-    }
-
-    .chat-panel {
-      display:none;
-      position:fixed;
-      right:16px;
-      bottom:84px;
-      width:min(340px,calc(100vw - 32px));
-      background:var(--panel);
-      border:1px solid var(--border);
-      border-radius:15px;
-      padding:18px;
-      z-index:5;
-      box-shadow:0 12px 50px #0008;
-    }
-
-    .chat-panel.open { display:block; }
-
-    .chat-toggle {
-      position:fixed;
-      right:16px;
-      bottom:16px;
-      z-index:6;
-      border-radius:30px;
-      box-shadow:0 6px 24px #0006;
-    }
-
-    a { color:var(--blue); }
-
-    @media(max-width:750px) {
-      .span-8,.span-6,.span-4 { grid-column:span 12; }
-      header { align-items:flex-start; }
-      .header-actions { width:100%; }
-      .header-actions button { flex:1; }
-    }
+    .row button { width:auto; min-width:120px; }
+    .hidden { display:none !important; }
+    footer { text-align:center; padding:20px; color:var(--muted); font-size:12px; }
   </style>
 </head>
-
 <body>
 <header>
   <div>
     <div class="brand">CK <span>TRADING BOT</span></div>
-    <div class="subtitle">TRADERSCHEME · STRUCTURED TRADING WORKSPACE</div>
+    <div class="muted small">TRADERSCHEME · DERIV ACCOUNT DASHBOARD</div>
   </div>
-
-  <div class="header-actions">
-    <button id="loginButton" class="primary" type="button">
-      Log In to Deriv
-    </button>
-    <button id="logoutButton" class="secondary" type="button" hidden>
-      Log Out
-    </button>
-  </div>
+  <button id="loginButton" class="primary" style="width:auto">
+    Log In to Deriv
+  </button>
 </header>
 
 <main>
-  <section class="hero">
-    <p class="green small">MARKET MONITORING WORKSPACE</p>
-    <h1>Trade with a plan, not emotion.</h1>
+  <section class="card">
+    <h1>Your Deriv Account</h1>
     <p class="muted">
-      Monitor live market prices, view a simple price chart and connect
-      your Deriv account securely.
+      Sign in securely to load the accounts made available to this
+      application and view the selected account's balance.
     </p>
-    <div class="button-row">
-      <button class="primary" id="heroLoginButton" type="button">
-        Connect Deriv Account
-      </button>
-      <button class="secondary" id="refreshMarketsButton" type="button">
-        Refresh Markets
-      </button>
-    </div>
     <div id="loginStatus" class="status" role="status" aria-live="polite">
-      Not connected. Tap Log In to Deriv to begin.
+      Not connected. Tap Log In to Deriv.
     </div>
   </section>
 
-  <section class="grid">
-    <article class="card span-4">
-      <div class="muted small">CONNECTION</div>
-      <div id="connectionValue" class="metric yellow">Offline</div>
-      <div id="connectionDetails" class="muted small">
-        Connect your Deriv account to check authorization.
-      </div>
-    </article>
+  <section class="card">
+    <h2>Account Selection</h2>
+    <label for="accountSelect">Choose your Deriv account</label>
+    <select id="accountSelect" disabled>
+      <option value="">Log in to load your accounts</option>
+    </select>
+    <button id="loadBalanceButton" class="secondary" disabled>
+      Load Selected Account Balance
+    </button>
+    <div id="accountStatus" class="status">
+      No account selected.
+    </div>
+  </section>
 
-    <article class="card span-4">
-      <div class="muted small">ACCOUNT</div>
-      <div id="accountValue" class="metric">Not connected</div>
-      <div id="accountDetails" class="muted small">
-        Your account information appears after successful login.
-      </div>
-    </article>
+  <section class="card">
+    <div class="row">
+      <h2>Account Balance</h2>
+      <span id="accountTypeBadge" class="muted small">NOT CONNECTED</span>
+    </div>
+    <div id="balanceValue" class="balance">—</div>
+    <div id="balanceDetails" class="muted">
+      Your balance will appear after account authorization.
+    </div>
+    <div id="balanceStatus" class="status">
+      Waiting for account connection.
+    </div>
+  </section>
 
-    <article class="card span-4">
-      <div class="muted small">BALANCE</div>
-      <div id="balanceValue" class="metric">—</div>
-      <div id="balanceDetails" class="muted small">
-        Read-only display. Requires successful account authorization.
-      </div>
-    </article>
+  <section class="card">
+    <h2>Session</h2>
+    <button id="refreshAccountsButton" class="secondary" disabled>
+      Refresh Accounts
+    </button>
+    <button id="logoutButton" class="secondary">
+      Log Out of This Website
+    </button>
+    <p class="muted small">
+      Logging out clears this website's stored session token. It does not
+      close your Deriv account. Real-account balance display is read-only.
+    </p>
+  </section>
 
-    <article class="card span-4">
-      <h2>Live Market Prices</h2>
-      <p class="muted small">
-        Streaming prices from Deriv's public market-data WebSocket.
-      </p>
-      <div id="marketList" class="market-list">
-        <div class="market">
-          <div><strong>Volatility 10 Index</strong><small>Waiting for price…</small></div>
-          <span>—</span>
-        </div>
-      </div>
-      <div id="marketStatus" class="status">Connecting to market data…</div>
-    </article>
-
-    <article class="card span-8">
-      <div class="row">
-        <h2>Live Price Chart</h2>
-        <select id="chartMarket" style="width:auto;min-width:180px">
-          <option value="R_10">Volatility 10 Index</option>
-          <option value="R_25">Volatility 25 Index</option>
-          <option value="R_50">Volatility 50 Index</option>
-          <option value="R_75">Volatility 75 Index</option>
-          <option value="R_100">Volatility 100 Index</option>
-        </select>
-      </div>
-      <canvas id="priceChart" width="900" height="300"
-        aria-label="Live market price chart"></canvas>
-      <p class="muted small">
-        The chart displays incoming prices. It is not a prediction or a
-        guarantee of future movements.
-      </p>
-    </article>
-
-    <article class="card span-6">
-      <h2>Account Connection</h2>
-      <p class="muted">
-        Use the official Deriv authorization page. Your password is entered
-        on Deriv, not on this website.
-      </p>
-      <button id="loginButton2" class="primary" type="button">
-        Log In Securely
-      </button>
-      <div id="accountStatus" class="status">
-        No authorized account loaded.
-      </div>
-      <p class="muted small">
-        OAuth login must be enabled for your registered Deriv application.
-        The redirect URL must match exactly.
-      </p>
-    </article>
-
-    <article class="card span-6">
-      <h2>Demo Trading Practice</h2>
-      <div class="notice">
-        This section is a practice planner only. It does not place orders
-        or buy contracts.
-      </div>
-      <label for="demoMarket">Market</label>
-      <select id="demoMarket">
-        <option value="R_10">Volatility 10 Index</option>
-        <option value="R_25">Volatility 25 Index</option>
-        <option value="R_50">Volatility 50 Index</option>
-        <option value="R_75">Volatility 75 Index</option>
-        <option value="R_100">Volatility 100 Index</option>
-      </select>
-
-      <label for="demoStake">Practice stake (demo planning only)</label>
-      <input id="demoStake" type="number" min="0.35" step="0.01" value="1">
-
-      <label for="demoDirection">Practice idea</label>
-      <select id="demoDirection">
-        <option value="RISE">Rise</option>
-        <option value="FALL">Fall</option>
-      </select>
-
-      <button id="savePlanButton" class="secondary" type="button">
-        Save Practice Plan
-      </button>
-      <div id="planStatus" class="status">
-        No practice plan saved.
-      </div>
-    </article>
-
-    <article class="card span-12">
-      <h2>Important Information</h2>
-      <p class="muted">
-        CK Trading Bot is an independent interface, not an official Deriv
-        product. Market prices can change rapidly. Charts and practice plans
-        do not guarantee profits.
-      </p>
-      <p class="muted small">
-        Never share your Deriv password, private keys, or access tokens with
-        anyone. Confirm account permissions and authorization before using
-        any third-party application.
-      </p>
-    </article>
+  <section class="card">
+    <h2>Security</h2>
+    <p class="muted small">
+      CK Trading Bot is an independent third-party interface. Your Deriv
+      password should only be entered on Deriv's own website. Never share
+      an access token or authorization code with anyone.
+    </p>
   </section>
 </main>
 
-<div id="aiPanel" class="chat-panel">
-  <div class="row">
-    <h2>CK Help</h2>
-    <button id="closeHelpButton" class="secondary" type="button">Close</button>
-  </div>
-  <p><strong>Why does login fail?</strong></p>
-  <p class="muted small">
-    Check the Deriv App ID, OAuth application settings, exact redirect URL,
-    and Worker token-exchange configuration.
-  </p>
-  <p><strong>Why is balance blank?</strong></p>
-  <p class="muted small">
-    The OAuth flow must finish successfully and the authorized account API
-    must return account information.
-  </p>
-  <p><strong>Does this panel provide AI trading signals?</strong></p>
-  <p class="muted small">
-    No. It is a built-in help guide, not a live AI service or signal generator.
-  </p>
-</div>
-
-<button id="helpButton" class="primary chat-toggle" type="button">
-  CK Help
-</button>
-
-<div class="footer">
-  CK Trading Bot · Independent trading interface · Use responsibly
-</div>
+<footer>CK Trading Bot · Account information supplied by Deriv</footer>
 
 <script>
 (function () {
   "use strict";
 
-  // Your existing Deriv and GitHub Pages configuration.
   const APP_ID = "34JjnKJzecylG5kwmjaXm";
   const REDIRECT_URI =
     "https://collinskipkorir9406-pixel.github.io/cktradindscheme/";
+
+  // Existing Cloudflare Worker. It must exchange the OAuth code securely.
   const WORKER_URL =
     "https://steep-snow-a539.collinskipkorir70.workers.dev/";
 
   const AUTH_URL = "https://auth.deriv.com/oauth2/auth";
-  const ACCOUNTS_URL =
-    "https://api.derivws.com/trading/v1/options/accounts";
+  const API_BASE = "https://api.derivws.com/trading/v1/options";
+  const $ = id => document.getElementById(id);
 
-  const $ = (id) => document.getElementById(id);
+  let accessToken = null;
+  let accounts = [];
+  let balanceSocket = null;
+  let selectedAccountId = null;
+  let selectedCurrency = "";
+  let balanceSubscriptionId = null;
 
-  let marketSocket = null;
-  let reconnectTimer = null;
-  let marketConnected = false;
-  let selectedChartMarket = $("chartMarket").value;
-  let marketPrices = {};
-  let chartHistory = {};
-  let reconnectAttempts = 0;
-
-  function setStatus(id, message, kind) {
-    const element = $(id);
-    if (!element) return;
-    element.textContent = message;
-    element.className = "status" + (kind ? " " + kind : "");
+  function status(id, message, type) {
+    const el = $(id);
+    el.textContent = message;
+    el.className = "status" + (type ? " " + type : "");
   }
 
-  function setLoginStatus(message, kind) {
-    setStatus("loginStatus", message, kind);
-  }
-
-  function showRuntimeError(message) {
-    setLoginStatus("JavaScript error: " + message, "error");
-  }
-
-  // Install error reporting early so failures are visible on mobile.
   window.addEventListener("error", function (event) {
-    showRuntimeError(event.message || "Unknown script error");
+    status(
+      "loginStatus",
+      "JavaScript error: " + (event.message || "Unknown error"),
+      "error"
+    );
   });
 
   window.addEventListener("unhandledrejection", function (event) {
     const reason = event.reason;
-    showRuntimeError(
-      reason && reason.message ? reason.message : String(reason)
+    status(
+      "loginStatus",
+      "Unexpected error: " +
+        (reason && reason.message ? reason.message : String(reason)),
+      "error"
     );
   });
 
-  function randomString(length) {
-    const bytes = crypto.getRandomValues(new Uint8Array(length));
+  function randomVerifier() {
+    const bytes = crypto.getRandomValues(new Uint8Array(48));
     return Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("");
   }
 
   function base64Url(bytes) {
     let binary = "";
-    bytes.forEach(byte => binary += String.fromCharCode(byte));
+    bytes.forEach(b => binary += String.fromCharCode(b));
     return btoa(binary)
       .replace(/\+/g, "-")
       .replace(/\//g, "_")
       .replace(/=+$/, "");
   }
 
-  async function createCodeChallenge(verifier) {
+  async function makeChallenge(verifier) {
     if (!crypto.subtle) {
-      throw new Error(
-        "Secure browser cryptography is unavailable. Open the HTTPS website."
-      );
+      throw new Error("Secure HTTPS browser support is required for login.");
     }
-
-    const data = new TextEncoder().encode(verifier);
-    const digest = await crypto.subtle.digest("SHA-256", data);
+    const digest = await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(verifier)
+    );
     return base64Url(new Uint8Array(digest));
   }
 
   async function startLogin() {
-    const buttons = [
-      $("loginButton"),
-      $("heroLoginButton"),
-      $("loginButton2")
-    ];
-
-    buttons.forEach(button => button.disabled = true);
+    $("loginButton").disabled = true;
 
     try {
-      setLoginStatus("Preparing secure Deriv login…");
+      status("loginStatus", "Preparing secure Deriv login…");
 
-      if (!window.crypto || !crypto.getRandomValues || !crypto.subtle) {
-        throw new Error(
-          "Secure login is unavailable in this browser. Open the HTTPS site in Chrome."
-        );
-      }
+      const verifier = randomVerifier();
+      const challenge = await makeChallenge(verifier);
+      const state = randomVerifier().slice(0, 32);
 
-      const verifier = randomString(48);
-      const challenge = await createCodeChallenge(verifier);
-      const state = randomString(24);
-
-      sessionStorage.setItem("ck_pkce_verifier", verifier);
-      sessionStorage.setItem("ck_oauth_state", state);
+      sessionStorage.setItem("ck_verifier", verifier);
+      sessionStorage.setItem("ck_state", state);
 
       const url = new URL(AUTH_URL);
       url.searchParams.set("response_type", "code");
@@ -517,41 +237,66 @@
       url.searchParams.set("code_challenge", challenge);
       url.searchParams.set("code_challenge_method", "S256");
 
-      setLoginStatus("Opening Deriv authorization page…");
-
-      // Direct navigation is initiated by the user's button tap.
+      status("loginStatus", "Opening Deriv authorization…");
       window.location.assign(url.toString());
     } catch (error) {
-      setLoginStatus(
-        "Could not start login: " + (error.message || String(error)),
+      status(
+        "loginStatus",
+        "Login could not start: " + error.message,
         "error"
       );
-      buttons.forEach(button => button.disabled = false);
+      $("loginButton").disabled = false;
     }
   }
 
-  // Attach handlers immediately, before market setup or account requests.
+  // Attach login immediately so later errors cannot prevent the click handler.
   $("loginButton").onclick = startLogin;
-  $("heroLoginButton").onclick = startLogin;
-  $("loginButton2").onclick = startLogin;
 
-  async function exchangeCodeForToken(code) {
-    const verifier = sessionStorage.getItem("ck_pkce_verifier");
-    const savedState = sessionStorage.getItem("ck_oauth_state");
-    const params = new URLSearchParams(window.location.search);
-    const returnedState = params.get("state");
+  async function requestJson(url, options) {
+    const response = await fetch(url, options);
+    const text = await response.text();
+    let result;
 
-    if (!verifier || !savedState || !returnedState ||
-        returnedState !== savedState) {
+    try {
+      result = JSON.parse(text);
+    } catch (_) {
       throw new Error(
-        "Login state could not be verified. Please tap Log In and try again."
+        "Server returned an unreadable response (HTTP " + response.status + ")."
       );
     }
 
-    setLoginStatus("Deriv returned successfully. Completing secure login…");
+    if (!response.ok) {
+      throw new Error(
+        result.message ||
+        result.error_description ||
+        result.error ||
+        ("Request failed with HTTP " + response.status)
+      );
+    }
 
-    // This request format must match your Cloudflare Worker implementation.
-    const response = await fetch(WORKER_URL, {
+    if (result.error) {
+      throw new Error(result.error.message || result.error);
+    }
+
+    return result;
+  }
+
+  async function exchangeCode(code) {
+    const verifier = sessionStorage.getItem("ck_verifier");
+    const expectedState = sessionStorage.getItem("ck_state");
+    const params = new URLSearchParams(location.search);
+    const receivedState = params.get("state");
+
+    if (!verifier || !expectedState || receivedState !== expectedState) {
+      throw new Error(
+        "Security state check failed. Please log in again."
+      );
+    }
+
+    status("loginStatus", "Completing secure Deriv authorization…");
+
+    // These request fields must match the Cloudflare Worker implementation.
+    const result = await requestJson(WORKER_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -562,442 +307,390 @@
       })
     });
 
-    const rawText = await response.text();
-    let result;
-
-    try {
-      result = JSON.parse(rawText);
-    } catch (_) {
-      throw new Error(
-        "The token-exchange Worker returned a non-JSON response. Check its configuration."
-      );
-    }
-
-    if (!response.ok) {
-      throw new Error(
-        result.error_description ||
-        result.message ||
-        result.error ||
-        ("Token exchange failed with HTTP " + response.status)
-      );
-    }
-
     const token = result.access_token ||
       (result.data && result.data.access_token);
 
     if (!token) {
       throw new Error(
-        result.error_description ||
-        result.message ||
-        "The Worker response did not contain an access_token."
+        "Worker did not return access_token. Check the Worker token exchange."
       );
     }
 
-    // Keep the OAuth token in session storage, not in the source code.
-    sessionStorage.setItem("ck_oauth_access_token", token);
-    sessionStorage.removeItem("ck_pkce_verifier");
-    sessionStorage.removeItem("ck_oauth_state");
+    accessToken = token;
+    sessionStorage.setItem("ck_access_token", token);
+    sessionStorage.removeItem("ck_verifier");
+    sessionStorage.removeItem("ck_state");
 
-    // Remove the one-time authorization code from the address bar.
     history.replaceState({}, document.title, REDIRECT_URI);
 
-    await loadAccountInfo(token);
+    await loadAccounts();
   }
 
-  async function loadAccountInfo(token) {
-    setLoginStatus("Login succeeded. Loading account information…");
-
-    try {
-      const response = await fetch(ACCOUNTS_URL, {
-        method: "GET",
-        headers: {
-          "Authorization": "Bearer " + token
-        }
-      });
-
-      const body = await response.text();
-      let data;
-
-      try {
-        data = JSON.parse(body);
-      } catch (_) {
-        throw new Error("Account API returned an unexpected response.");
-      }
-
-      if (!response.ok) {
-        throw new Error(
-          data.message ||
-          data.error ||
-          ("Account API returned HTTP " + response.status)
-        );
-      }
-
-      const accounts = Array.isArray(data)
-        ? data
-        : Array.isArray(data.accounts)
-          ? data.accounts
-          : Array.isArray(data.data)
-            ? data.data
-            : data.data && Array.isArray(data.data.accounts)
-              ? data.data.accounts
-              : [];
-
-      $("connectionValue").textContent = "Connected";
-      $("connectionValue").className = "metric green";
-      $("connectionDetails").textContent =
-        "OAuth access token accepted by the account API.";
-
-      $("loginButton").hidden = true;
-      $("heroLoginButton").hidden = true;
-      $("loginButton2").hidden = true;
-      $("logoutButton").hidden = false;
-
-      if (accounts.length) {
-        const account = accounts[0];
-        const accountId = account.account_id ||
-          account.loginid || account.id || "Account connected";
-        const currency = account.currency || "";
-        const balance = account.balance;
-
-        $("accountValue").textContent = String(accountId);
-        $("accountDetails").textContent =
-          currency ? "Currency: " + currency : "Account loaded.";
-
-        if (balance !== undefined && balance !== null) {
-          $("balanceValue").textContent =
-            (currency ? currency + " " : "") +
-            Number(balance).toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2
-            });
-          $("balanceDetails").textContent = "Account API balance · read-only";
-        } else {
-          $("balanceValue").textContent = "Not supplied";
-          $("balanceDetails").textContent =
-            "Login worked, but this API response did not include a balance field.";
-        }
-      } else {
-        $("accountValue").textContent = "Connected";
-        $("accountDetails").textContent =
-          "The API did not return an account list in the expected format.";
-        $("balanceValue").textContent = "—";
-        $("balanceDetails").textContent =
-          "Check the current account API response format.";
-      }
-
-      setStatus(
-        "accountStatus",
-        "OAuth login completed. Account data was requested securely.",
-        "success"
-      );
-      setLoginStatus(
-        "Deriv authorization succeeded. Review the account details below.",
-        "success"
-      );
-    } catch (error) {
-      $("connectionValue").textContent = "Login returned";
-      $("connectionValue").className = "metric yellow";
-      $("connectionDetails").textContent =
-        "OAuth may have succeeded, but account loading failed.";
-      setStatus(
-        "accountStatus",
-        error.message || String(error),
-        "error"
-      );
-      setLoginStatus(
-        "Authorization code exchanged, but account loading failed: " +
-        (error.message || String(error)),
-        "error"
-      );
-    }
-  }
-
-  async function processOAuthCallback() {
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
-    const oauthError = params.get("error");
-
-    if (oauthError) {
-      const description = params.get("error_description") || oauthError;
-      history.replaceState({}, document.title, REDIRECT_URI);
-      setLoginStatus("Deriv login error: " + description, "error");
-      return;
-    }
-
-    if (code) {
-      try {
-        await exchangeCodeForToken(code);
-      } catch (error) {
-        setLoginStatus(
-          "Login callback failed: " + (error.message || String(error)),
-          "error"
-        );
-      }
-      return;
-    }
-
-    const token = sessionStorage.getItem("ck_oauth_access_token");
-    if (token) {
-      await loadAccountInfo(token);
-    }
-  }
-
-  $("logoutButton").onclick = function () {
-    sessionStorage.removeItem("ck_oauth_access_token");
-    sessionStorage.removeItem("ck_pkce_verifier");
-    sessionStorage.removeItem("ck_oauth_state");
-
-    $("connectionValue").textContent = "Offline";
-    $("connectionValue").className = "metric yellow";
-    $("connectionDetails").textContent = "You are logged out.";
-    $("accountValue").textContent = "Not connected";
-    $("accountDetails").textContent = "Log in to load account information.";
-    $("balanceValue").textContent = "—";
-    $("balanceDetails").textContent = "No authorized account loaded.";
-
-    $("loginButton").hidden = false;
-    $("heroLoginButton").hidden = false;
-    $("loginButton2").hidden = false;
-    $("logoutButton").hidden = true;
-
-    setLoginStatus("Logged out of this CK Trading Bot session.");
-    setStatus("accountStatus", "No authorized account loaded.");
-  };
-
-  function drawChart() {
-    const canvas = $("priceChart");
-    const ctx = canvas.getContext("2d");
-    const width = canvas.width;
-    const height = canvas.height;
-    const values = chartHistory[selectedChartMarket] || [];
-
-    ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = "#0a1422";
-    ctx.fillRect(0, 0, width, height);
-
-    ctx.strokeStyle = "#23364c";
-    ctx.lineWidth = 1;
-
-    for (let i = 1; i < 5; i++) {
-      const y = i * height / 5;
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(width, y);
-      ctx.stroke();
-    }
-
-    if (values.length < 2) {
-      ctx.fillStyle = "#9aabc3";
-      ctx.font = "16px Arial";
-      ctx.fillText("Waiting for live price data…", 24, 42);
-      return;
-    }
-
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-    const range = max - min || 1;
-
-    ctx.strokeStyle = "#25d99a";
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-
-    values.forEach((value, index) => {
-      const x = index * width / (values.length - 1);
-      const y = height - 22 -
-        ((value - min) / range) * (height - 44);
-
-      if (index === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
-
-    ctx.stroke();
-
-    ctx.fillStyle = "#eef4ff";
-    ctx.font = "14px Arial";
-    ctx.fillText("High: " + max, 14, 22);
-    ctx.fillText("Low: " + min, 14, height - 8);
-  }
-
-  function renderMarkets() {
-    const symbols = [
-      ["R_10", "Volatility 10 Index"],
-      ["R_25", "Volatility 25 Index"],
-      ["R_50", "Volatility 50 Index"],
-      ["R_75", "Volatility 75 Index"],
-      ["R_100", "Volatility 100 Index"]
+  function extractAccounts(result) {
+    const possible = [
+      result.accounts,
+      result.data,
+      result.data && result.data.accounts,
+      result.data && result.data.items
     ];
 
-    $("marketList").innerHTML = "";
-
-    symbols.forEach(([symbol, name]) => {
-      const value = marketPrices[symbol];
-      const item = document.createElement("div");
-      item.className = "market";
-
-      const left = document.createElement("div");
-      const strong = document.createElement("strong");
-      strong.textContent = name;
-
-      const small = document.createElement("small");
-      small.textContent = symbol + " · " +
-        (value === undefined ? "Waiting for price…" : "Live tick received");
-
-      left.appendChild(strong);
-      left.appendChild(small);
-
-      const price = document.createElement("span");
-      price.textContent = value === undefined
-        ? "—"
-        : Number(value).toLocaleString(undefined, {
-            maximumFractionDigits: 4
-          });
-
-      item.appendChild(left);
-      item.appendChild(price);
-      $("marketList").appendChild(item);
-    });
-  }
-
-  function connectMarkets() {
-    if (marketSocket) {
-      try { marketSocket.close(); } catch (_) {}
+    for (const value of possible) {
+      if (Array.isArray(value)) return value;
     }
 
-    clearTimeout(reconnectTimer);
-    setStatus("marketStatus", "Connecting to live market data…");
+    return [];
+  }
+
+  function accountType(account) {
+    const raw = String(
+      account.account_type ||
+      account.landing_company_name ||
+      account.type ||
+      ""
+    ).toLowerCase();
+
+    if (raw.includes("demo") || raw.includes("virtual")) return "demo";
+    if (raw.includes("real") || raw.includes("financial") ||
+        raw.includes("standard")) return "real";
+
+    // Some API responses use a demo flag.
+    if (account.is_virtual === true || account.is_virtual === 1) return "demo";
+    if (account.is_virtual === false || account.is_virtual === 0) return "real";
+
+    return "unknown";
+  }
+
+  function getAccountId(account) {
+    return account.account_id || account.loginid || account.id || "";
+  }
+
+  async function loadAccounts() {
+    if (!accessToken) {
+      throw new Error("Please log in to Deriv first.");
+    }
+
+    status("accountStatus", "Retrieving accounts from Deriv…");
+    $("accountSelect").disabled = true;
+    $("loadBalanceButton").disabled = true;
+    $("refreshAccountsButton").disabled = true;
 
     try {
-      marketSocket = new WebSocket(
-        "wss://ws.derivws.com/websockets/v3?app_id=" +
-        encodeURIComponent(APP_ID)
+      const result = await requestJson(
+        API_BASE + "/accounts",
+        {
+          method: "GET",
+          headers: { "Authorization": "Bearer " + accessToken }
+        }
       );
 
-      marketSocket.onopen = function () {
-        marketConnected = true;
-        reconnectAttempts = 0;
-        setStatus("marketStatus", "Market-data connection established.", "success");
+      accounts = extractAccounts(result).filter(a => getAccountId(a));
 
-        ["R_10", "R_25", "R_50", "R_75", "R_100"].forEach(symbol => {
-          marketSocket.send(JSON.stringify({
-            ticks: symbol,
-            subscribe: 1
-          }));
-        });
+      if (!accounts.length) {
+        throw new Error(
+          "Deriv returned no accounts in the expected format. " +
+          "The account API response needs checking."
+        );
+      }
+
+      $("accountSelect").innerHTML = "";
+
+      accounts.forEach((account, index) => {
+        const id = getAccountId(account);
+        const type = accountType(account);
+        const currency = account.currency || "";
+        const option = document.createElement("option");
+
+        option.value = id;
+        option.textContent =
+          (type === "unknown" ? "Account" : type.toUpperCase()) +
+          " · " + id + (currency ? " · " + currency : "");
+
+        option.dataset.index = String(index);
+        $("accountSelect").appendChild(option);
+      });
+
+      $("accountSelect").disabled = false;
+      $("loadBalanceButton").disabled = false;
+      $("refreshAccountsButton").disabled = false;
+
+      // Prefer a real account when available; otherwise select the first.
+      let firstIndex = accounts.findIndex(a => accountType(a) === "real");
+      if (firstIndex < 0) firstIndex = 0;
+
+      $("accountSelect").selectedIndex = firstIndex;
+
+      status(
+        "accountStatus",
+        "Loaded " + accounts.length +
+        " account(s). Select the account whose balance you want to view.",
+        "success"
+      );
+      status(
+        "loginStatus",
+        "Deriv login succeeded. Your accounts have been loaded.",
+        "success"
+      );
+
+      await loadSelectedBalance();
+    } catch (error) {
+      status("accountStatus", error.message, "error");
+      throw error;
+    } finally {
+      $("refreshAccountsButton").disabled = false;
+    }
+  }
+
+  async function loadSelectedBalance() {
+    if (!accessToken) {
+      status("balanceStatus", "Log in to Deriv first.", "error");
+      return;
+    }
+
+    const accountId = $("accountSelect").value;
+    const account = accounts.find(a => getAccountId(a) === accountId);
+
+    if (!accountId || !account) {
+      status("balanceStatus", "Select an account first.", "error");
+      return;
+    }
+
+    selectedAccountId = accountId;
+    selectedCurrency = account.currency || "";
+
+    if (balanceSocket) {
+      try {
+        balanceSocket.close();
+      } catch (_) {}
+      balanceSocket = null;
+    }
+
+    balanceSubscriptionId = null;
+    $("balanceValue").textContent = "Loading…";
+    $("balanceDetails").textContent = "Requesting account balance from Deriv…";
+    $("accountTypeBadge").textContent = accountType(account).toUpperCase();
+
+    $("loadBalanceButton").disabled = true;
+    status("balanceStatus", "Requesting a secure account connection…");
+
+    try {
+      const otpResult = await requestJson(
+        API_BASE + "/accounts/" +
+          encodeURIComponent(accountId) + "/otp",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer " + accessToken,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({})
+        }
+      );
+
+      const wsUrl = otpResult.data && otpResult.data.url
+        ? otpResult.data.url
+        : otpResult.url;
+
+      if (!wsUrl) {
+        throw new Error(
+          "Deriv did not return an authenticated WebSocket URL."
+        );
+      }
+
+      balanceSocket = new WebSocket(wsUrl);
+
+      balanceSocket.onopen = function () {
+        if (accountId !== selectedAccountId) return;
+
+        balanceSocket.send(JSON.stringify({
+          balance: 1,
+          subscribe: 1
+        }));
+
+        status(
+          "balanceStatus",
+          "Connected to selected account. Waiting for balance…"
+        );
       };
 
-      marketSocket.onmessage = function (event) {
+      balanceSocket.onmessage = function (event) {
         let message;
 
-        try { message = JSON.parse(event.data); }
-        catch (_) { return; }
+        try {
+          message = JSON.parse(event.data);
+        } catch (_) {
+          return;
+        }
+
+        if (accountId !== selectedAccountId) return;
 
         if (message.error) {
-          setStatus(
-            "marketStatus",
-            "Market-data error: " + message.error.message,
+          status(
+            "balanceStatus",
+            message.error.message || "Deriv balance request failed.",
             "error"
           );
           return;
         }
 
-        if (message.tick) {
-          const symbol = message.tick.symbol;
-          const quote = Number(message.tick.quote);
+        if (message.balance) {
+          const balance = message.balance;
+          const currency = balance.currency || selectedCurrency;
+          const amount = Number(balance.balance);
 
-          marketPrices[symbol] = quote;
+          $("balanceValue").textContent =
+            (currency ? currency + " " : "") +
+            amount.toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            });
 
-          if (!chartHistory[symbol]) chartHistory[symbol] = [];
-          chartHistory[symbol].push(quote);
+          $("balanceDetails").textContent =
+            "Account: " + accountId +
+            " · Type: " + accountType(account).toUpperCase();
 
-          if (chartHistory[symbol].length > 80) {
-            chartHistory[symbol].shift();
+          status(
+            "balanceStatus",
+            "Balance received from Deriv. Updates will appear while connected.",
+            "success"
+          );
+
+          if (message.subscription && message.subscription.id) {
+            balanceSubscriptionId = message.subscription.id;
           }
-
-          renderMarkets();
-
-          if (symbol === selectedChartMarket) drawChart();
         }
       };
 
-      marketSocket.onerror = function () {
-        setStatus(
-          "marketStatus",
-          "Market-data connection error. Check your internet connection.",
+      balanceSocket.onerror = function () {
+        if (accountId !== selectedAccountId) return;
+
+        status(
+          "balanceStatus",
+          "Balance connection failed. Check the account permissions and API response.",
           "error"
         );
       };
 
-      marketSocket.onclose = function () {
-        marketConnected = false;
-        setStatus("marketStatus", "Market data disconnected. Reconnecting…");
+      balanceSocket.onclose = function () {
+        if (accountId !== selectedAccountId) return;
 
-        reconnectAttempts++;
-        const delay = Math.min(15000, 1500 * reconnectAttempts);
-        reconnectTimer = setTimeout(connectMarkets, delay);
+        if ($("balanceValue").textContent === "Loading…") {
+          status(
+            "balanceStatus",
+            "The account connection closed before a balance arrived.",
+            "error"
+          );
+        }
       };
     } catch (error) {
-      setStatus(
-        "marketStatus",
-        "Could not start market data: " + error.message,
-        "error"
-      );
+      status("balanceStatus", error.message, "error");
+      $("balanceValue").textContent = "Unavailable";
+      $("balanceDetails").textContent =
+        "Could not retrieve this account's balance.";
+    } finally {
+      $("loadBalanceButton").disabled = false;
     }
   }
 
-  $("chartMarket").onchange = function () {
-    selectedChartMarket = this.value;
-    drawChart();
+  $("loadBalanceButton").onclick = loadSelectedBalance;
+
+  $("accountSelect").onchange = function () {
+    $("balanceValue").textContent = "—";
+    $("balanceDetails").textContent = "Load the selected account balance.";
+    status("balanceStatus", "Account selected. Tap Load Selected Account Balance.");
   };
 
-  $("refreshMarketsButton").onclick = function () {
-    if (marketSocket && marketSocket.readyState === WebSocket.OPEN) {
-      setStatus("marketStatus", "Market data is already connected.", "success");
-    } else {
-      connectMarkets();
+  $("refreshAccountsButton").onclick = async function () {
+    try {
+      await loadAccounts();
+    } catch (error) {
+      status("loginStatus", error.message, "error");
     }
   };
 
-  $("savePlanButton").onclick = function () {
-    const stake = Number($("demoStake").value);
-    const market = $("demoMarket").value;
-    const direction = $("demoDirection").value;
+  $("logoutButton").onclick = function () {
+    if (balanceSocket) {
+      try {
+        if (balanceSubscriptionId &&
+            balanceSocket.readyState === WebSocket.OPEN) {
+          balanceSocket.send(JSON.stringify({
+            forget: balanceSubscriptionId
+          }));
+        }
+        balanceSocket.close();
+      } catch (_) {}
+    }
 
-    if (!Number.isFinite(stake) || stake < 0.35) {
-      setStatus(
-        "planStatus",
-        "Enter a valid practice stake of at least 0.35.",
+    accessToken = null;
+    accounts = [];
+    selectedAccountId = null;
+    sessionStorage.removeItem("ck_access_token");
+    sessionStorage.removeItem("ck_verifier");
+    sessionStorage.removeItem("ck_state");
+
+    $("accountSelect").innerHTML =
+      '<option value="">Log in to load your accounts</option>';
+    $("accountSelect").disabled = true;
+    $("loadBalanceButton").disabled = true;
+    $("refreshAccountsButton").disabled = true;
+    $("balanceValue").textContent = "—";
+    $("balanceDetails").textContent = "No account connected.";
+    $("accountTypeBadge").textContent = "NOT CONNECTED";
+
+    status("loginStatus", "Logged out of this website.");
+    status("accountStatus", "No account selected.");
+    status("balanceStatus", "Waiting for account connection.");
+    $("loginButton").disabled = false;
+  };
+
+  async function startPage() {
+    const params = new URLSearchParams(location.search);
+    const code = params.get("code");
+    const oauthError = params.get("error");
+
+    if (oauthError) {
+      history.replaceState({}, document.title, REDIRECT_URI);
+      status(
+        "loginStatus",
+        "Deriv authorization error: " +
+          (params.get("error_description") || oauthError),
         "error"
       );
       return;
     }
 
-    setStatus(
-      "planStatus",
-      "Practice plan saved locally for " + market +
-      ": " + direction + ", practice stake " + stake.toFixed(2) +
-      ". No trade was placed.",
-      "success"
-    );
-  };
+    if (code) {
+      try {
+        await exchangeCode(code);
+      } catch (error) {
+        status(
+          "loginStatus",
+          "Login failed: " + error.message,
+          "error"
+        );
+      }
+      return;
+    }
 
-  $("helpButton").onclick = function () {
-    $("aiPanel").classList.toggle("open");
-  };
+    // Reuse this tab's existing session if it is still valid.
+    const savedToken = sessionStorage.getItem("ck_access_token");
 
-  $("closeHelpButton").onclick = function () {
-    $("aiPanel").classList.remove("open");
-  };
+    if (savedToken) {
+      accessToken = savedToken;
+      try {
+        await loadAccounts();
+      } catch (error) {
+        status(
+          "loginStatus",
+          "Could not reload account: " + error.message +
+          ". Log in again if your session has expired.",
+          "error"
+        );
+      }
+    }
+  }
 
-  // Start public market data and process a possible OAuth callback.
-  renderMarkets();
-  drawChart();
-  connectMarkets();
-
-  processOAuthCallback().catch(function (error) {
-    setLoginStatus(
-      "Startup error: " + (error.message || String(error)),
-      "error"
-    );
+  startPage().catch(function (error) {
+    status("loginStatus", "Startup error: " + error.message, "error");
   });
 })();
 </script>
