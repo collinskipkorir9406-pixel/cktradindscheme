@@ -54,8 +54,14 @@
       <option value="1HZ10V">Volatility 10 (1s) Index</option>
     </select>
     <div class="grid">
-      <div class="small-card"><strong>Selected Market</strong><p class="muted" id="market-name">Volatility 100 (1s) Index</p></div>
-      <div class="small-card"><strong>Public Data Status</strong><p class="status" id="status">Connecting...</p></div>
+      <div class="small-card">
+        <strong>Selected Market</strong>
+        <p class="muted" id="market-name">Volatility 100 (1s) Index</p>
+      </div>
+      <div class="small-card">
+        <strong>Public Data Status</strong>
+        <p class="status" id="status">Connecting...</p>
+      </div>
     </div>
     <h2>Latest Market Price</h2>
     <div class="price" id="price">Waiting for prices...</div>
@@ -67,8 +73,16 @@
   <section class="panel">
     <h2>Account Balances</h2>
     <div class="grid">
-      <div class="small-card"><strong>DEMO ACCOUNT</strong><div class="balance-amount" id="demo-balance">—</div><p class="muted" id="demo-balance-status">Sign in to load your demo balance.</p></div>
-      <div class="small-card"><strong>REAL ACCOUNT</strong><div class="balance-amount" id="real-balance">—</div><p class="muted" id="real-balance-status">Sign in to load your real balance.</p></div>
+      <div class="small-card">
+        <strong>DEMO ACCOUNT</strong>
+        <div class="balance-amount" id="demo-balance">—</div>
+        <p class="muted" id="demo-balance-status">Sign in to load your demo balance.</p>
+      </div>
+      <div class="small-card">
+        <strong>REAL ACCOUNT</strong>
+        <div class="balance-amount" id="real-balance">—</div>
+        <p class="muted" id="real-balance-status">Sign in to load your real balance.</p>
+      </div>
     </div>
     <p class="notice">Balances are displayed only when returned by Deriv.</p>
     <a class="button secondary" href="https://app.deriv.com/" target="_blank" rel="noopener noreferrer">Open Deriv</a>
@@ -77,21 +91,55 @@
   <section class="panel">
     <h2>Demo Trading</h2>
     <p class="notice">Demo practice only. Real-account purchasing is not implemented. Multiplier contracts can lose the entire stake.</p>
-    <div class="small-card"><strong>Trading account</strong><p class="status" id="demo-account-status">Not connected to a Demo trading session.</p></div>
+    <div class="small-card">
+      <strong>Trading account</strong>
+      <p class="status" id="demo-account-status">Not connected to a Demo trading session.</p>
+    </div>
+
     <label for="demo-contract">Contract type</label>
-    <select id="demo-contract"><option value="MULTUP">Multiplier Up</option><option value="MULTDOWN">Multiplier Down</option></select>
+    <select id="demo-contract">
+      <option value="MULTUP">Multiplier Up</option>
+      <option value="MULTDOWN">Multiplier Down</option>
+    </select>
+
     <label for="demo-stake">Stake in Demo currency</label>
     <input id="demo-stake" type="number" min="1" max="10" step="0.01" value="1">
+
     <label for="demo-multiplier">Multiplier</label>
-    <select id="demo-multiplier"><option value="10">10×</option><option value="20">20×</option><option value="30">30×</option><option value="40">40×</option><option value="50">50×</option></select>
+    <select id="demo-multiplier">
+      <option value="10">10×</option>
+      <option value="20">20×</option>
+      <option value="30">30×</option>
+      <option value="40">40×</option>
+      <option value="50">50×</option>
+    </select>
+
     <label for="demo-duration">Contract duration (informational)</label>
-    <select id="demo-duration"><option value="1">1 second</option><option value="5">5 seconds</option><option value="10">10 seconds</option><option value="30">30 seconds</option><option value="60">60 seconds</option></select>
+    <select id="demo-duration">
+      <option value="1">1 second</option>
+      <option value="5">5 seconds</option>
+      <option value="10">10 seconds</option>
+      <option value="30">30 seconds</option>
+      <option value="60">60 seconds</option>
+    </select>
+
     <button class="button" id="demo-connect" disabled>Connect Demo Trading</button>
     <button class="button secondary" id="demo-get-price" disabled>Get Demo Quote</button>
     <button class="button" id="demo-buy" disabled>Buy Demo Trade</button>
+
     <p class="status" id="demo-trade-status">Sign in first. No trade has been placed.</p>
-    <div class="small-card"><strong>Latest quote</strong><p id="demo-quote" class="muted">No quote received.</p><p id="demo-quote-expiry" class="muted"></p></div>
-    <div class="small-card"><strong>Latest trade result</strong><p id="demo-trade-result" class="muted">No Demo trade placed.</p></div>
+
+    <div class="small-card">
+      <strong>Latest quote</strong>
+      <p id="demo-quote" class="muted">No quote received.</p>
+      <p id="demo-quote-expiry" class="muted"></p>
+    </div>
+
+    <div class="small-card">
+      <strong>Latest trade result</strong>
+      <p id="demo-trade-result" class="muted">No Demo trade placed.</p>
+    </div>
+
     <p class="notice">Quotes expire. Review all terms and confirm each Demo purchase.</p>
   </section>
 
@@ -99,6 +147,7 @@
     <h2>Automation</h2>
     <p class="muted">Automated strategies are not enabled in this version.</p>
   </section>
+
   <footer>CK Trading Bot | Independent third-party interface</footer>
 </main>
 
@@ -120,306 +169,704 @@
     "1HZ10V":"Volatility 10 (1s) Index"
   };
 
-  let accessToken=null, demoAccount=null, demoSocket=null, publicSocket=null;
-  let balanceSockets=[], pending=new Map(), requestId=0, latestProposal=null;
-  let activeContractId=null, prices=[], decimals=2, reconnectTimer=null;
+  let accessToken = null;
+  let demoAccount = null;
+  let demoSocket = null;
+  let publicSocket = null;
+  let balanceSockets = [];
+  let pending = new Map();
+  let requestId = 0;
+  let latestProposal = null;
+  let activeContractId = null;
+  let prices = [];
+  let decimals = 2;
+  let reconnectTimer = null;
 
-  const canvas=$("chart"), ctx=canvas.getContext("2d");
-  const setStatus=(id,msg)=>$(id).textContent=msg;
+  const canvas = $("chart");
+  const ctx = canvas.getContext("2d");
+  const setStatus = (id, msg) => $(id).textContent = msg;
 
-  function money(value,currency) {
-    const n=Number(value), c=currency||"USD";
-    if(!Number.isFinite(n)) return "Unavailable";
-    try { return new Intl.NumberFormat("en-US",{style:"currency",currency:c}).format(n); }
-    catch(_) { return n.toFixed(2)+" "+c; }
+  function money(value, currency) {
+    const n = Number(value), c = currency || "USD";
+    if (!Number.isFinite(n)) return "Unavailable";
+    try {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency", currency: c
+      }).format(n);
+    } catch (_) {
+      return n.toFixed(2) + " " + c;
+    }
   }
 
   function randomString(length) {
-    const bytes=crypto.getRandomValues(new Uint8Array(length));
-    let s=""; bytes.forEach(b=>s+=String.fromCharCode(b));
-    return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+    const bytes = crypto.getRandomValues(new Uint8Array(length));
+    let s = "";
+    bytes.forEach(b => s += String.fromCharCode(b));
+    return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
   }
 
   async function challenge(verifier) {
-    const hash=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(verifier));
-    let s=""; new Uint8Array(hash).forEach(b=>s+=String.fromCharCode(b));
-    return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+    const hash = await crypto.subtle.digest(
+      "SHA-256", new TextEncoder().encode(verifier)
+    );
+    let s = "";
+    new Uint8Array(hash).forEach(b => s += String.fromCharCode(b));
+    return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
   }
 
   async function login() {
     try {
-      const verifier=randomString(64), state=randomString(24);
-      sessionStorage.setItem("ck_pkce_verifier",verifier);
-      sessionStorage.setItem("ck_oauth_state",state);
-      const url=new URL(AUTH_URL);
+      const verifier = randomString(64);
+      const state = randomString(24);
+      sessionStorage.setItem("ck_pkce_verifier", verifier);
+      sessionStorage.setItem("ck_oauth_state", state);
+
+      const url = new URL(AUTH_URL);
       Object.entries({
-        response_type:"code",client_id:APP_ID,redirect_uri:REDIRECT_URI,
-        scope:"trade account_manage",state,
-        code_challenge:await challenge(verifier),code_challenge_method:"S256"
-      }).forEach(([k,v])=>url.searchParams.set(k,v));
-      setStatus("login-status","Opening Deriv authorization...");
+        response_type: "code",
+        client_id: APP_ID,
+        redirect_uri: REDIRECT_URI,
+        scope: "trade account_manage",
+        state,
+        code_challenge: await challenge(verifier),
+        code_challenge_method: "S256"
+      }).forEach(([k, v]) => url.searchParams.set(k, v));
+
+      setStatus("login-status", "Opening Deriv authorization...");
       location.assign(url.toString());
-    } catch(e) { setStatus("login-status","Login could not start: "+e.message); }
+    } catch (e) {
+      setStatus("login-status", "Login could not start: " + e.message);
+    }
   }
 
-  async function fetchJson(url,options) {
-    const r=await fetch(url,options);
-    let d; try { d=await r.json(); } catch(_) { throw Error("Unreadable server response."); }
-    if(!r.ok) throw Error(d?.error?.message||d?.errors?.[0]?.message||d?.message||"Request failed.");
+  async function fetchJson(url, options) {
+    const r = await fetch(url, options);
+    let d;
+    try {
+      d = await r.json();
+    } catch (_) {
+      throw Error("Unreadable server response.");
+    }
+    if (!r.ok) {
+      throw Error(
+        d?.error?.message ||
+        d?.errors?.[0]?.message ||
+        d?.message ||
+        "Request failed."
+      );
+    }
     return d;
   }
 
   async function accounts(token) {
-    const r=await fetchJson("https://api.derivws.com/trading/v1/options/accounts",{
-      headers:{Authorization:"Bearer "+token,Accept:"application/json"}
-    });
-    const list=Array.isArray(r.data)?r.data:(r.data?[r.data]:[]);
-    const demo=list.find(a=>String(a.account_type).toLowerCase()==="demo");
-    const real=list.find(a=>String(a.account_type).toLowerCase()==="real");
-    showBalance(demo,"demo");
-    showBalance(real,"real");
-    if(demo) balanceStream(demo,token,"demo");
-    if(real) balanceStream(real,token,"real");
-    return {demo,real};
+    const r = await fetchJson(
+      "https://api.derivws.com/trading/v1/options/accounts",
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+          Accept: "application/json"
+        }
+      }
+    );
+
+    const list = Array.isArray(r.data) ? r.data : (r.data ? [r.data] : []);
+    const demo = list.find(a => String(a.account_type).toLowerCase() === "demo");
+    const real = list.find(a => String(a.account_type).toLowerCase() === "real");
+
+    showBalance(demo, "demo");
+    showBalance(real, "real");
+
+    if (demo) balanceStream(demo, token, "demo");
+    if (real) balanceStream(real, token, "real");
+
+    return { demo, real };
   }
 
-  function showBalance(a,type) {
-    $(type+"-balance").textContent=a&&a.balance!=null?money(a.balance,a.currency):"Unavailable";
-    $(type+"-balance-status").textContent=a?"Account returned by Deriv.":"No account returned.";
+  function showBalance(a, type) {
+    $(type + "-balance").textContent =
+      a && a.balance != null ? money(a.balance, a.currency) : "Unavailable";
+    $(type + "-balance-status").textContent =
+      a ? "Account returned by Deriv." : "No account returned.";
   }
 
-  async function balanceStream(a,token,type) {
-    if(!a.account_id) return;
+  async function balanceStream(a, token, type) {
+    if (!a.account_id) return;
+
     try {
-      const r=await fetchJson("https://api.derivws.com/trading/v1/options/accounts/"+encodeURIComponent(a.account_id)+"/otp",{
-        method:"POST",headers:{Authorization:"Bearer "+token,Accept:"application/json"}
-      });
-      if(!r?.data?.url) throw Error("No WebSocket URL returned.");
-      const ws=new WebSocket(r.data.url); balanceSockets.push(ws);
-      ws.onopen=()=>ws.send(JSON.stringify({balance:1,subscribe:1}));
-      ws.onmessage=e=>{
-        let d; try{d=JSON.parse(e.data)}catch(_){return}
-        if(d.error) {setStatus(type+"-balance-status",d.error.message);return}
-        if(d.msg_type==="balance"&&d.balance&&d.balance.balance!=null) {
-          $(type+"-balance").textContent=money(d.balance.balance,d.balance.currency||a.currency);
-          setStatus(type+"-balance-status","Live balance updates connected.");
+      const r = await fetchJson(
+        "https://api.derivws.com/trading/v1/options/accounts/" +
+        encodeURIComponent(a.account_id) + "/otp",
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + token,
+            Accept: "application/json"
+          }
+        }
+      );
+
+      if (!r?.data?.url) throw Error("No WebSocket URL returned.");
+
+      const ws = new WebSocket(r.data.url);
+      balanceSockets.push(ws);
+
+      ws.onopen = () => ws.send(JSON.stringify({ balance: 1, subscribe: 1 }));
+
+      ws.onmessage = e => {
+        let d;
+        try { d = JSON.parse(e.data); } catch (_) { return; }
+
+        if (d.error) {
+          setStatus(type + "-balance-status", d.error.message);
+          return;
+        }
+
+        if (d.msg_type === "balance" && d.balance &&
+            d.balance.balance != null) {
+          $(type + "-balance").textContent =
+            money(d.balance.balance, d.balance.currency || a.currency);
+          setStatus(type + "-balance-status", "Live balance updates connected.");
         }
       };
-    } catch(e) {setStatus(type+"-balance-status","Balance unavailable: "+e.message)}
+    } catch (e) {
+      setStatus(type + "-balance-status", "Balance unavailable: " + e.message);
+    }
   }
 
   async function callback() {
-    const p=new URLSearchParams(location.search), code=p.get("code"), state=p.get("state");
-    if(p.get("error")) {setStatus("login-status","Login error: "+p.get("error_description"));cleanUrl();return}
-    if(!code&&!state) return;
-    const saved=sessionStorage.getItem("ck_oauth_state");
-    const verifier=sessionStorage.getItem("ck_pkce_verifier");
-    if(!code||!state||state!==saved||!verifier) {
-      setStatus("login-status","Login state could not be verified. Please log in again.");cleanUrl();return;
+    const p = new URLSearchParams(location.search);
+    const code = p.get("code");
+    const state = p.get("state");
+
+    if (p.get("error")) {
+      setStatus("login-status", "Login error: " + p.get("error_description"));
+      cleanUrl();
+      return;
     }
+
+    if (!code && !state) return;
+
+    const saved = sessionStorage.getItem("ck_oauth_state");
+    const verifier = sessionStorage.getItem("ck_pkce_verifier");
+
+    if (!code || !state || state !== saved || !verifier) {
+      setStatus("login-status", "Login state could not be verified. Please log in again.");
+      cleanUrl();
+      return;
+    }
+
     sessionStorage.removeItem("ck_oauth_state");
-    setStatus("login-status","Verifying authorization...");
+    setStatus("login-status", "Verifying authorization...");
+
     try {
-      const r=await fetchJson(WORKER_URL,{
-        method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({code,code_verifier:verifier,client_id:APP_ID,redirect_uri:REDIRECT_URI})
+      const r = await fetchJson(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code,
+          code_verifier: verifier,
+          client_id: APP_ID,
+          redirect_uri: REDIRECT_URI
+        })
       });
+
       sessionStorage.removeItem("ck_pkce_verifier");
-      if(!r.access_token) throw Error("No access token returned.");
-      accessToken=r.access_token; cleanUrl();
-      const a=await accounts(accessToken); demoAccount=a.demo||null;
-      if(demoAccount) {
-        setStatus("demo-account-status","Demo account found. Connect to continue.");
-        $("demo-connect").disabled=false;
-      } else setStatus("demo-account-status","No Demo account returned.");
-      setStatus("login-status","Signed in to Deriv.");
-    } catch(e) {cleanUrl();setStatus("login-status","Login failed: "+e.message)}
+      if (!r.access_token) throw Error("No access token returned.");
+
+      accessToken = r.access_token;
+      cleanUrl();
+
+      const a = await accounts(accessToken);
+      demoAccount = a.demo || null;
+
+      if (demoAccount) {
+        setStatus("demo-account-status", "Demo account found. Connect to continue.");
+        $("demo-connect").disabled = false;
+      } else {
+        setStatus("demo-account-status", "No Demo account returned.");
+      }
+
+      setStatus("login-status", "Signed in to Deriv.");
+    } catch (e) {
+      cleanUrl();
+      setStatus("login-status", "Login failed: " + e.message);
+    }
   }
 
-  function cleanUrl() {history.replaceState({},document.title,location.pathname+location.hash)}
+  function cleanUrl() {
+    history.replaceState({}, document.title, location.pathname + location.hash);
+  }
 
-  function request(ws,payload) {
-    return new Promise((resolve,reject)=>{
-      if(!ws||ws.readyState!==WebSocket.OPEN) return reject(Error("Trading connection is not open."));
-      const id=++requestId;
-      const timer=setTimeout(()=>{pending.delete(id);reject(Error("Deriv did not respond in time."))},15000);
-      pending.set(id,{resolve,reject,timer});
-      ws.send(JSON.stringify({...payload,req_id:id}));
+  function request(ws, payload) {
+    return new Promise((resolve, reject) => {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        return reject(Error("Trading connection is not open."));
+      }
+
+      const id = ++requestId;
+      const timer = setTimeout(() => {
+        pending.delete(id);
+        reject(Error("Deriv did not respond in time."));
+      }, 15000);
+
+      pending.set(id, { resolve, reject, timer });
+
+      try {
+        ws.send(JSON.stringify({ ...payload, req_id: id }));
+      } catch (e) {
+        clearTimeout(timer);
+        pending.delete(id);
+        reject(e);
+      }
     });
   }
 
   async function connectDemo() {
-    if(!accessToken||!demoAccount?.account_id||String(demoAccount.account_type).toLowerCase()!=="demo") {
-      setStatus("demo-trade-status","A verified Demo account is required.");return;
+    if (!accessToken || !demoAccount?.account_id ||
+        String(demoAccount.account_type).toLowerCase() !== "demo") {
+      setStatus("demo-trade-status", "A verified Demo account is required.");
+      return;
     }
-    $("demo-connect").disabled=true;
-    setStatus("demo-trade-status","Requesting Demo session...");
+
+    $("demo-connect").disabled = true;
+    $("demo-get-price").disabled = true;
+    $("demo-buy").disabled = true;
+    setStatus("demo-trade-status", "Requesting Demo session...");
+
     try {
-      if(demoSocket) demoSocket.close();
-      const r=await fetchJson("https://api.derivws.com/trading/v1/options/accounts/"+encodeURIComponent(demoAccount.account_id)+"/otp",{
-        method:"POST",headers:{Authorization:"Bearer "+accessToken,Accept:"application/json"}
-      });
-      const wsUrl=r?.data?.url;
-      if(!wsUrl) throw Error("Deriv did not return a WebSocket URL.");
-      demoSocket=new WebSocket(wsUrl);
-      demoSocket.onopen=()=>{
-        setStatus("demo-trade-status","Demo WebSocket connected. Quote support still needs verification.");
-        setStatus("demo-account-status","Connected to Demo session.");
-        $("demo-get-price").disabled=false;$("demo-connect").disabled=false;
-      };
-      demoSocket.onmessage=e=>{
-        let d;try{d=JSON.parse(e.data)}catch(_){return}
-        if(d.req_id&&pending.has(d.req_id)) {
-          const p=pending.get(d.req_id);clearTimeout(p.timer);pending.delete(d.req_id);
-          if(d.error)p.reject(Error(d.error.message));else p.resolve(d);return;
+      if (demoSocket) demoSocket.close();
+
+      const r = await fetchJson(
+        "https://api.derivws.com/trading/v1/options/accounts/" +
+        encodeURIComponent(demoAccount.account_id) + "/otp",
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + accessToken,
+            Accept: "application/json"
+          }
         }
-        if(d.error){setStatus("demo-trade-status","Deriv error: "+d.error.message);return}
-        if(d.msg_type==="proposal_open_contract"&&d.proposal_open_contract) {
-          const c=d.proposal_open_contract;
-          setStatus("demo-trade-result","Contract "+(c.contract_id||activeContractId||"")+" · Status: "+(c.status||"pending")+" · Profit/Loss: "+money(c.profit,demoAccount.currency));
-          if(c.is_sold){activeContractId=null;setStatus("demo-trade-status","Demo contract settled.");}
+      );
+
+      const wsUrl = r?.data?.url;
+      if (!wsUrl) throw Error("Deriv did not return a WebSocket URL.");
+
+      demoSocket = new WebSocket(wsUrl);
+
+      demoSocket.onopen = () => {
+        setStatus("demo-trade-status", "Demo connection ready. Request a quote to continue.");
+        setStatus("demo-account-status", "Connected to Demo session.");
+        $("demo-get-price").disabled = false;
+        $("demo-connect").disabled = false;
+      };
+
+      demoSocket.onmessage = e => {
+        let d;
+        try { d = JSON.parse(e.data); } catch (_) { return; }
+
+        if (d.req_id && pending.has(d.req_id)) {
+          const p = pending.get(d.req_id);
+          clearTimeout(p.timer);
+          pending.delete(d.req_id);
+
+          if (d.error) p.reject(Error(d.error.message));
+          else p.resolve(d);
+          return;
+        }
+
+        if (d.error) {
+          setStatus("demo-trade-status", "Deriv error: " + d.error.message);
+          return;
+        }
+
+        if (d.msg_type === "proposal_open_contract" &&
+            d.proposal_open_contract) {
+          const c = d.proposal_open_contract;
+
+          setStatus(
+            "demo-trade-result",
+            "Contract " + (c.contract_id || activeContractId || "") +
+            " · Status: " + (c.status || "pending") +
+            " · Profit/Loss: " + money(c.profit, demoAccount.currency)
+          );
+
+          if (c.is_sold) {
+            activeContractId = null;
+            setStatus("demo-trade-status", "Demo contract settled.");
+            $("demo-buy").disabled = true;
+            $("demo-get-price").disabled = false;
+          }
         }
       };
-      demoSocket.onerror=()=>setStatus("demo-trade-status","Demo WebSocket error.");
-      demoSocket.onclose=()=>{
-        $("demo-get-price").disabled=true;$("demo-buy").disabled=true;
-        setStatus("demo-account-status","Demo connection closed.");
+
+      demoSocket.onerror = () => {
+        setStatus("demo-trade-status", "Demo WebSocket error.");
       };
-    } catch(e) {
-      setStatus("demo-trade-status","Could not connect: "+e.message);
-      $("demo-connect").disabled=false;
+
+      demoSocket.onclose = () => {
+        $("demo-get-price").disabled = true;
+        $("demo-buy").disabled = true;
+        $("demo-connect").disabled = false;
+        setStatus("demo-account-status", "Demo connection closed.");
+      };
+    } catch (e) {
+      setStatus("demo-trade-status", "Could not connect: " + e.message);
+      $("demo-connect").disabled = false;
     }
   }
 
   async function getQuote() {
-    if(!demoSocket||demoSocket.readyState!==WebSocket.OPEN||!demoAccount) {
-      setStatus("demo-trade-status","Connect the Demo account first.");return;
+    if (!demoSocket || demoSocket.readyState !== WebSocket.OPEN || !demoAccount) {
+      setStatus("demo-trade-status", "Connect the Demo account first.");
+      return;
     }
-    if(String(demoAccount.account_type).toLowerCase()!=="demo") {
-      setStatus("demo-trade-status","Safety check failed: this is not a Demo account.");return;
+
+    if (String(demoAccount.account_type).toLowerCase() !== "demo") {
+      setStatus("demo-trade-status", "Safety check failed: this is not a Demo account.");
+      return;
     }
-    const stake=Number($("demo-stake").value), mult=Number($("demo-multiplier").value);
-    if(!Number.isFinite(stake)||stake<1||stake>10) {
-      setStatus("demo-trade-status","Enter a stake between 1 and 10.");return;
+
+    const stake = Number($("demo-stake").value);
+    const mult = Number($("demo-multiplier").value);
+
+    if (!Number.isFinite(stake) || stake < 1 || stake > 10) {
+      setStatus("demo-trade-status", "Enter a stake between 1 and 10.");
+      return;
     }
-    latestProposal=null;$("demo-buy").disabled=true;$("demo-get-price").disabled=true;
-    setStatus("demo-trade-status","Requesting a Demo quote...");
+
+    latestProposal = null;
+    $("demo-buy").disabled = true;
+    $("demo-get-price").disabled = true;
+    setStatus("demo-trade-status", "Requesting a Demo quote...");
+
     try {
-      // Duration is deliberately omitted for this multiplier proposal request.
-      const r=await request(demoSocket,{
-        proposal:1,amount:stake,basis:"stake",
-        contract_type:$("demo-contract").value,
-        currency:demoAccount.currency||"USD",
-        duration_unit:"s",multiplier:mult,
-        underlying_symbol:$("market").value
+      const r = await request(demoSocket, {
+        proposal: 1,
+        amount: stake,
+        basis: "stake",
+        contract_type: $("demo-contract").value,
+        currency: demoAccount.currency || "USD",
+        duration_unit: "s",
+        multiplier: mult,
+        underlying_symbol: $("market").value
       });
-      if(!r.proposal?.id) throw Error("No proposal ID returned.");
-      const ask=Number(r.proposal.ask_price);
-      if(!Number.isFinite(ask)) throw Error("Proposal has no valid ask price.");
-      latestProposal={id:r.proposal.id,ask,stake,currency:demoAccount.currency||"USD",
-        symbol:$("market").value,type:$("demo-contract").value,created:Date.now()};
-      setStatus("demo-quote","Stake: "+money(stake,latestProposal.currency)+" · Purchase price: "+money(ask,latestProposal.currency));
-      setStatus("demo-quote-expiry","Market: "+(names[latestProposal.symbol]||latestProposal.symbol)+" · Request a new quote if it expires.");
-      setStatus("demo-trade-status","Quote received. Review before any Demo purchase.");
-      $("demo-buy").disabled=false;
-    } catch(e) {
-      setStatus("demo-trade-status","Quote failed: "+e.message);
-    } finally {$("demo-get-price").disabled=false}
+
+      if (!r.proposal?.id) throw Error("No proposal ID returned.");
+
+      const ask = Number(r.proposal.ask_price);
+      if (!Number.isFinite(ask)) throw Error("Proposal has no valid ask price.");
+
+      latestProposal = {
+        id: r.proposal.id,
+        ask,
+        stake,
+        currency: demoAccount.currency || "USD",
+        symbol: $("market").value,
+        type: $("demo-contract").value,
+        multiplier: mult,
+        created: Date.now()
+      };
+
+      setStatus(
+        "demo-quote",
+        "Stake: " + money(stake, latestProposal.currency) +
+        " · Purchase price: " + money(ask, latestProposal.currency)
+      );
+
+      setStatus(
+        "demo-quote-expiry",
+        "Market: " + (names[latestProposal.symbol] || latestProposal.symbol) +
+        " · Contract: " + latestProposal.type +
+        " · Multiplier: " + latestProposal.multiplier + "×"
+      );
+
+      setStatus("demo-trade-status", "Quote received. Review before a Demo purchase.");
+      $("demo-buy").disabled = false;
+    } catch (e) {
+      setStatus("demo-trade-status", "Quote failed: " + e.message);
+    } finally {
+      $("demo-get-price").disabled =
+        !demoSocket || demoSocket.readyState !== WebSocket.OPEN;
+    }
   }
 
   async function buyDemo() {
-    if(!latestProposal||!demoSocket||demoSocket.readyState!==WebSocket.OPEN||!demoAccount) {
-      setStatus("demo-trade-status","Request a fresh quote first.");return;
+    if (!latestProposal || !demoSocket ||
+        demoSocket.readyState !== WebSocket.OPEN || !demoAccount) {
+      setStatus("demo-trade-status", "Request a fresh quote first.");
+      return;
     }
-    if(String(demoAccount.account_type).toLowerCase()!=="demo") {
-      setStatus("demo-trade-status","Safety check failed: not a Demo account.");return;
+
+    if (String(demoAccount.account_type).toLowerCase() !== "demo") {
+      setStatus("demo-trade-status", "Safety check failed: not a Demo account.");
+      return;
     }
-    if(Date.now()-latestProposal.created>30000) {
-      latestProposal=null;$("demo-buy").disabled=true;
-      setStatus("demo-trade-status","Quote expired. Request a new quote.");return;
+
+    if (Date.now() - latestProposal.created > 30000) {
+      latestProposal = null;
+      $("demo-buy").disabled = true;
+      setStatus("demo-trade-status", "Quote expired. Request a new quote.");
+      return;
     }
-    const q=latestProposal;
-    if(!confirm("DEMO TRADE ONLY\nMarket: "+q.symbol+"\nContract: "+q.type+"\nStake: "+money(q.stake,q.currency)+"\nPrice: "+money(q.ask,q.currency)+"\n\nContinue with Demo purchase?")) {
-      setStatus("demo-trade-status","Purchase cancelled.");return;
+
+    const q = latestProposal;
+
+    if (!confirm(
+      "DEMO TRADE ONLY\n" +
+      "Market: " + q.symbol + "\n" +
+      "Contract: " + q.type + "\n" +
+      "Multiplier: " + q.multiplier + "×\n" +
+      "Stake: " + money(q.stake, q.currency) + "\n" +
+      "Purchase price: " + money(q.ask, q.currency) +
+      "\n\nContinue with Demo purchase?"
+    )) {
+      setStatus("demo-trade-status", "Purchase cancelled.");
+      return;
     }
-    $("demo-buy").disabled=true;$("demo-get-price").disabled=true;
+
+    $("demo-buy").disabled = true;
+    $("demo-get-price").disabled = true;
+    setStatus("demo-trade-status", "Submitting Demo purchase...");
+
+    let contractId;
+
     try {
-      if(String(demoAccount.account_type).toLowerCase()!=="demo") throw Error("Demo safety check failed.");
-      const r=await request(demoSocket,{buy:q.id,price:q.ask});
-      if(!r.buy?.contract_id) throw Error("Deriv did not confirm a contract ID.");
-      activeContractId=r.buy.contract_id;
-      setStatus("demo-trade-result","Demo purchase accepted. Contract ID: "+activeContractId);
-      setStatus("demo-trade-status","Demo purchase accepted; waiting for contract updates.");
-      await request(demoSocket,{proposal_open_contract:1,contract_id:activeContractId,subscribe:1});
-      latestProposal=null;
-    } catch(e) {setStatus("demo-trade-status","Purchase failed or unconfirmed: "+e.message)}
-    finally {$("demo-get-price").disabled=false}
+      // Submit the purchase only once.
+      const r = await request(demoSocket, {
+        buy: q.id,
+        price: q.ask
+      });
+
+      if (!r.buy || !r.buy.contract_id) {
+        latestProposal = null;
+        setStatus(
+          "demo-trade-status",
+          "Purchase not confirmed. Check Deriv transaction history before retrying."
+        );
+        return;
+      }
+
+      contractId = r.buy.contract_id;
+      activeContractId = contractId;
+      latestProposal = null;
+
+      setStatus(
+        "demo-trade-result",
+        "Deriv returned a contract ID: " + contractId
+      );
+
+      setStatus(
+        "demo-trade-status",
+        "Purchase accepted by Deriv. Checking contract updates..."
+      );
+
+    } catch (e) {
+      latestProposal = null;
+      setStatus(
+        "demo-trade-status",
+        "Purchase outcome uncertain: " + e.message +
+        ". Check Deriv transaction history before trying again."
+      );
+      return;
+
+    } finally {
+      $("demo-get-price").disabled =
+        !demoSocket || demoSocket.readyState !== WebSocket.OPEN;
+    }
+
+    // Monitor the contract separately from the purchase request.
+    try {
+      await request(demoSocket, {
+        proposal_open_contract: 1,
+        contract_id: contractId,
+        subscribe: 1
+      });
+
+      setStatus(
+        "demo-trade-status",
+        "Purchase accepted. Contract updates requested."
+      );
+
+    } catch (e) {
+      setStatus(
+        "demo-trade-status",
+        "Purchase was accepted (contract " + contractId +
+        "), but contract updates failed: " + e.message +
+        ". Check Deriv for the current contract status."
+      );
+    }
   }
 
   function drawChart() {
-    const w=canvas.width,h=canvas.height;ctx.clearRect(0,0,w,h);
-    ctx.strokeStyle="#263950";ctx.lineWidth=1;
-    for(let i=1;i<4;i++){const y=h*i/4;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
-    if(prices.length<2){ctx.fillStyle="#aab8cb";ctx.font="16px Arial";ctx.fillText("Waiting for market prices...",18,35);return}
-    const min=Math.min(...prices),max=Math.max(...prices),range=max-min||1,pad=20;
-    ctx.beginPath();ctx.strokeStyle="#28d7a1";ctx.lineWidth=3;
-    prices.forEach((v,i)=>{const x=pad+i*(w-2*pad)/(prices.length-1),y=h-pad-((v-min)/range)*(h-2*pad);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = "#263950";
+    ctx.lineWidth = 1;
+
+    for (let i = 1; i < 4; i++) {
+      const y = h * i / 4;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(w, y);
+      ctx.stroke();
+    }
+
+    if (prices.length < 2) {
+      ctx.fillStyle = "#aab8cb";
+      ctx.font = "16px Arial";
+      ctx.fillText("Waiting for market prices...", 18, 35);
+      return;
+    }
+
+    const min = Math.min(...prices);
+    const max = Math.max(...prices);
+    const range = max - min || 1;
+    const pad = 20;
+
+    ctx.beginPath();
+    ctx.strokeStyle = "#28d7a1";
+    ctx.lineWidth = 3;
+
+    prices.forEach((v, i) => {
+      const x = pad + i * (w - 2 * pad) / (prices.length - 1);
+      const y = h - pad - ((v - min) / range) * (h - 2 * pad);
+      if (i) ctx.lineTo(x, y);
+      else ctx.moveTo(x, y);
+    });
+
     ctx.stroke();
   }
 
   function connectMarket() {
     clearTimeout(reconnectTimer);
-    if(publicSocket){try{publicSocket.close()}catch(_){}}
-    prices=[];drawChart();setStatus("status","Connecting to public market data...");
-    setStatus("price","Waiting for prices...");
-    try{publicSocket=new WebSocket(MARKET_ENDPOINT)}
-    catch(e){setStatus("status","Connection failed: "+e.message);return}
-    publicSocket.onopen=()=>publicSocket.send(JSON.stringify({ticks:$("market").value,subscribe:1}));
-    publicSocket.onmessage=e=>{
-      let d;try{d=JSON.parse(e.data)}catch(_){return}
-      if(d.error){setStatus("status","Market API error: "+d.error.message);return}
-      if(d.msg_type==="tick"&&d.tick){
-        const n=Number(d.tick.quote);if(!Number.isFinite(n))return;
-        decimals=Number.isInteger(d.tick.pip_size)?d.tick.pip_size:2;
-        prices.push(n);if(prices.length>100)prices.shift();drawChart();
-        setStatus("price",n.toFixed(decimals));
-        setStatus("updated","Last updated: "+new Date().toLocaleTimeString());
-        setStatus("status","Live market data connected.");
+
+    if (publicSocket) {
+      try { publicSocket.close(); } catch (_) {}
+    }
+
+    prices = [];
+    drawChart();
+    setStatus("status", "Connecting to public market data...");
+    setStatus("price", "Waiting for prices...");
+
+    try {
+      publicSocket = new WebSocket(MARKET_ENDPOINT);
+    } catch (e) {
+      setStatus("status", "Connection failed: " + e.message);
+      return;
+    }
+
+    publicSocket.onopen = () => {
+      publicSocket.send(JSON.stringify({
+        ticks: $("market").value,
+        subscribe: 1
+      }));
+    };
+
+    publicSocket.onmessage = e => {
+      let d;
+      try { d = JSON.parse(e.data); } catch (_) { return; }
+
+      if (d.error) {
+        setStatus("status", "Market API error: " + d.error.message);
+        return;
+      }
+
+      if (d.msg_type === "tick" && d.tick) {
+        const n = Number(d.tick.quote);
+        if (!Number.isFinite(n)) return;
+
+        decimals = Number.isInteger(d.tick.pip_size) ? d.tick.pip_size : 2;
+        prices.push(n);
+        if (prices.length > 100) prices.shift();
+        drawChart();
+
+        setStatus("price", n.toFixed(decimals));
+        setStatus("updated", "Last updated: " + new Date().toLocaleTimeString());
+        setStatus("status", "Live market data connected.");
       }
     };
-    publicSocket.onerror=()=>setStatus("status","Market data connection error.");
-    publicSocket.onclose=()=>{setStatus("status","Market data disconnected; retrying...");reconnectTimer=setTimeout(connectMarket,5000)};
+
+    publicSocket.onerror = () => {
+      setStatus("status", "Market data connection error.");
+    };
+
+    publicSocket.onclose = () => {
+      setStatus("status", "Market data disconnected; retrying...");
+      reconnectTimer = setTimeout(connectMarket, 5000);
+    };
   }
 
   function disconnect() {
-    accessToken=null;demoAccount=null;latestProposal=null;activeContractId=null;
-    if(demoSocket){try{demoSocket.close()}catch(_){}demoSocket=null}
-    balanceSockets.forEach(ws=>{try{ws.close()}catch(_){}});balanceSockets=[];
-    pending.forEach(p=>{clearTimeout(p.timer);p.reject(Error("Disconnected."))});pending.clear();
-    ["demo-connect","demo-get-price","demo-buy"].forEach(id=>$(id).disabled=true);
-    ["demo-balance","real-balance"].forEach(id=>setStatus(id,"—"));
-    setStatus("demo-account-status","Not connected to a Demo session.");
-    setStatus("demo-trade-status","Disconnected. No further trades can be submitted.");
-    setStatus("login-status","Disconnected. Log in again to use account features.");
-    setStatus("demo-balance-status","Not connected.");
-    setStatus("real-balance-status","Not connected.");
+    accessToken = null;
+    demoAccount = null;
+    latestProposal = null;
+    activeContractId = null;
+
+    if (demoSocket) {
+      try { demoSocket.close(); } catch (_) {}
+      demoSocket = null;
+    }
+
+    balanceSockets.forEach(ws => {
+      try { ws.close(); } catch (_) {}
+    });
+    balanceSockets = [];
+
+    pending.forEach(p => {
+      clearTimeout(p.timer);
+      p.reject(Error("Disconnected."));
+    });
+    pending.clear();
+
+    ["demo-connect", "demo-get-price", "demo-buy"].forEach(id => {
+      $(id).disabled = true;
+    });
+
+    ["demo-balance", "real-balance"].forEach(id => {
+      setStatus(id, "—");
+    });
+
+    setStatus("demo-account-status", "Not connected to a Demo session.");
+    setStatus("demo-trade-status", "Disconnected. Log in again to use account features.");
+    setStatus("login-status", "Disconnected. Log in again to use account features.");
+    setStatus("demo-balance-status", "Not connected.");
+    setStatus("real-balance-status", "Not connected.");
+    setStatus("demo-quote", "No quote received.");
+    setStatus("demo-quote-expiry", "");
+    setStatus("demo-trade-result", "No Demo trade placed.");
   }
 
-  $("login-button").addEventListener("click",login);
-  $("logout-button").addEventListener("click",disconnect);
-  $("demo-connect").addEventListener("click",connectDemo);
-  $("demo-get-price").addEventListener("click",getQuote);
-  $("demo-buy").addEventListener("click",buyDemo);
-  $("market").addEventListener("change",()=>{
-    $("market-name").textContent=names[$("market").value]||$("market").value;
-    latestProposal=null;$("demo-buy").disabled=true;connectMarket();
-  });
-  ["demo-stake","demo-multiplier","demo-contract","demo-duration"].forEach(id=>{
-    $(id).addEventListener("change",()=>{latestProposal=null;$("demo-buy").disabled=true});
-  });
-  $("demo-stake").addEventListener("input",()=>{latestProposal=null;$("demo-buy").disabled=true});
+  $("login-button").addEventListener("click", login);
+  $("logout-button").addEventListener("click", disconnect);
+  $("demo-connect").addEventListener("click", connectDemo);
+  $("demo-get-price").addEventListener("click", getQuote);
+  $("demo-buy").addEventListener("click", buyDemo);
 
-  drawChart();connectMarket();callback();
+  $("market").addEventListener("change", () => {
+    $("market-name").textContent =
+      names[$("market").value] || $("market").value;
+    latestProposal = null;
+    $("demo-buy").disabled = true;
+    connectMarket();
+  });
+
+  ["demo-stake", "demo-multiplier", "demo-contract", "demo-duration"].forEach(id => {
+    $(id).addEventListener("change", () => {
+      latestProposal = null;
+      $("demo-buy").disabled = true;
+      setStatus("demo-quote", "Settings changed. Request a new quote.");
+    });
+  });
+
+  $("demo-stake").addEventListener("input", () => {
+    latestProposal = null;
+    $("demo-buy").disabled = true;
+  });
+
+  drawChart();
+  connectMarket();
+  callback();
 })();
 </script>
 </body>
