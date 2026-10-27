@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="deriv-site-verification" content="ded285725a66c864612bf8d91ba4de4b63642ce64f6dd2f14fed08d232275b4a">
-<title>CK Trading Bot</title>
+<title>CK Trading Bot — Pro Workspace</title>
 <meta name="theme-color" content="#07111f">
 <style>
 :root{--bg:#07111f;--panel:#101e30;--panel2:#14253a;--line:#263b53;--text:#eef5ff;--muted:#9bb0c8;--green:#27d99a;--red:#ff647c;--blue:#60a5fa;--gold:#f5c451}
@@ -34,6 +34,10 @@ label{display:block;color:var(--muted);font-size:13px;margin:10px 0}
 table{width:100%;border-collapse:collapse;font-size:13px;min-width:470px}
 th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left}
 th{color:var(--muted)}canvas{width:100%;height:180px;display:block;background:#091625;border-radius:10px}
+.digit-bars{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-top:10px;align-items:end;height:80px;background:#091625;padding:8px;border-radius:8px;border:1px solid var(--line)}
+.bar-col{display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end}
+.bar-fill{width:100%;background:var(--blue);border-radius:3px 3px 0 0;min-height:4px}
+.bar-label{font-size:11px;color:var(--muted);margin-top:4px}
 @media(max-width:650px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}.market-grid{grid-template-columns:1fr 1fr}}
 </style>
 </head>
@@ -41,8 +45,8 @@ th{color:var(--muted)}canvas{width:100%;height:180px;display:block;background:#0
 <header>
   <div class="head">
     <div>
-      <h1>CK Trading Bot</h1>
-      <div class="muted">Structured Trading Workspace · Powered by Deriv</div>
+      <h1>CK Trading Bot Pro</h1>
+      <div class="muted">Advanced Structured Workspace · Deriv API Connected</div>
     </div>
     <button class="primary" id="loginBtn">Log In to Deriv</button>
   </div>
@@ -72,67 +76,94 @@ th{color:var(--muted)}canvas{width:100%;height:180px;display:block;background:#0
 
 <section class="panel wide">
   <div class="row between">
-    <h2>Live Markets</h2><button id="refreshMarketsBtn">Refresh Markets</button>
+    <h2>Live Markets & Digit Analyzer</h2><button id="refreshMarketsBtn">Refresh Markets</button>
   </div>
   <div class="market-grid" id="markets"></div>
-  <p class="muted">Live quotes are market data, not trading recommendations.</p>
-  <canvas id="chart" width="900" height="240"></canvas>
+  <p class="muted" style="margin:12px 0 4px">Last Digit Distribution (Last 100 ticks for selected symbol):</p>
+  <div class="digit-bars" id="digitBars"></div>
+  <canvas id="chart" width="900" height="200" style="margin-top:12px"></canvas>
   <div id="marketStatus" class="status">Connecting to market data…</div>
 </section>
 
 <section class="panel">
   <h2>Manual Trading</h2>
   <label>Market<select id="manualSymbol"></select></label>
-  <label>Direction
-    <select id="manualDirection">
-      <option value="CALL">Rise</option><option value="PUT">Fall</option>
+  <label>Contract Type
+    <select id="manualContractType">
+      <option value="CALL">Rise (CALL)</option>
+      <option value="PUT">Fall (PUT)</option>
+      <option value="DIGITMATCH">Digit Match</option>
+      <option value="DIGITDIFF">Digit Differs</option>
+      <option value="DIGITOVER">Digit Over</option>
+      <option value="DIGITUNDER">Digit Under</option>
+      <option value="DIGITEVEN">Digit Even</option>
+      <option value="DIGITODD">Digit Odd</option>
     </select>
   </label>
+  <div id="manualDigitWrapper" style="display:none">
+    <label>Prediction Digit (0-9)<input id="manualDigit" type="number" min="0" max="9" value="5"></label>
+  </div>
   <label>Stake amount<input id="manualStake" type="number" min="0.35" step="0.01" value="1"></label>
-  <label>Duration
+  <label>Duration (Ticks)
     <select id="manualDuration">
-      <option value="5">5 ticks</option><option value="10">10 ticks</option>
-      <option value="15">15 ticks</option><option value="20">20 ticks</option>
+      <option value="1">1 tick</option><option value="5">5 ticks</option>
+      <option value="10">10 ticks</option><option value="15">15 ticks</option>
     </select>
   </label>
   <label class="check">
     <input id="realConfirm" type="checkbox">
     <span>I understand that real-account trades can lose real money.</span>
   </label>
-  <button class="primary full" id="manualTradeBtn" disabled>Get Quote & Place Trade</button>
+  <button class="primary full" id="manualTradeBtn" disabled>Place Order</button>
   <div id="manualStatus" class="status">Connect a Deriv account before trading.</div>
 </section>
 
 <section class="panel">
-  <h2>Bot Controls</h2>
+  <h2>Bot Controls & Strategy Hub</h2>
   <label>Strategy
     <select id="strategySelect">
       <option value="nexus">Nexus Flow — EMA trend + momentum</option>
       <option value="volt">Volt Sprint — momentum breakout</option>
-      <option value="apex">Apex Signal — trend + RSI-style filter</option>
+      <option value="apex">Apex Signal — trend + RSI filter</option>
+      <option value="digit_under">Digit Under AI (Target Under 7)</option>
+      <option value="digit_even">Digit Parity Engine (Even Bot)</option>
     </select>
   </label>
   <label>Market<select id="botSymbol"></select></label>
-  <label>Stake per trade<input id="botStake" type="number" min="0.35" step="0.01" value="1"></label>
-  <label>Maximum trades per run<input id="maxTrades" type="number" min="1" max="100" step="1" value="5"></label>
-  <label>Session loss limit (0 disables limit)
-    <input id="maxLoss" type="number" min="0" step="0.01" value="5">
-  </label>
+  <label>Base Stake<input id="botStake" type="number" min="0.35" step="0.01" value="1"></label>
+  
+  <div class="row">
+    <div style="flex:1">
+      <label>Max Trades<input id="maxTrades" type="number" min="1" max="500" value="10"></label>
+    </div>
+    <div style="flex:1">
+      <label>Target Profit ($)<input id="targetProfit" type="number" min="0" step="0.01" value="10"></label>
+    </div>
+  </div>
+
+  <div class="row">
+    <div style="flex:1">
+      <label>Session Loss Limit ($)<input id="maxLoss" type="number" min="0" step="0.01" value="5"></label>
+    </div>
+    <div style="flex:1">
+      <label>Martingale Multiplier<input id="martingaleMultiplier" type="number" min="1" step="0.1" value="2.0"></label>
+    </div>
+  </div>
+
   <label class="check">
     <input id="botRealConfirm" type="checkbox">
     <span>I authorize automated real-money orders if I select a real account.</span>
   </label>
-  <div class="row">
+  <div class="row" style="margin-top:10px">
     <button class="primary" id="startBotBtn" disabled>Start Bot</button>
     <button class="danger" id="stopBotBtn" disabled>Emergency Stop</button>
   </div>
   <div id="botStatus" class="status">Bot stopped.</div>
-  <p class="muted small">Strategies are rule-based and do not guarantee profit. Stop the bot before changing settings.</p>
 </section>
 
 <section class="panel">
-  <h2>Load Bot</h2>
-  <p class="muted">Save settings on this device.</p>
+  <h2>Storage & Backup</h2>
+  <p class="muted">Save or reload your preset configurations safely.</p>
   <button class="blue full" id="saveConfigBtn">Save Configuration</button>
   <button class="full" id="loadConfigBtn">Load Configuration</button>
   <div id="configStatus" class="status"></div>
@@ -147,10 +178,10 @@ th{color:var(--muted)}canvas{width:100%;height:180px;display:block;background:#0
 </section>
 
 <section class="panel wide">
-  <h2>Trade History</h2>
+  <h2>Trade History Log</h2>
   <div class="scroll">
     <table>
-      <thead><tr><th>Time</th><th>Market</th><th>Direction</th><th>Stake</th><th>Result</th><th>P/L</th></tr></thead>
+      <thead><tr><th>Time</th><th>Market</th><th>Contract</th><th>Stake</th><th>Result</th><th>P/L</th></tr></thead>
       <tbody id="historyBody"><tr><td colspan="6">No completed trades yet.</td></tr></tbody>
     </table>
   </div>
@@ -162,8 +193,6 @@ th{color:var(--muted)}canvas{width:100%;height:180px;display:block;background:#0
 <script>
 "use strict";
 
-/* CK Trading Bot — OAuth token exchange handled by Cloudflare Worker.
-   Never put a client secret or private credential in this public file. */
 const APP_ID = "34JjnKJzecylG5kwmjaXm";
 const REDIRECT_URI = "https://collinskipkorir9406-pixel.github.io/cktradindscheme/";
 const WORKER_URL = "https://steep-snow-a539.collinskipkorir70.workers.dev/";
@@ -193,16 +222,19 @@ let requestId = 1;
 let pending = new Map();
 let marketTicks = {};
 let chartPoints = [];
+let digitHistory = {}; // symbol -> array of last digits
 let completedTrades = [];
 let openContracts = new Map();
+
 let botRunning = false;
 let botBusy = false;
 let botTrades = 0;
 let botSessionStartPL = 0;
+let botSessionPL = 0;
+let currentStake = 1;
 let lastBotTradeAt = 0;
 let lastBotTickAt = 0;
 let botSymbolActive = "";
-let botSessionPL = 0;
 let balanceValue = null;
 let connectionAttempt = 0;
 
@@ -324,25 +356,17 @@ async function handleOAuthCallback() {
     const response = await fetch(WORKER_URL, {
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        code,
-        code_verifier:verifier,
-        redirect_uri:REDIRECT_URI,
-        client_id:APP_ID
-      })
+      body:JSON.stringify({code, code_verifier:verifier, redirect_uri:REDIRECT_URI, client_id:APP_ID})
     });
 
     const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.error || result.message || "Token exchange failed (HTTP " + response.status + ").");
-    }
+    if (!response.ok) throw new Error(result.error || "Token exchange failed.");
 
-    const token = result.access_token || result.accessToken || result.token ||
-      (result.data && (result.data.access_token || result.data.token));
+    const token = result.access_token || result.accessToken || result.token || (result.data && result.data.access_token);
     if (!token) throw new Error("Worker did not return an access token.");
 
     accessToken = token;
-    const expiresIn = Number(result.expires_in || result.expiresIn || 3600);
+    const expiresIn = Number(result.expires_in || 3600);
     oauthExpiry = Date.now() + expiresIn * 1000;
 
     sessionStorage.setItem("ck_deriv_access_token", accessToken);
@@ -368,24 +392,13 @@ async function apiFetch(path, options={}) {
   if (!accessToken) throw new Error("Please log in to Deriv first.");
   if (oauthExpiry && Date.now() >= oauthExpiry) {
     logout(false);
-    throw new Error("Your Deriv login has expired. Please log in again.");
+    throw new Error("Your login has expired. Please log in again.");
   }
-
-  const headers = Object.assign({
-    "Authorization":"Bearer " + accessToken,
-    "Accept":"application/json"
-  }, options.headers || {});
-
+  const headers = Object.assign({"Authorization":"Bearer " + accessToken, "Accept":"application/json"}, options.headers || {});
   const response = await fetch(API_BASE + path, {...options, headers});
   let data = {};
   try { data = await response.json(); } catch (_) {}
-
-  if (!response.ok) {
-    const msg = data.message ||
-      (data.errors && data.errors[0] && data.errors[0].message) ||
-      "Deriv API request failed (HTTP " + response.status + ").";
-    throw new Error(msg);
-  }
+  if (!response.ok) throw new Error(data.message || "Deriv API request failed.");
   return data;
 }
 
@@ -393,7 +406,6 @@ function findAccounts(result) {
   if (Array.isArray(result)) return result;
   if (Array.isArray(result.data)) return result.data;
   if (result.data && Array.isArray(result.data.accounts)) return result.data.accounts;
-  if (Array.isArray(result.accounts)) return result.accounts;
   return [];
 }
 
@@ -401,10 +413,7 @@ async function loadAccounts() {
   try {
     const result = await apiFetch("/trading/v1/options/accounts");
     accounts = findAccounts(result);
-
-    if (!accounts.length) {
-      throw new Error("No trading accounts returned. Check the Deriv app permissions.");
-    }
+    if (!accounts.length) throw new Error("No accounts found.");
 
     $("accountSelect").innerHTML = "";
     accounts.forEach((a, i) => {
@@ -412,8 +421,7 @@ async function loadAccounts() {
       const type = String(a.account_type || a.type || "account").toUpperCase();
       const opt = document.createElement("option");
       opt.value = String(id || "");
-      opt.textContent = type + " · " + (id || "Account " + (i+1)) +
-        (a.currency ? " " + a.currency : "");
+      opt.textContent = type + " · " + (id || "Account " + (i+1)) + (a.currency ? " " + a.currency : "");
       $("accountSelect").appendChild(opt);
     });
 
@@ -421,16 +429,14 @@ async function loadAccounts() {
     $("logoutBtn").disabled = false;
     $("loginBtn").textContent = "Connected to Deriv";
 
-    /* Prefer a real account only when Deriv explicitly identifies it as real.
-       Otherwise select the first available account. */
     const preferred = accounts.find(isRealAccount) || accounts[0];
     selectedAccount = preferred;
     $("accountSelect").value = String(accountId(preferred) || "");
     updateAccountLabels();
 
-    setStatus("loginStatus", "Signed in. Review the selected account, then connect.");
+    setStatus("loginStatus", "Signed in successfully.");
     $("connectAccountBtn").disabled = false;
-    setStatus("accountStatus", "Account selected. Tap Connect Account to connect.");
+    setStatus("accountStatus", "Account selected. Tap Connect Account.");
   } catch (e) {
     setStatus("loginStatus", e.message, "red");
   }
@@ -439,9 +445,8 @@ async function loadAccounts() {
 function updateAccountLabels() {
   if (!selectedAccount) return;
   const real = isRealAccount(selectedAccount);
-  $("accountType").textContent = real ? "REAL ACCOUNT" : "DEMO / UNCONFIRMED";
+  $("accountType").textContent = real ? "REAL ACCOUNT" : "DEMO ACCOUNT";
   $("accountType").className = "stat " + (real ? "gold" : "green");
-  $("accountSelect").value = String(accountId(selectedAccount) || "");
 }
 
 function closeTradeConnection() {
@@ -453,13 +458,8 @@ function closeTradeConnection() {
     try { tradeWS.close(); } catch (_) {}
   }
   tradeWS = null;
-
-  pending.forEach(p => {
-    clearTimeout(p.timeout);
-    p.reject(new Error("Account connection changed."));
-  });
+  pending.forEach(p => { clearTimeout(p.timeout); p.reject(new Error("Connection changed.")); });
   pending.clear();
-
   $("manualTradeBtn").disabled = true;
   $("startBotBtn").disabled = true;
   stopBot("Trading connection closed.");
@@ -468,25 +468,18 @@ function closeTradeConnection() {
 async function connectSelectedAccount() {
   const id = $("accountSelect").value;
   const account = accounts.find(a => String(accountId(a)) === String(id));
-
-  if (!account) throw new Error("Select a valid Deriv account.");
+  if (!account) throw new Error("Select a valid account.");
   selectedAccount = account;
   updateAccountLabels();
   closeTradeConnection();
 
   const attempt = connectionAttempt;
-  setStatus("accountStatus", "Requesting a secure account connection…");
+  setStatus("accountStatus", "Connecting securely…");
 
   try {
-    const otpResult = await apiFetch(
-      "/trading/v1/options/accounts/" + encodeURIComponent(accountId(account)) + "/otp",
-      {method:"POST"}
-    );
-
+    const otpResult = await apiFetch("/trading/v1/options/accounts/" + encodeURIComponent(accountId(account)) + "/otp", {method:"POST"});
     const wsUrl = otpResult && otpResult.data && otpResult.data.url;
-    if (!wsUrl || !wsUrl.startsWith("wss://")) {
-      throw new Error("Deriv did not return a valid secure WebSocket URL.");
-    }
+    if (!wsUrl || !wsUrl.startsWith("wss://")) throw new Error("Invalid secure socket URL.");
 
     if (attempt !== connectionAttempt) return;
     const ws = new WebSocket(wsUrl);
@@ -494,8 +487,7 @@ async function connectSelectedAccount() {
 
     ws.onopen = async () => {
       if (tradeWS !== ws) return;
-      setStatus("accountStatus", "Trading connection open. Checking account…", "green");
-
+      setStatus("accountStatus", "Connection active. Syncing balance…", "green");
       try {
         const response = await sendWS({balance:1, subscribe:1});
         if (response.balance) {
@@ -504,9 +496,9 @@ async function connectSelectedAccount() {
         }
         $("manualTradeBtn").disabled = false;
         $("startBotBtn").disabled = false;
-        setStatus("accountStatus", "Account connected. Check account type before placing orders.", "green");
+        setStatus("accountStatus", "Ready for trading.", "green");
       } catch (e) {
-        setStatus("accountStatus", "Connected, but account check failed: " + e.message, "red");
+        setStatus("accountStatus", "Sync error: " + e.message, "red");
       }
     };
 
@@ -518,23 +510,14 @@ async function connectSelectedAccount() {
       handleTradeMessage(data);
     };
 
-    ws.onerror = () => {
-      if (tradeWS === ws) {
-        setStatus("accountStatus", "WebSocket error. Check the account permissions and reconnect.", "red");
-      }
-    };
-
+    ws.onerror = () => { if (tradeWS === ws) setStatus("accountStatus", "WebSocket connection error.", "red"); };
     ws.onclose = event => {
       if (tradeWS !== ws) return;
       tradeWS = null;
       $("manualTradeBtn").disabled = true;
       $("startBotBtn").disabled = true;
-      stopBot("Trading connection closed.");
-
-      const reason = event.reason ? " Reason: " + event.reason : "";
-      setStatus("accountStatus",
-        "Trading connection closed (code " + event.code + ")." + reason +
-        " Tap Connect Account to retry.", "red");
+      stopBot("Connection dropped.");
+      setStatus("accountStatus", "Disconnected (Code " + event.code + ").", "red");
     };
   } catch (e) {
     setStatus("accountStatus", "Connection failed: " + e.message, "red");
@@ -554,33 +537,27 @@ function logout(showMessage=true) {
   $("accountSelect").innerHTML = '<option value="">Log in first</option>';
   $("accountSelect").disabled = true;
   $("connectAccountBtn").disabled = true;
-  $("manualTradeBtn").disabled = true;
-  $("startBotBtn").disabled = true;
   $("logoutBtn").disabled = true;
   $("loginBtn").textContent = "Log In to Deriv";
   $("balance").textContent = "—";
   $("accountType").textContent = "—";
   setStatus("accountStatus", "Not connected.");
-  setStatus("loginStatus", showMessage ? "Logged out." : "Session cleared.");
+  setStatus("loginStatus", showMessage ? "Logged out." : "Cleared.");
 }
 
-/* Public feed: subscribe to every selectable symbol. */
 function connectPublicMarkets() {
   if (publicWS) {
     publicWS.onclose = null;
     try { publicWS.close(); } catch (_) {}
   }
-
-  setStatus("marketStatus", "Connecting to public market feed…");
+  setStatus("marketStatus", "Connecting to live market feed…");
   const ws = new WebSocket(PUBLIC_WS_URL);
   publicWS = ws;
 
   ws.onopen = () => {
     if (publicWS !== ws) return;
-    setStatus("marketStatus", "Public market feed connected.", "green");
-    marketList.forEach(m => {
-      ws.send(JSON.stringify({ticks:m.symbol, subscribe:1}));
-    });
+    setStatus("marketStatus", "Live market feed connected.", "green");
+    marketList.forEach(m => ws.send(JSON.stringify({ticks:m.symbol, subscribe:1})));
     renderMarkets();
   };
 
@@ -588,11 +565,6 @@ function connectPublicMarkets() {
     if (publicWS !== ws) return;
     let data;
     try { data = JSON.parse(event.data); } catch (_) { return; }
-
-    if (data.error) {
-      setStatus("marketStatus", "Market feed: " + data.error.message, "red");
-      return;
-    }
 
     if (data.msg_type === "tick" && data.tick) {
       const symbol = data.tick.symbol;
@@ -603,521 +575,56 @@ function connectPublicMarkets() {
       chartPoints.push({symbol, quote, time:Date.now()});
       if (chartPoints.length > 1000) chartPoints.shift();
 
+      // Extract last digit for digit tools
+      const quoteStr = quote.toFixed(6);
+      const lastDigit = parseInt(quoteStr.slice(-1), 10);
+      if (!digitHistory[symbol]) digitHistory[symbol] = [];
+      digitHistory[symbol].push(lastDigit);
+      if (digitHistory[symbol].length > 100) digitHistory[symbol].shift();
+
       renderMarkets();
+      renderDigitBars();
       drawChart();
 
       if (botRunning && symbol === botSymbolActive) considerBotTrade();
     }
   };
 
-  ws.onerror = () => {
-    if (publicWS === ws) setStatus("marketStatus", "Market feed error. Tap Refresh Markets.", "red");
-  };
-
-  ws.onclose = () => {
-    if (publicWS === ws) setStatus("marketStatus", "Market feed disconnected. Tap Refresh Markets.", "red");
-  };
+  ws.onerror = () => { if (publicWS === ws) setStatus("marketStatus", "Market feed error.", "red"); };
+  ws.onclose = () => { if (publicWS === ws) setStatus("marketStatus", "Market feed disconnected.", "red"); };
 }
 
 function renderMarkets() {
   const container = $("markets");
   container.innerHTML = "";
-
   marketList.slice(0,4).forEach(m => {
     const card = document.createElement("div");
     card.className = "market";
     const quote = marketTicks[m.symbol];
-    const title = document.createElement("div");
-    title.className = "muted";
-    title.textContent = m.name;
-
-    const price = document.createElement("div");
-    price.className = "price";
-    price.textContent = quote === undefined
-      ? "Waiting for quote…"
-      : quote.toLocaleString(undefined,{maximumFractionDigits:6});
-
-    const symbol = document.createElement("div");
-    symbol.className = "muted";
-    symbol.textContent = m.symbol;
-
-    card.append(title, price, symbol);
+    card.innerHTML = `<div class="muted">${m.name}</div><div class="price">${quote === undefined ? "Waiting…" : quote.toFixed(4)}</div><div class="muted small">${m.symbol}</div>`;
     container.appendChild(card);
   });
 }
 
+function renderDigitBars() {
+  const activeSym = $("manualSymbol").value;
+  const digits = digitHistory[activeSym] || [];
+  const container = $("digitBars");
+  container.innerHTML = "";
+
+  const counts = Array(10).fill(0);
+  digits.forEach(d => counts[d]++);
+  const total = digits.length || 1;
+
+  for (let i = 0; i < 10; i++) {
+    const pct = Math.round((counts[i] / total) * 100);
+    const col = document.createElement("div");
+    col.className = "bar-col";
+    col.innerHTML = `<div class="bar-label small">${pct}%</div><div class="bar-fill" style="height:${Math.max(pct, 6)}%"></div><div class="bar-label"><b>${i}</b></div>`;
+    container.appendChild(col);
+  }
+}
+
 function drawChart() {
   const canvas = $("chart");
-  const ctx = canvas.getContext("2d");
-  const symbol = $("manualSymbol").value;
-  const points = chartPoints.filter(p => p.symbol === symbol).slice(-80);
-
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle = "#091625";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-
-  if (points.length < 2) {
-    ctx.fillStyle = "#9bb0c8";
-    ctx.font = "14px Arial";
-    ctx.fillText("Waiting for ticks for " + symbol, 20, 35);
-    return;
-  }
-
-  const values = points.map(p => p.quote);
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const span = max - min || 1;
-
-  ctx.strokeStyle = "#27d99a";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  points.forEach((p,i) => {
-    const x = 12 + i * (canvas.width-24)/(points.length-1);
-    const y = canvas.height-16 - ((p.quote-min)/span)*(canvas.height-32);
-    if (i === 0) ctx.moveTo(x,y);
-    else ctx.lineTo(x,y);
-  });
-  ctx.stroke();
-
-  ctx.fillStyle = "#9bb0c8";
-  ctx.font = "12px Arial";
-  ctx.fillText("High " + max, 12, 16);
-  ctx.fillText("Low " + min, 12, canvas.height-4);
-}
-
-/* Request a quote, buy, then monitor the contract. */
-async function placeTrade({symbol,direction,stake,duration,source}) {
-  if (!selectedAccount || !tradeWS || tradeWS.readyState !== WebSocket.OPEN) {
-    throw new Error("Connect your Deriv account first.");
-  }
-  if (botBusy) throw new Error("A trade request is already in progress.");
-  if (openContracts.size > 0) {
-    throw new Error("Wait for the open contract to settle before placing another order.");
-  }
-  if (!Number.isFinite(stake) || stake < 0.35) {
-    throw new Error("Enter a valid stake of at least 0.35.");
-  }
-
-  if (isRealAccount()) {
-    const confirmed = source === "bot"
-      ? $("botRealConfirm").checked
-      : $("realConfirm").checked;
-
-    if (!confirmed) {
-      throw new Error(source === "bot"
-        ? "Tick the real-account automation confirmation first."
-        : "Tick the real-money confirmation first.");
-    }
-
-    const approved = window.confirm(
-      "REAL-MONEY ORDER\n\nAccount: " + accountId() +
-      "\nMarket: " + symbol +
-      "\nDirection: " + direction +
-      "\nStake: " + stake +
-      "\n\nThis order can lose real money. Place it now?"
-    );
-    if (!approved) throw new Error("Order cancelled.");
-  }
-
-  botBusy = true;
-  if (source === "manual") setStatus("manualStatus", "Requesting price quote…");
-
-  try {
-    const currency = selectedAccount.currency || "USD";
-    const proposalResponse = await sendWS({
-      proposal:1,
-      amount:stake,
-      basis:"stake",
-      contract_type:direction,
-      currency,
-      duration:Number(duration),
-      duration_unit:"t",
-      underlying_symbol:symbol
-    });
-
-    const proposal = proposalResponse.proposal;
-    if (!proposal || !proposal.id) {
-      throw new Error("No valid quote returned. Check the market and contract availability.");
-    }
-
-    if (source === "manual") {
-      setStatus("manualStatus",
-        "Quote received: " + money(proposal.ask_price,currency) + ". Placing order…");
-    }
-
-    const buyResponse = await sendWS({
-      buy:proposal.id,
-      price:Number(proposal.ask_price)
-    });
-
-    const contract = buyResponse.buy;
-    if (!contract || !contract.contract_id) {
-      throw new Error("Deriv did not confirm the order.");
-    }
-
-    openContracts.set(String(contract.contract_id), {
-      contract_id:contract.contract_id,
-      symbol,direction,stake,source,
-      buyPrice:Number(contract.buy_price || proposal.ask_price),
-      startTime:Date.now(),currency
-    });
-
-    updateSummary();
-    setStatus("tradeStatus",
-      "Order accepted. Monitoring contract #" + contract.contract_id + ".", "green");
-
-    if (source === "manual") {
-      setStatus("manualStatus",
-        "Order placed. Contract #" + contract.contract_id + " is open.", "green");
-    }
-
-    await sendWS({
-      proposal_open_contract:1,
-      contract_id:contract.contract_id,
-      subscribe:1
-    });
-  } finally {
-    botBusy = false;
-  }
-}
-
-function handleTradeMessage(data) {
-  if (data.msg_type === "balance" && data.balance) {
-    balanceValue = Number(data.balance.balance);
-    $("balance").textContent = money(balanceValue, data.balance.currency);
-  }
-
-  if (data.msg_type === "proposal_open_contract" && data.proposal_open_contract) {
-    const c = data.proposal_open_contract;
-    const key = String(c.contract_id);
-    const local = openContracts.get(key);
-    if (!local) return;
-
-    if (c.is_sold || ["won","lost","sold"].includes(c.status)) {
-      const profit = Number(c.profit || 0);
-
-      completedTrades.unshift({
-        time:new Date().toLocaleTimeString(),
-        symbol:local.symbol,
-        direction:local.direction,
-        stake:local.stake,
-        result:c.status || (profit >= 0 ? "won" : "lost"),
-        profit
-      });
-
-      if (completedTrades.length > 100) completedTrades.pop();
-      botSessionPL += profit;
-      openContracts.delete(key);
-
-      updateHistory();
-      updateSummary();
-
-      setStatus("tradeStatus",
-        "Contract settled: " + (c.status || "closed") +
-        ", P/L " + money(profit,local.currency),
-        profit >= 0 ? "green" : "red");
-
-      if (local.source === "manual") {
-        setStatus("manualStatus",
-          "Trade settled. P/L: " + money(profit,local.currency),
-          profit >= 0 ? "green" : "red");
-      }
-
-      const maxLoss = Math.max(0,Number($("maxLoss").value) || 0);
-      if (botRunning && maxLoss > 0 &&
-          botSessionPL - botSessionStartPL <= -maxLoss) {
-        stopBot("Session loss limit reached. Bot stopped.");
-      }
-    }
-  }
-}
-
-function updateHistory() {
-  const body = $("historyBody");
-  body.innerHTML = "";
-
-  if (!completedTrades.length) {
-    body.innerHTML = '<tr><td colspan="6">No completed trades yet.</td></tr>';
-    return;
-  }
-
-  completedTrades.slice(0,30).forEach(t => {
-    const tr = document.createElement("tr");
-    [t.time,t.symbol,t.direction,money(t.stake),t.result,money(t.profit)].forEach((v,i) => {
-      const td = document.createElement("td");
-      td.textContent = v;
-      if (i === 5) td.className = t.profit >= 0 ? "green" : "red";
-      tr.appendChild(td);
-    });
-    body.appendChild(tr);
-  });
-}
-
-function updateSummary() {
-  $("tradeCount").textContent = String(completedTrades.length);
-  $("sessionPL").textContent = money(botSessionPL);
-  $("sessionPL").className = "stat " + (botSessionPL >= 0 ? "green" : "red");
-  $("openCount").textContent = String(openContracts.size);
-}
-
-/* Simple rule-based strategies. These are not profit guarantees. */
-function ema(values,period) {
-  if (!values.length) return 0;
-  const k = 2/(period+1);
-  let result = values[0];
-  for (let i=1;i<values.length;i++) result = values[i]*k + result*(1-k);
-  return result;
-}
-
-function getSignal(strategy,symbol) {
-  const values = chartPoints.filter(p => p.symbol === symbol)
-    .map(p => p.quote).slice(-50);
-
-  if (values.length < 20) return null;
-
-  const fast = ema(values.slice(-20),5);
-  const slow = ema(values.slice(-20),13);
-  const momentum = values[values.length-1] - values[values.length-6];
-  const recent = values.slice(-14);
-  let gains = 0, losses = 0;
-
-  for (let i=1;i<recent.length;i++) {
-    const d = recent[i]-recent[i-1];
-    if (d >= 0) gains += d;
-    else losses += Math.abs(d);
-  }
-
-  const avgGain = gains/13;
-  const avgLoss = losses/13;
-  const rsi = avgLoss === 0 ? 100 : 100-(100/(1+avgGain/avgLoss));
-
-  if (strategy === "nexus") {
-    if (fast > slow && momentum > 0) return "CALL";
-    if (fast < slow && momentum < 0) return "PUT";
-  } else if (strategy === "volt") {
-    const prior = values.slice(-11,-1);
-    const high = Math.max(...prior);
-    const low = Math.min(...prior);
-    if (values[values.length-1] > high && momentum > 0) return "CALL";
-    if (values[values.length-1] < low && momentum < 0) return "PUT";
-  } else if (strategy === "apex") {
-    if (fast > slow && momentum > 0 && rsi >= 50 && rsi < 72) return "CALL";
-    if (fast < slow && momentum < 0 && rsi <= 50 && rsi > 28) return "PUT";
-  }
-
-  return null;
-}
-
-function considerBotTrade() {
-  if (!botRunning || botBusy || openContracts.size > 0) return;
-
-  const now = Date.now();
-  if (now-lastBotTickAt < 15000 || now-lastBotTradeAt < 15000) return;
-  lastBotTickAt = now;
-
-  if (botTrades >= Number($("maxTrades").value)) {
-    stopBot("Maximum trades reached. Bot stopped.");
-    return;
-  }
-
-  const maxLoss = Math.max(0,Number($("maxLoss").value) || 0);
-  if (maxLoss > 0 && botSessionPL-botSessionStartPL <= -maxLoss) {
-    stopBot("Session loss limit reached. Bot stopped.");
-    return;
-  }
-
-  const symbol = $("botSymbol").value;
-  const direction = getSignal($("strategySelect").value,symbol);
-  if (!direction) {
-    setStatus("botStatus","Running: waiting for a valid strategy signal…");
-    return;
-  }
-
-  lastBotTradeAt = now;
-  botTrades++;
-  setStatus("botStatus",
-    "Signal: " + direction + " on " + symbol + ". Requesting quote…","green");
-
-  placeTrade({
-    symbol,
-    direction,
-    stake:Number($("botStake").value),
-    duration:5,
-    source:"bot"
-  }).then(() => {
-    setStatus("botStatus","Bot running. Order placed: " + direction + " on " + symbol + ".","green");
-  }).catch(e => {
-    botTrades = Math.max(0,botTrades-1);
-    setStatus("botStatus","Bot order not placed: " + e.message,"red");
-    if (isRealAccount() && !$("botRealConfirm").checked) {
-      stopBot("Real-account automation confirmation is required.");
-    }
-  });
-}
-
-function startBot() {
-  if (!selectedAccount || !tradeWS || tradeWS.readyState !== WebSocket.OPEN) {
-    setStatus("botStatus","Connect a Deriv account before starting the bot.","red");
-    return;
-  }
-
-  if (isRealAccount()) {
-    if (!$("botRealConfirm").checked) {
-      setStatus("botStatus","Tick the real-account automation confirmation first.","red");
-      return;
-    }
-    if (!window.confirm(
-      "START REAL-MONEY AUTOMATION?\n\nThe bot can place repeated orders. Losses are possible. Start?"
-    )) return;
-  }
-
-  botSymbolActive = $("botSymbol").value;
-  if (marketTicks[botSymbolActive] === undefined) {
-    setStatus("botStatus","No live quote for " + botSymbolActive + ". Wait for market data.","red");
-    return;
-  }
-
-  botRunning = true;
-  botBusy = false;
-  botTrades = 0;
-  botSessionStartPL = botSessionPL;
-  lastBotTradeAt = 0;
-  lastBotTickAt = 0;
-
-  $("startBotBtn").disabled = true;
-  $("stopBotBtn").disabled = false;
-  setStatus("botStatus",
-    "Bot running: " + $("strategySelect").selectedOptions[0].text + ".","green");
-}
-
-function stopBot(reason="Emergency stop activated.") {
-  botRunning = false;
-  $("startBotBtn").disabled = !selectedAccount || !tradeWS ||
-    tradeWS.readyState !== WebSocket.OPEN;
-  $("stopBotBtn").disabled = true;
-  setStatus("botStatus",reason);
-}
-
-/* Populate all market selectors. */
-function fillMarketSelect(selectId) {
-  const select = $(selectId);
-  select.innerHTML = "";
-  marketList.forEach(m => {
-    const option = document.createElement("option");
-    option.value = m.symbol;
-    option.textContent = m.name;
-    select.appendChild(option);
-  });
-}
-fillMarketSelect("manualSymbol");
-fillMarketSelect("botSymbol");
-$("manualSymbol").value = "1HZ100V";
-$("botSymbol").value = "1HZ100V";
-botSymbolActive = "1HZ100V";
-
-/* Buttons and settings. */
-$("manualTradeBtn").addEventListener("click", async () => {
-  try {
-    await placeTrade({
-      symbol:$("manualSymbol").value,
-      direction:$("manualDirection").value,
-      stake:Number($("manualStake").value),
-      duration:Number($("manualDuration").value),
-      source:"manual"
-    });
-  } catch (e) {
-    setStatus("manualStatus",e.message,"red");
-  }
-});
-
-$("startBotBtn").addEventListener("click",startBot);
-$("stopBotBtn").addEventListener("click",() =>
-  stopBot("Emergency stop activated. No new orders will be placed."));
-
-$("loginBtn").addEventListener("click",() => {
-  if (accessToken && (!oauthExpiry || Date.now() < oauthExpiry)) {
-    loadAccounts();
-  } else {
-    login();
-  }
-});
-
-$("logoutBtn").addEventListener("click",() => logout());
-
-$("connectAccountBtn").addEventListener("click",() => {
-  connectSelectedAccount().catch(e => setStatus("accountStatus",e.message,"red"));
-});
-
-$("accountSelect").addEventListener("change",() => {
-  selectedAccount = accounts.find(a =>
-    String(accountId(a)) === $("accountSelect").value);
-  if (selectedAccount) {
-    updateAccountLabels();
-    closeTradeConnection();
-    setStatus("accountStatus","Account changed. Tap Connect Account.");
-  }
-});
-
-$("refreshMarketsBtn").addEventListener("click",connectPublicMarkets);
-$("manualSymbol").addEventListener("change",drawChart);
-$("botSymbol").addEventListener("change",() => {
-  botSymbolActive = $("botSymbol").value;
-});
-
-$("saveConfigBtn").addEventListener("click",() => {
-  const config = {
-    manualSymbol:$("manualSymbol").value,
-    manualDirection:$("manualDirection").value,
-    manualStake:$("manualStake").value,
-    manualDuration:$("manualDuration").value,
-    strategy:$("strategySelect").value,
-    botSymbol:$("botSymbol").value,
-    botStake:$("botStake").value,
-    maxTrades:$("maxTrades").value,
-    maxLoss:$("maxLoss").value
-  };
-  localStorage.setItem("ck_bot_config",JSON.stringify(config));
-  setStatus("configStatus","Configuration saved on this device.","green");
-});
-
-$("loadConfigBtn").addEventListener("click",() => {
-  try {
-    const c = JSON.parse(localStorage.getItem("ck_bot_config") || "null");
-    if (!c) throw new Error("No saved configuration found.");
-
-    $("manualSymbol").value = c.manualSymbol || "1HZ100V";
-    $("manualDirection").value = c.manualDirection || "CALL";
-    $("manualStake").value = c.manualStake || "1";
-    $("manualDuration").value = c.manualDuration || "5";
-    $("strategySelect").value = c.strategy || "nexus";
-    $("botSymbol").value = c.botSymbol || "1HZ100V";
-    $("botStake").value = c.botStake || "1";
-    $("maxTrades").value = c.maxTrades || "5";
-    $("maxLoss").value = c.maxLoss ?? "5";
-    botSymbolActive = $("botSymbol").value;
-    drawChart();
-    setStatus("configStatus","Saved configuration loaded.","green");
-  } catch (e) {
-    setStatus("configStatus",e.message,"red");
-  }
-});
-
-$("clearHistoryBtn").addEventListener("click",() => {
-  if (!window.confirm("Clear completed trade history and session totals?")) return;
-  completedTrades = [];
-  botSessionPL = 0;
-  updateHistory();
-  updateSummary();
-  setStatus("tradeStatus","Local history cleared.");
-});
-
-/* Start public market data and process OAuth callback. */
-renderMarkets();
-connectPublicMarkets();
-
-handleOAuthCallback().then(() => {
-  if (accessToken && !selectedAccount) loadAccounts();
-}).catch(e => setStatus("loginStatus",e.message,"red"));
-</script>
-</body>
-  </html>
+  const ctx = canvas
