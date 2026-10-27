@@ -38,6 +38,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
 select,input{display:block;width:100%;max-width:380px;padding:12px;margin:7px 0 14px;background:var(--inner);color:white;border:1px solid #3a506d;border-radius:8px}
 label{font-size:13px;color:#c5d7f1}
 .notice{padding:12px;border-radius:9px;background:#17243a;font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+.warning{border:1px solid #76502d;background:#302419}
 canvas{display:block;width:100%;height:220px;background:#0b1728;border:1px solid var(--border);border-radius:10px}
 footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px solid var(--border);font-size:12px}
 @media(max-width:480px){h1{font-size:22px}.panel{padding:14px}.price{font-size:22px}}
@@ -97,7 +98,7 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 <h3>REAL ACCOUNT</h3>
 <div class="price" id="realBalance">—</div>
 <div id="realCurrency" class="muted small">Connect to load real balance.</div>
-<div id="realStatus" class="status">Read-only balance display.</div>
+<div id="realStatus" class="status">Not connected.</div>
 </div>
 <div class="balance-card">
 <h3>DEMO ACCOUNT</h3>
@@ -106,12 +107,12 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 <div id="accountStatus" class="status">Log in to connect your demo account.</div>
 </div>
 </div>
-<p class="muted small">The real account is for balance viewing only. Demo trading uses the demo account.</p>
 </section>
 
 <section class="panel">
 <h2>Manual Demo Trading</h2>
-<p class="muted small">Demo account only. Review every quote carefully. No trade is purchased without confirmation.</p>
+<p class="muted small">Demo funds only. A quote is requested first, then you must confirm before a purchase is sent.</p>
+
 <label for="tradeMarket">Market</label>
 <select id="tradeMarket">
 <option value="1HZ100V">Volatility 100 (1s)</option>
@@ -124,13 +125,16 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 <option value="R_25">Volatility 25</option>
 <option value="R_10">Volatility 10</option>
 </select>
+
 <label for="tradeDirection">Direction</label>
 <select id="tradeDirection">
 <option value="MULTUP">Multiplier Up</option>
 <option value="MULTDOWN">Multiplier Down</option>
 </select>
+
 <label for="tradeStake">Stake amount (demo currency)</label>
 <input id="tradeStake" type="number" min="1" max="10" step="0.01" value="1">
+
 <label for="tradeMultiplier">Multiplier</label>
 <select id="tradeMultiplier">
 <option value="10">10×</option>
@@ -139,14 +143,60 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 <option value="50">50×</option>
 <option value="100">100×</option>
 </select>
+
 <button id="tradeButton" disabled>Connect Demo Account First</button>
 <div id="tradeStatus" class="status">No trade placed.</div>
 <div id="contractStatus" class="status"></div>
 </section>
 
 <section class="panel">
+<h2>Manual Real Trading</h2>
+<div class="notice warning">
+<strong>REAL MONEY WARNING</strong><br>
+Real trades can lose money. This panel is separate from demo trading, but separation in the website is not a guarantee of account-level security. Verify the account and quote before confirming any purchase.
+</div>
+
+<label for="realTradeMarket">Market</label>
+<select id="realTradeMarket">
+<option value="1HZ100V">Volatility 100 (1s)</option>
+<option value="1HZ75V">Volatility 75 (1s)</option>
+<option value="1HZ50V">Volatility 50 (1s)</option>
+<option value="1HZ25V">Volatility 25 (1s)</option>
+<option value="R_100">Volatility 100</option>
+<option value="R_75">Volatility 75</option>
+<option value="R_50">Volatility 50</option>
+<option value="R_25">Volatility 25</option>
+<option value="R_10">Volatility 10</option>
+</select>
+
+<label for="realTradeDirection">Direction</label>
+<select id="realTradeDirection">
+<option value="MULTUP">Multiplier Up</option>
+<option value="MULTDOWN">Multiplier Down</option>
+</select>
+
+<label for="realTradeStake">Stake amount (real currency)</label>
+<input id="realTradeStake" type="number" min="1" max="10" step="0.01" value="1">
+
+<label for="realTradeMultiplier">Multiplier</label>
+<select id="realTradeMultiplier">
+<option value="10">10×</option>
+<option value="20">20×</option>
+<option value="40">40×</option>
+<option value="50">50×</option>
+<option value="100">100×</option>
+</select>
+
+<button id="realTradeButton" disabled>Connect Real Account First</button>
+<div id="realTradeStatus" class="status">Real trading is not connected.</div>
+<div id="realContractStatus" class="status"></div>
+</section>
+
+<section class="panel">
 <h2>Safety</h2>
-<div class="notice">Independent third-party interface, not an official Deriv website. This version is intended for demo testing. Trading involves risk; never use real funds while testing.</div>
+<div class="notice">
+Independent third-party interface, not an official Deriv website. Check the selected account, market, stake and quote before every purchase. Never assume a purchase failed just because the connection dropped.
+</div>
 </section>
 </main>
 <footer>CK Trading Bot · Independent third-party interface · Not an official Deriv website</footer>
@@ -174,377 +224,837 @@ const MARKET_LIST = [
 const $ = id => document.getElementById(id);
 const prices = {};
 const chartHistory = {};
-let marketSocket = null, marketTimer = null, marketGeneration = 0;
-let tradeSocket = null, realSocket = null, demoCurrency = "USD", demoAccountId = "";
-let tradeBusy = false, pendingProposal = false, requestId = 100;
-let lastTradeRequestId = null;
 
-function show(id,message){$(id).textContent=message;}
+let marketSocket = null, marketTimer = null, marketGeneration = 0;
+let tradeSocket = null, realSocket = null;
+let demoCurrency = "USD", realCurrency = "USD";
+let demoAccountId = "", realAccountId = "";
+let tradeBusy = false, pendingProposal = false;
+let realTradeBusy = false, realPendingProposal = false;
+let requestId = 100;
+let lastTradeRequestId = null, lastRealTradeRequestId = null;
+let sessionGeneration = 0;
+
+function show(id,message){
+  $(id).textContent = message;
+}
 
 function makeMarketCards(){
-$("markets").replaceChildren();
-MARKET_LIST.forEach(m=>{
-const card=document.createElement("div");card.className="market";
-const name=document.createElement("div");name.className="market-name";name.textContent=m.name;
-const price=document.createElement("div");price.className="price";price.id="price-"+m.symbol;price.textContent="Waiting…";
-const time=document.createElement("div");time.className="status";time.id="time-"+m.symbol;time.textContent="Waiting for first tick";
-card.append(name,price,time);$("markets").appendChild(card);
-});
+  $("markets").replaceChildren();
+  MARKET_LIST.forEach(m=>{
+    const card=document.createElement("div");
+    card.className="market";
+    const name=document.createElement("div");
+    name.className="market-name";
+    name.textContent=m.name;
+    const price=document.createElement("div");
+    price.className="price";
+    price.id="price-"+m.symbol;
+    price.textContent="Waiting…";
+    const time=document.createElement("div");
+    time.className="status";
+    time.id="time-"+m.symbol;
+    time.textContent="Waiting for first tick";
+    card.append(name,price,time);
+    $("markets").appendChild(card);
+  });
 }
 
 function connectMarkets(){
-marketGeneration++;
-const generation=marketGeneration;
-if(marketTimer)clearTimeout(marketTimer);
-if(marketSocket){try{marketSocket.onclose=null;marketSocket.close();}catch(e){}}
-show("marketStatus","Connecting to public market data…");
-try{marketSocket=new WebSocket(MARKET_WS_URL);}
-catch(e){show("marketStatus","Market connection error.");return;}
-const socket=marketSocket;
-socket.onopen=()=>{
-if(generation!==marketGeneration)return;
-show("marketStatus","Connected. Requesting live prices…");
-MARKET_LIST.forEach(m=>socket.send(JSON.stringify({ticks:m.symbol,subscribe:1})));
-socket.send(JSON.stringify({ticks_history:$("chartMarket").value,count:100,end:"latest",style:"ticks"}));
-};
-socket.onmessage=event=>{
-if(generation!==marketGeneration)return;
-let d;try{d=JSON.parse(event.data);}catch(e){return;}
-if(d.error){show("marketStatus","Market API error: "+(d.error.message||"Request failed"));return;}
-if(d.msg_type==="tick"&&d.tick){
-const t=d.tick,s=t.symbol,q=Number(t.quote);
-if(!s||!Number.isFinite(q))return;
-prices[s]=q;
-if($("price-"+s))$("price-"+s).textContent=q.toLocaleString("en-US",{maximumFractionDigits:5});
-if($("time-"+s))$("time-"+s).textContent="Live · "+new Date(Number(t.epoch||Date.now()/1000)*1000).toLocaleTimeString();
-if(!chartHistory[s])chartHistory[s]=[];
-chartHistory[s].push(q);if(chartHistory[s].length>100)chartHistory[s].shift();
-show("marketStatus","Live market feed connected · "+new Date().toLocaleTimeString());
-drawChart();
-}
-if(d.msg_type==="history"&&d.history&&Array.isArray(d.history.prices)){
-chartHistory[$("chartMarket").value]=d.history.prices.map(Number).filter(Number.isFinite).slice(-100);
-drawChart();
-}
-};
-socket.onerror=()=>{if(generation===marketGeneration)show("marketStatus","Market network error; waiting to reconnect.");};
-socket.onclose=e=>{
-if(generation!==marketGeneration)return;
-show("marketStatus","Market connection closed ("+e.code+"). Reconnecting…");
-marketTimer=setTimeout(()=>{if(generation===marketGeneration)connectMarkets();},5000);
-};
+  marketGeneration++;
+  const generation=marketGeneration;
+
+  if(marketTimer)clearTimeout(marketTimer);
+  if(marketSocket){
+    try{marketSocket.onclose=null;marketSocket.close();}catch(e){}
+  }
+
+  show("marketStatus","Connecting to public market data…");
+
+  try{
+    marketSocket=new WebSocket(MARKET_WS_URL);
+  }catch(e){
+    show("marketStatus","Market connection error.");
+    return;
+  }
+
+  const socket=marketSocket;
+
+  socket.onopen=()=>{
+    if(generation!==marketGeneration)return;
+    show("marketStatus","Connected. Requesting live prices…");
+    MARKET_LIST.forEach(m=>
+      socket.send(JSON.stringify({ticks:m.symbol,subscribe:1}))
+    );
+    socket.send(JSON.stringify({
+      ticks_history:$("chartMarket").value,
+      count:100,end:"latest",style:"ticks"
+    }));
+  };
+
+  socket.onmessage=event=>{
+    if(generation!==marketGeneration)return;
+    let d;
+    try{d=JSON.parse(event.data);}catch(e){return;}
+
+    if(d.error){
+      show("marketStatus","Market API error: "+(d.error.message||"Request failed"));
+      return;
+    }
+
+    if(d.msg_type==="tick"&&d.tick){
+      const t=d.tick,s=t.symbol,q=Number(t.quote);
+      if(!s||!Number.isFinite(q))return;
+
+      prices[s]=q;
+      if($("price-"+s)){
+        $("price-"+s).textContent=q.toLocaleString("en-US",{maximumFractionDigits:5});
+      }
+      if($("time-"+s)){
+        $("time-"+s).textContent="Live · "+
+          new Date(Number(t.epoch||Date.now()/1000)*1000).toLocaleTimeString();
+      }
+
+      if(!chartHistory[s])chartHistory[s]=[];
+      chartHistory[s].push(q);
+      if(chartHistory[s].length>100)chartHistory[s].shift();
+
+      show("marketStatus","Live market feed connected · "+new Date().toLocaleTimeString());
+      drawChart();
+    }
+
+    if(d.msg_type==="history"&&d.history&&Array.isArray(d.history.prices)){
+      chartHistory[$("chartMarket").value]=
+        d.history.prices.map(Number).filter(Number.isFinite).slice(-100);
+      drawChart();
+    }
+  };
+
+  socket.onerror=()=>{
+    if(generation===marketGeneration){
+      show("marketStatus","Market network error; waiting to reconnect.");
+    }
+  };
+
+  socket.onclose=e=>{
+    if(generation!==marketGeneration)return;
+    show("marketStatus","Market connection closed ("+e.code+"). Reconnecting…");
+    marketTimer=setTimeout(()=>{
+      if(generation===marketGeneration)connectMarkets();
+    },5000);
+  };
 }
 
 function drawChart(){
-const c=$("chart"),ctx=c.getContext("2d"),v=chartHistory[$("chartMarket").value]||[];
-const w=c.width,h=c.height;
-ctx.clearRect(0,0,w,h);ctx.fillStyle="#0b1728";ctx.fillRect(0,0,w,h);ctx.strokeStyle="#263852";
-for(let i=1;i<5;i++){ctx.beginPath();ctx.moveTo(0,h*i/5);ctx.lineTo(w,h*i/5);ctx.stroke();}
-if(v.length<2){
-ctx.fillStyle="#9bacc5";ctx.font="18px Arial";ctx.fillText("Waiting for price data…",24,40);
-show("chartStatus","Waiting for ticks for "+$("chartMarket").value);return;
-}
-const min=Math.min(...v),max=Math.max(...v),range=max-min||1,pad=24;
-ctx.beginPath();ctx.strokeStyle="#4f8cff";ctx.lineWidth=3;
-v.forEach((n,i)=>{
-const x=pad+i*(w-2*pad)/(v.length-1),y=h-pad-((n-min)/range)*(h-2*pad);
-if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
-});
-ctx.stroke();ctx.fillStyle="#f3f7ff";ctx.font="16px Arial";ctx.fillText("Latest: "+v[v.length-1],20,25);
-show("chartStatus",v.length+" price points · "+$("chartMarket").value);
+  const c=$("chart"),ctx=c.getContext("2d");
+  const v=chartHistory[$("chartMarket").value]||[];
+  const w=c.width,h=c.height;
+
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle="#0b1728";
+  ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle="#263852";
+
+  for(let i=1;i<5;i++){
+    ctx.beginPath();
+    ctx.moveTo(0,h*i/5);
+    ctx.lineTo(w,h*i/5);
+    ctx.stroke();
+  }
+
+  if(v.length<2){
+    ctx.fillStyle="#9bacc5";
+    ctx.font="18px Arial";
+    ctx.fillText("Waiting for price data…",24,40);
+    show("chartStatus","Waiting for ticks for "+$("chartMarket").value);
+    return;
+  }
+
+  const min=Math.min(...v),max=Math.max(...v),range=max-min||1,pad=24;
+  ctx.beginPath();
+  ctx.strokeStyle="#4f8cff";
+  ctx.lineWidth=3;
+
+  v.forEach((n,i)=>{
+    const x=pad+i*(w-2*pad)/(v.length-1);
+    const y=h-pad-((n-min)/range)*(h-2*pad);
+    if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  });
+
+  ctx.stroke();
+  ctx.fillStyle="#f3f7ff";
+  ctx.font="16px Arial";
+  ctx.fillText("Latest: "+v[v.length-1],20,25);
+  show("chartStatus",v.length+" price points · "+$("chartMarket").value);
 }
 
 function randomString(length){
-const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
-const bytes=crypto.getRandomValues(new Uint8Array(length));
-return Array.from(bytes,b=>chars[b%chars.length]).join("");
+  const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
+  const bytes=crypto.getRandomValues(new Uint8Array(length));
+  return Array.from(bytes,b=>chars[b%chars.length]).join("");
 }
+
 function base64Url(bytes){
-let binary="";bytes.forEach(b=>binary+=String.fromCharCode(b));
-return btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/g,"");
+  let binary="";
+  bytes.forEach(b=>binary+=String.fromCharCode(b));
+  return btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/g,"");
 }
 
 async function startLogin(){
-try{
-const verifier=randomString(64);
-const digest=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(verifier));
-const challenge=base64Url(new Uint8Array(digest)),state=randomString(32);
-sessionStorage.setItem("ck_pkce_verifier",verifier);
-sessionStorage.setItem("ck_oauth_state",state);
-const url=new URL("https://auth.deriv.com/oauth2/auth");
-url.searchParams.set("response_type","code");
-url.searchParams.set("client_id",CLIENT_ID);
-url.searchParams.set("redirect_uri",REDIRECT_URI);
-url.searchParams.set("scope","trade");
-url.searchParams.set("state",state);
-url.searchParams.set("code_challenge",challenge);
-url.searchParams.set("code_challenge_method","S256");
-location.assign(url.toString());
-}catch(e){show("loginStatus","Could not start login. Check that your browser supports secure login.");}
+  try{
+    const verifier=randomString(64);
+    const digest=await crypto.subtle.digest(
+      "SHA-256",new TextEncoder().encode(verifier)
+    );
+    const challenge=base64Url(new Uint8Array(digest));
+    const state=randomString(32);
+
+    sessionStorage.setItem("ck_pkce_verifier",verifier);
+    sessionStorage.setItem("ck_oauth_state",state);
+
+    const url=new URL("https://auth.deriv.com/oauth2/auth");
+    url.searchParams.set("response_type","code");
+    url.searchParams.set("client_id",CLIENT_ID);
+    url.searchParams.set("redirect_uri",REDIRECT_URI);
+    url.searchParams.set("scope","trade");
+    url.searchParams.set("state",state);
+    url.searchParams.set("code_challenge",challenge);
+    url.searchParams.set("code_challenge_method","S256");
+
+    location.assign(url.toString());
+  }catch(e){
+    show("loginStatus","Could not start login. Check browser security settings.");
+  }
 }
 
 function safeOAuthError(result,status){
-const bits=[];
-if(result&&typeof result.error==="string")bits.push(result.error.slice(0,100));
-if(result&&typeof result.provider_error==="string")bits.push(result.provider_error.slice(0,100));
-if(bits.length)return "Token exchange failed (HTTP "+status+"): "+bits.join(" — ");
-return "Token exchange failed (HTTP "+status+"). Check the Worker and Deriv app settings.";
+  const bits=[];
+  if(result&&typeof result.error==="string")bits.push(result.error.slice(0,100));
+  if(result&&typeof result.provider_error==="string"){
+    bits.push(result.provider_error.slice(0,100));
+  }
+  return bits.length
+    ? "Token exchange failed (HTTP "+status+"): "+bits.join(" — ")
+    : "Token exchange failed (HTTP "+status+"). Check Worker and app settings.";
 }
 
 async function processOAuthCallback(){
-const params=new URLSearchParams(location.search);
-const code=params.get("code"),state=params.get("state"),oauthError=params.get("error");
-if(oauthError){
-show("loginStatus","Deriv login error: "+(params.get("error_description")||oauthError).slice(0,180));
-history.replaceState({},document.title,REDIRECT_URI);
-sessionStorage.removeItem("ck_oauth_state");sessionStorage.removeItem("ck_pkce_verifier");return;
-}
-if(!code){show("loginStatus","Not connected to an account. Log in to connect your demo account.");return;}
-const savedState=sessionStorage.getItem("ck_oauth_state");
-const verifier=sessionStorage.getItem("ck_pkce_verifier");
-if(!savedState||state!==savedState||!verifier){
-show("loginStatus","Login verification failed. Please start a fresh login.");
-history.replaceState({},document.title,REDIRECT_URI);
-sessionStorage.removeItem("ck_oauth_state");sessionStorage.removeItem("ck_pkce_verifier");return;
-}
-sessionStorage.removeItem("ck_oauth_state");
-show("loginStatus","Login returned. Exchanging authorization code…");
-try{
-const response=await fetch(TOKEN_WORKER,{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({code,code_verifier:verifier,client_id:CLIENT_ID,redirect_uri:REDIRECT_URI})
-});
-let result;
-try{result=await response.json();}catch(e){result={error:"Worker returned a non-JSON response"};}
-sessionStorage.removeItem("ck_pkce_verifier");
-history.replaceState({},document.title,REDIRECT_URI);
-if(!response.ok||!result||typeof result.access_token!=="string"||!result.access_token){
-show("loginStatus",safeOAuthError(result,response.status));return;
-}
-sessionStorage.setItem("ck_access_token",result.access_token);
-await connectDemoAccount(result.access_token);
-}catch(e){
-sessionStorage.removeItem("ck_pkce_verifier");
-history.replaceState({},document.title,REDIRECT_URI);
-console.error("OAuth Worker request failed:",e&&e.name?e.name:"Network error");
-show("loginStatus","Could not contact the token exchange Worker. Check the connection and try a fresh login.");
-}
+  const params=new URLSearchParams(location.search);
+  const code=params.get("code");
+  const state=params.get("state");
+  const oauthError=params.get("error");
+
+  if(oauthError){
+    show("loginStatus","Deriv login error: "+
+      (params.get("error_description")||oauthError).slice(0,180));
+    history.replaceState({},document.title,REDIRECT_URI);
+    sessionStorage.removeItem("ck_oauth_state");
+    sessionStorage.removeItem("ck_pkce_verifier");
+    return;
+  }
+
+  if(!code){
+    show("loginStatus","Not connected. Log in to connect your accounts.");
+    return;
+  }
+
+  const savedState=sessionStorage.getItem("ck_oauth_state");
+  const verifier=sessionStorage.getItem("ck_pkce_verifier");
+
+  if(!savedState||state!==savedState||!verifier){
+    show("loginStatus","Login verification failed. Start a fresh login.");
+    history.replaceState({},document.title,REDIRECT_URI);
+    sessionStorage.removeItem("ck_oauth_state");
+    sessionStorage.removeItem("ck_pkce_verifier");
+    return;
+  }
+
+  sessionStorage.removeItem("ck_oauth_state");
+  show("loginStatus","Exchanging authorization code…");
+
+  try{
+    const response=await fetch(TOKEN_WORKER,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        code,
+        code_verifier:verifier,
+        client_id:CLIENT_ID,
+        redirect_uri:REDIRECT_URI
+      })
+    });
+
+    let result;
+    try{result=await response.json();}
+    catch(e){result={error:"Worker returned a non-JSON response"};}
+
+    sessionStorage.removeItem("ck_pkce_verifier");
+    history.replaceState({},document.title,REDIRECT_URI);
+
+    if(!response.ok||!result||typeof result.access_token!=="string"||
+       !result.access_token){
+      show("loginStatus",safeOAuthError(result,response.status));
+      return;
+    }
+
+    sessionStorage.setItem("ck_access_token",result.access_token);
+    await connectAccounts(result.access_token);
+  }catch(e){
+    sessionStorage.removeItem("ck_pkce_verifier");
+    history.replaceState({},document.title,REDIRECT_URI);
+    show("loginStatus","Could not contact the token Worker. Check connection and retry.");
+  }
 }
 
-async function connectRealBalance(account,accessToken){
-show("realStatus","Connecting to real account for balance only…");
-const realId=account.account_id||account.id;
-if(!realId){show("realStatus","Real account ID was not supplied by Deriv.");return;}
-try{
-const response=await fetch("https://api.derivws.com/trading/v1/options/accounts/"+encodeURIComponent(realId)+"/otp",{
-method:"POST",headers:{Authorization:"Bearer "+accessToken}
-});
-const result=await response.json();
-if(!response.ok||!result.data?.url)throw new Error("Balance connection request failed (HTTP "+response.status+").");
-if(realSocket){realSocket.onclose=null;try{realSocket.close();}catch(e){}}
-realSocket=new WebSocket(result.data.url);
-const socket=realSocket;
-socket.onopen=()=>{
-if(socket!==realSocket)return;
-socket.send(JSON.stringify({balance:1,subscribe:1,req_id:++requestId}));
-};
-socket.onmessage=event=>{
-if(socket!==realSocket)return;
-let m;try{m=JSON.parse(event.data);}catch(e){return;}
-if(m.error){show("realStatus","Real balance unavailable: "+(m.error.message||"Deriv API error"));return;}
-if(m.msg_type==="balance"&&m.balance){
-const currency=m.balance.currency||account.currency||"";
-$("realBalance").textContent=Number(m.balance.balance).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-show("realCurrency","Currency: "+currency);
-show("realStatus","Real account connected · balance only");
-}
-};
-socket.onerror=()=>{if(socket===realSocket)show("realStatus","Real balance connection error. Demo trading is unaffected.");};
-socket.onclose=()=>{if(socket===realSocket)show("realStatus","Real balance connection closed. Demo trading is unaffected.");};
-}catch(e){show("realStatus",e&&e.message?e.message:"Could not load real account balance.");}
+async function connectAccounts(accessToken){
+  const generation=++sessionGeneration;
+  show("loginStatus","Looking up your Deriv accounts…");
+  show("accountStatus","Looking up demo account…");
+  show("realStatus","Looking up real account…");
+
+  $("tradeButton").disabled=true;
+  $("realTradeButton").disabled=true;
+
+  try{
+    const response=await fetch(
+      "https://api.derivws.com/trading/v1/options/accounts",
+      {headers:{Authorization:"Bearer "+accessToken}}
+    );
+
+    const result=await response.json();
+    if(generation!==sessionGeneration)return;
+    if(!response.ok){
+      throw new Error("Account lookup failed (HTTP "+response.status+").");
+    }
+
+    const data=result.data;
+    const accounts=Array.isArray(data)?data:(data?.accounts||data?.items||[]);
+
+    const accountType=a=>String(
+      a.account_type||a.type||a.account_type_name||""
+    ).toLowerCase();
+
+    const demo=accounts.find(a=>
+      accountType(a)==="demo"||accountType(a).includes("demo")
+    );
+    const real=accounts.find(a=>
+      accountType(a)==="real"||accountType(a).includes("real")
+    );
+
+    if(real){
+      connectRealBalance(real,accessToken,generation);
+    }else{
+      show("realStatus","No real account was identified in the returned account list.");
+      $("realTradeButton").disabled=true;
+    }
+
+    if(!demo){
+      throw new Error("No demo account was identified. No trade was placed.");
+    }
+
+    demoAccountId=demo.account_id||demo.id||"";
+    demoCurrency=demo.currency||"USD";
+
+    if(!demoAccountId){
+      throw new Error("Demo account ID was missing.");
+    }
+
+    show("accountStatus","Requesting demo account connection…");
+
+    const otpResponse=await fetch(
+      "https://api.derivws.com/trading/v1/options/accounts/"+
+      encodeURIComponent(demoAccountId)+"/otp",
+      {
+        method:"POST",
+        headers:{Authorization:"Bearer "+accessToken}
+      }
+    );
+
+    const otpResult=await otpResponse.json();
+    if(generation!==sessionGeneration)return;
+
+    if(!otpResponse.ok||!otpResult.data?.url){
+      throw new Error("Demo connection request failed (HTTP "+otpResponse.status+").");
+    }
+
+    if(tradeSocket){
+      tradeSocket.onclose=null;
+      try{tradeSocket.close();}catch(e){}
+    }
+
+    const socket=new WebSocket(otpResult.data.url);
+    tradeSocket=socket;
+
+    socket.onopen=()=>{
+      if(socket!==tradeSocket||generation!==sessionGeneration)return;
+      socket.send(JSON.stringify({balance:1,subscribe:1,req_id:++requestId}));
+    };
+
+    socket.onmessage=event=>{
+      if(socket!==tradeSocket||generation!==sessionGeneration)return;
+      let m;
+      try{m=JSON.parse(event.data);}catch(e){return;}
+
+      if(m.error){
+        show("tradeStatus","Demo API error: "+(m.error.message||"Request failed"));
+        if(m.req_id===lastTradeRequestId){
+          tradeBusy=false;
+          pendingProposal=false;
+          $("tradeButton").disabled=false;
+        }
+        return;
+      }
+
+      if(m.msg_type==="balance"&&m.balance){
+        demoCurrency=m.balance.currency||demoCurrency;
+        $("accountBalance").textContent=Number(m.balance.balance).toLocaleString(
+          undefined,{minimumFractionDigits:2,maximumFractionDigits:2}
+        );
+        show("accountCurrency","Demo currency: "+demoCurrency);
+        show("accountStatus","Demo account connected.");
+        show("loginStatus","Demo account connected; real account connection is checked separately.");
+        $("tradeButton").disabled=false;
+        $("tradeButton").textContent="Request Demo Trade Quote";
+        show("tradeStatus","Connected. Request a demo quote when ready.");
+      }
+
+      if(m.msg_type==="proposal"&&m.proposal){
+        if(m.req_id===lastTradeRequestId)confirmAndBuyDemo(m.proposal);
+      }
+
+      if(m.msg_type==="buy"&&m.buy&&m.req_id===lastTradeRequestId){
+        tradeBusy=false;
+        pendingProposal=false;
+        show("tradeStatus","Demo purchase accepted. Contract ID: "+
+          (m.buy.contract_id||"received"));
+        $("tradeButton").disabled=false;
+        $("tradeButton").textContent="Request Demo Trade Quote";
+        socket.send(JSON.stringify({balance:1,subscribe:1,req_id:++requestId}));
+        if(m.buy.contract_id){
+          socket.send(JSON.stringify({
+            proposal_open_contract:1,
+            contract_id:m.buy.contract_id,
+            subscribe:1,
+            req_id:++requestId
+          }));
+        }
+      }
+
+      if(m.msg_type==="proposal_open_contract"&&m.proposal_open_contract){
+        const c=m.proposal_open_contract;
+        show("contractStatus","Contract "+c.contract_id+" · Status: "+
+          (c.status||"open")+
+          (c.profit!==undefined?" · P/L: "+c.profit:""));
+      }
+    };
+
+    socket.onerror=()=>{
+      if(socket===tradeSocket){
+        show("tradeStatus","Demo connection error. Do not retry an uncertain purchase automatically.");
+      }
+    };
+
+    socket.onclose=e=>{
+      if(socket!==tradeSocket)return;
+      $("tradeButton").disabled=true;
+      $("tradeButton").textContent="Log In to Reconnect";
+      show("accountStatus","Demo account connection closed ("+e.code+").");
+      tradeBusy=false;
+      pendingProposal=false;
+    };
+  }catch(e){
+    if(generation!==sessionGeneration)return;
+    show("accountStatus",e.message||"Demo connection failed.");
+    show("tradeStatus","No new trade was intentionally sent.");
+    $("tradeButton").disabled=true;
+  }
 }
 
-async function connectDemoAccount(accessToken){
-show("accountStatus","Looking up your demo Options account…");
-show("tradeStatus","Connecting account…");
-$("tradeButton").disabled=true;
-try{
-const response=await fetch("https://api.derivws.com/trading/v1/options/accounts",{
-headers:{Authorization:"Bearer "+accessToken}
-});
-const result=await response.json();
-if(!response.ok)throw new Error("Account lookup failed (HTTP "+response.status+").");
-const data=result.data;
-const accounts=Array.isArray(data)?data:(data?.accounts||data?.items||[]);
-console.log("Account lookup diagnostic:",{
-responseKeys:Object.keys(result||{}),
-dataIsArray:Array.isArray(data),
-accountCount:accounts.length,
-firstAccountFields:accounts[0]?Object.keys(accounts[0]):[]
-});
-const accountType=a=>String(a.account_type||a.type||a.account_type_name||"").toLowerCase();
-const demo=accounts.find(a=>accountType(a)==="demo"||accountType(a).includes("demo"));
-const real=accounts.find(a=>accountType(a)==="real"||accountType(a).includes("real"));
-if(real)connectRealBalance(real,accessToken);
-else show("realStatus","Real account type was not identified in the account list.");
-if(!demo)throw new Error("No demo account was found. No trade was placed.");
-demoAccountId=demo.account_id;
-demoCurrency=demo.currency||"USD";
-if(!demoAccountId)throw new Error("Demo account ID was missing.");
+async function connectRealBalance(account,accessToken,generation){
+  realAccountId=account.account_id||account.id||"";
+  realCurrency=account.currency||"USD";
 
-show("accountStatus","Demo account found. Requesting authenticated connection…");
-const otpResponse=await fetch("https://api.derivws.com/trading/v1/options/accounts/"+encodeURIComponent(demoAccountId)+"/otp",{
-method:"POST",headers:{Authorization:"Bearer "+accessToken}
-});
-const otpResult=await otpResponse.json();
-if(!otpResponse.ok||!otpResult.data?.url)throw new Error("Demo account connection request failed (HTTP "+otpResponse.status+").");
-if(tradeSocket){tradeSocket.onclose=null;try{tradeSocket.close();}catch(e){}}
-tradeSocket=new WebSocket(otpResult.data.url);
-const socket=tradeSocket;
-show("accountStatus","Authenticated account connection starting…");
+  if(!realAccountId){
+    show("realStatus","Real account ID is missing.");
+    return;
+  }
 
-socket.onopen=()=>{
-if(socket!==tradeSocket)return;
-show("accountStatus","Account WebSocket open. Waiting for balance confirmation…");
-show("loginStatus","Deriv login successful. Verifying demo account…");
-socket.send(JSON.stringify({balance:1,subscribe:1,req_id:++requestId}));
-};
+  show("realStatus","Requesting real account connection…");
+  $("realTradeButton").disabled=true;
 
-socket.onmessage=event=>{
-if(socket!==tradeSocket)return;
-let m;try{m=JSON.parse(event.data);}catch(e){return;}
-if(m.error){
-console.error("Deriv account API error:",{
-code:m.error.code||"API_ERROR",
-message:m.error.message||"Request failed",
-req_id:m.req_id||null
-});
-show("tradeStatus","Deriv API error: "+(m.error.message||"Request failed"));
-if(m.req_id&&m.req_id===lastTradeRequestId){
-tradeBusy=false;pendingProposal=false;$("tradeButton").disabled=false;
-}
-return;
-}
-if(m.msg_type==="balance"&&m.balance){
-demoCurrency=m.balance.currency||demoCurrency;
-$("accountBalance").textContent=Number(m.balance.balance).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-show("accountCurrency","Demo account currency: "+demoCurrency);
-show("accountStatus","Demo account connected · "+demoAccountId);
-show("loginStatus","Connected to demo account.");
-show("tradeStatus","Account connected. Request a demo quote when ready.");
-$("tradeButton").disabled=false;
-$("tradeButton").textContent="Request Demo Trade Quote";
-}
-if(m.msg_type==="proposal"&&m.proposal)confirmAndBuyDemo(m.proposal);
-if(m.msg_type==="buy"&&m.buy){
-tradeBusy=false;pendingProposal=false;
-show("tradeStatus","Demo trade submitted. Contract ID: "+(m.buy.contract_id||"received"));
-$("tradeButton").disabled=false;$("tradeButton").textContent="Request Demo Trade Quote";
-socket.send(JSON.stringify({balance:1,subscribe:1,req_id:++requestId}));
-if(m.buy.contract_id)socket.send(JSON.stringify({proposal_open_contract:1,contract_id:m.buy.contract_id,subscribe:1,req_id:++requestId}));
-}
-if(m.msg_type==="proposal_open_contract"&&m.proposal_open_contract){
-const c=m.proposal_open_contract;
-show("contractStatus","Contract "+c.contract_id+" · Status: "+(c.status||"open")+(c.profit!==undefined?" · P/L: "+c.profit:""));
-}
-};
+  try{
+    const response=await fetch(
+      "https://api.derivws.com/trading/v1/options/accounts/"+
+      encodeURIComponent(realAccountId)+"/otp",
+      {
+        method:"POST",
+        headers:{Authorization:"Bearer "+accessToken}
+      }
+    );
 
-socket.onerror=()=>{
-if(socket!==tradeSocket)return;
-show("tradeStatus","Account WebSocket network error. Check connection and log in again if needed.");
-console.error("Account WebSocket error event.");
-};
-socket.onclose=e=>{
-if(socket!==tradeSocket)return;
-$("tradeButton").disabled=true;
-$("tradeButton").textContent="Log In to Reconnect";
-show("accountStatus","Account connection closed. Public market prices can still work.");
-show("tradeStatus","Account connection closed · Code: "+e.code+" · "+(e.reason||"No reason supplied"));
-tradeBusy=false;pendingProposal=false;
-};
-}catch(e){
-console.error("Demo account connection failed:",e&&e.message?e.message:"Unknown error");
-show("accountStatus",e&&e.message?e.message:"Demo account connection failed.");
-show("tradeStatus","Account connection failed. No new trade was placed.");
-$("tradeButton").disabled=true;
-sessionStorage.removeItem("ck_access_token");
-}
+    const result=await response.json();
+    if(generation!==sessionGeneration)return;
+
+    if(!response.ok||!result.data?.url){
+      throw new Error("Real account connection failed (HTTP "+response.status+").");
+    }
+
+    if(realSocket){
+      realSocket.onclose=null;
+      try{realSocket.close();}catch(e){}
+    }
+
+    const socket=new WebSocket(result.data.url);
+    realSocket=socket;
+
+    socket.onopen=()=>{
+      if(socket!==realSocket||generation!==sessionGeneration)return;
+      socket.send(JSON.stringify({balance:1,subscribe:1,req_id:++requestId}));
+    };
+
+    socket.onmessage=event=>{
+      if(socket!==realSocket||generation!==sessionGeneration)return;
+      let m;
+      try{m=JSON.parse(event.data);}catch(e){return;}
+
+      if(m.error){
+        show("realStatus","Real account API error: "+(m.error.message||"Request failed"));
+        if(m.req_id===lastRealTradeRequestId){
+          realTradeBusy=false;
+          realPendingProposal=false;
+          $("realTradeButton").disabled=false;
+          $("realTradeButton").textContent="Request Real Trade Quote";
+        }
+        return;
+      }
+
+      if(m.msg_type==="balance"&&m.balance){
+        realCurrency=m.balance.currency||realCurrency;
+        $("realBalance").textContent=Number(m.balance.balance).toLocaleString(
+          undefined,{minimumFractionDigits:2,maximumFractionDigits:2}
+        );
+        show("realCurrency","Real currency: "+realCurrency);
+        show("realStatus","Real account connected.");
+        $("realTradeButton").disabled=false;
+        $("realTradeButton").textContent="Request Real Trade Quote";
+      }
+
+      if(m.msg_type==="proposal"&&m.proposal){
+        if(m.req_id===lastRealTradeRequestId)confirmAndBuyReal(m.proposal);
+      }
+
+      if(m.msg_type==="buy"&&m.buy&&m.req_id===lastRealTradeRequestId){
+        realTradeBusy=false;
+        realPendingProposal=false;
+        show("realTradeStatus","Deriv accepted the purchase request. Contract ID: "+
+          (m.buy.contract_id||"received")+
+          ". Check contract status and account balance.");
+        $("realTradeButton").disabled=false;
+        $("realTradeButton").textContent="Request Real Trade Quote";
+
+        socket.send(JSON.stringify({balance:1,subscribe:1,req_id:++requestId}));
+
+        if(m.buy.contract_id){
+          socket.send(JSON.stringify({
+            proposal_open_contract:1,
+            contract_id:m.buy.contract_id,
+            subscribe:1,
+            req_id:++requestId
+          }));
+        }
+      }
+
+      if(m.msg_type==="proposal_open_contract"&&m.proposal_open_contract){
+        const c=m.proposal_open_contract;
+        show("realContractStatus","Contract "+c.contract_id+" · Status: "+
+          (c.status||"open")+
+          (c.profit!==undefined?" · P/L: "+c.profit:""));
+      }
+    };
+
+    socket.onerror=()=>{
+      if(socket===realSocket){
+        show("realStatus","Real connection error.");
+        $("realTradeButton").disabled=true;
+      }
+    };
+
+    socket.onclose=e=>{
+      if(socket!==realSocket)return;
+      $("realTradeButton").disabled=true;
+      $("realTradeButton").textContent="Reconnect Real Account";
+      show("realStatus","Real account disconnected ("+e.code+").");
+      show("realTradeStatus","Disconnected. Check account activity before attempting another trade.");
+      realTradeBusy=false;
+      realPendingProposal=false;
+    };
+  }catch(e){
+    if(generation!==sessionGeneration)return;
+    show("realStatus",e.message||"Could not connect to the real account.");
+    $("realTradeButton").disabled=true;
+  }
 }
 
 $("tradeButton").addEventListener("click",()=>{
-if(!tradeSocket||tradeSocket.readyState!==WebSocket.OPEN){
-show("tradeStatus","Account WebSocket is not open. Log in again.");return;
-}
-if(tradeBusy)return;
-const stake=Number($("tradeStake").value),symbol=$("tradeMarket").value;
-const direction=$("tradeDirection").value,multiplier=Number($("tradeMultiplier").value);
-if(!Number.isFinite(stake)||stake<1||stake>10){
-show("tradeStatus","For this test version, enter a demo stake between 1 and 10.");return;
-}
-if(!["MULTUP","MULTDOWN"].includes(direction)||![10,20,40,50,100].includes(multiplier)){
-show("tradeStatus","Invalid trade selection.");return;
-}
-tradeBusy=true;pendingProposal=true;$("tradeButton").disabled=true;
-show("tradeStatus","Requesting a demo quote…");
-lastTradeRequestId=++requestId;
-tradeSocket.send(JSON.stringify({
-proposal:1,amount:stake,basis:"stake",contract_type:direction,
-currency:demoCurrency,multiplier,underlying_symbol:symbol,req_id:lastTradeRequestId
-}));
+  if(!tradeSocket||tradeSocket.readyState!==WebSocket.OPEN){
+    show("tradeStatus","Demo account is not connected. Log in again.");
+    return;
+  }
+  if(tradeBusy)return;
+
+  const stake=Number($("tradeStake").value);
+  const symbol=$("tradeMarket").value;
+  const direction=$("tradeDirection").value;
+  const multiplier=Number($("tradeMultiplier").value);
+
+  if(!Number.isFinite(stake)||stake<1||stake>10){
+    show("tradeStatus","Enter a demo stake between 1 and 10.");
+    return;
+  }
+  if(!["MULTUP","MULTDOWN"].includes(direction)||
+     ![10,20,40,50,100].includes(multiplier)){
+    show("tradeStatus","Invalid demo trade selection.");
+    return;
+  }
+
+  tradeBusy=true;
+  pendingProposal=true;
+  $("tradeButton").disabled=true;
+  show("tradeStatus","Requesting demo quote…");
+  lastTradeRequestId=++requestId;
+
+  tradeSocket.send(JSON.stringify({
+    proposal:1,
+    amount:stake,
+    basis:"stake",
+    contract_type:direction,
+    currency:demoCurrency,
+    multiplier,
+    underlying_symbol:symbol,
+    req_id:lastTradeRequestId
+  }));
 });
 
 function confirmAndBuyDemo(proposal){
-if(!tradeBusy||!pendingProposal)return;
-const askPrice=Number(proposal.ask_price);
-if(!proposal.id||!Number.isFinite(askPrice)||askPrice<=0){
-tradeBusy=false;pendingProposal=false;$("tradeButton").disabled=false;
-show("tradeStatus","Invalid quote returned. No purchase was sent.");return;
+  if(!tradeBusy||!pendingProposal)return;
+
+  const askPrice=Number(proposal.ask_price);
+  if(!proposal.id||!Number.isFinite(askPrice)||askPrice<=0){
+    tradeBusy=false;
+    pendingProposal=false;
+    $("tradeButton").disabled=false;
+    show("tradeStatus","Invalid demo quote. No purchase was sent.");
+    return;
+  }
+
+  const stake=Number($("tradeStake").value);
+  const symbol=$("tradeMarket").value;
+  const direction=$("tradeDirection").value;
+  const multiplier=Number($("tradeMultiplier").value);
+
+  const approved=confirm(
+    "DEMO TRADE CONFIRMATION\n\nMarket: "+symbol+
+    "\nDirection: "+direction+
+    "\nMultiplier: "+multiplier+"x"+
+    "\nStake: "+stake+" "+demoCurrency+
+    "\nQuoted purchase price: "+askPrice+" "+demoCurrency+
+    "\n\nPlace this demo trade?"
+  );
+
+  if(!approved){
+    tradeBusy=false;
+    pendingProposal=false;
+    $("tradeButton").disabled=false;
+    show("tradeStatus","Cancelled. No purchase was sent.");
+    return;
+  }
+
+  if(!tradeSocket||tradeSocket.readyState!==WebSocket.OPEN){
+    tradeBusy=false;
+    pendingProposal=false;
+    show("tradeStatus","Connection lost. Check account activity before retrying.");
+    return;
+  }
+
+  show("tradeStatus","Submitting confirmed demo purchase…");
+  lastTradeRequestId=++requestId;
+  tradeSocket.send(JSON.stringify({
+    buy:proposal.id,
+    price:askPrice,
+    req_id:lastTradeRequestId
+  }));
 }
-const stake=Number($("tradeStake").value),symbol=$("tradeMarket").value;
-const direction=$("tradeDirection").value,multiplier=Number($("tradeMultiplier").value);
-const approved=confirm(
-"DEMO TRADE CONFIRMATION\n\nMarket: "+symbol+
-"\nDirection: "+direction+"\nMultiplier: "+multiplier+"x"+
-"\nStake: "+stake+" "+demoCurrency+
-"\nQuoted purchase price: "+askPrice+" "+demoCurrency+
-"\n\nPlace this demo trade?"
-);
-if(!approved){
-tradeBusy=false;pendingProposal=false;$("tradeButton").disabled=false;
-show("tradeStatus","Trade cancelled. No purchase was sent.");return;
-}
-show("tradeStatus","Submitting confirmed demo trade…");
-lastTradeRequestId=++requestId;
-tradeSocket.send(JSON.stringify({buy:proposal.id,price:askPrice,req_id:lastTradeRequestId}));
+
+$("realTradeButton").addEventListener("click",()=>{
+  if(!realSocket||realSocket.readyState!==WebSocket.OPEN){
+    show("realTradeStatus","Real account is not connected.");
+    return;
+  }
+  if(realTradeBusy)return;
+
+  const stake=Number($("realTradeStake").value);
+  const symbol=$("realTradeMarket").value;
+  const direction=$("realTradeDirection").value;
+  const multiplier=Number($("realTradeMultiplier").value);
+
+  if(!Number.isFinite(stake)||stake<1||stake>10){
+    show("realTradeStatus","For this version, enter a real stake between 1 and 10 "+
+      realCurrency+". This limit does not guarantee the trade is affordable or accepted.");
+    return;
+  }
+
+  if(!["MULTUP","MULTDOWN"].includes(direction)||
+     ![10,20,40,50,100].includes(multiplier)){
+    show("realTradeStatus","Invalid real trade selection.");
+    return;
+  }
+
+  if(!confirm(
+    "REAL-MONEY QUOTE REQUEST\n\n"+
+    "Real account: "+realAccountId+
+    "\nMarket: "+symbol+
+    "\nDirection: "+direction+
+    "\nMultiplier: "+multiplier+"x"+
+    "\nStake: "+stake+" "+realCurrency+
+    "\n\nThis requests a quote only. A second confirmation is required before purchase."
+  )){
+    show("realTradeStatus","Quote request cancelled.");
+    return;
+  }
+
+  realTradeBusy=true;
+  realPendingProposal=true;
+  $("realTradeButton").disabled=true;
+  show("realTradeStatus","Requesting real-account quote…");
+  lastRealTradeRequestId=++requestId;
+
+  realSocket.send(JSON.stringify({
+    proposal:1,
+    amount:stake,
+    basis:"stake",
+    contract_type:direction,
+    currency:realCurrency,
+    multiplier,
+    underlying_symbol:symbol,
+    req_id:lastRealTradeRequestId
+  }));
+});
+
+function confirmAndBuyReal(proposal){
+  if(!realTradeBusy||!realPendingProposal)return;
+
+  const askPrice=Number(proposal.ask_price);
+  if(!proposal.id||!Number.isFinite(askPrice)||askPrice<=0){
+    realTradeBusy=false;
+    realPendingProposal=false;
+    $("realTradeButton").disabled=false;
+    show("realTradeStatus","Invalid quote. No purchase was sent.");
+    return;
+  }
+
+  const stake=Number($("realTradeStake").value);
+  const symbol=$("realTradeMarket").value;
+  const direction=$("realTradeDirection").value;
+  const multiplier=Number($("realTradeMultiplier").value);
+
+  const approved=confirm(
+    "FINAL REAL-MONEY PURCHASE CONFIRMATION\n\n"+
+    "REAL ACCOUNT: "+realAccountId+
+    "\nMarket: "+symbol+
+    "\nDirection: "+direction+
+    "\nMultiplier: "+multiplier+"x"+
+    "\nStake: "+stake+" "+realCurrency+
+    "\nQuoted purchase price: "+askPrice+" "+realCurrency+
+    "\n\nA real-money purchase may lose money. Confirm purchase?"
+  );
+
+  if(!approved){
+    realTradeBusy=false;
+    realPendingProposal=false;
+    $("realTradeButton").disabled=false;
+    show("realTradeStatus","Cancelled. No purchase was sent.");
+    return;
+  }
+
+  if(!realSocket||realSocket.readyState!==WebSocket.OPEN){
+    realTradeBusy=false;
+    realPendingProposal=false;
+    $("realTradeButton").disabled=true;
+    show("realTradeStatus","Connection lost before purchase. Check account activity before retrying.");
+    return;
+  }
+
+  show("realTradeStatus","Sending confirmed purchase request…");
+  lastRealTradeRequestId=++requestId;
+
+  realSocket.send(JSON.stringify({
+    buy:proposal.id,
+    price:askPrice,
+    req_id:lastRealTradeRequestId
+  }));
 }
 
 $("loginButton").addEventListener("click",startLogin);
 $("refreshButton").addEventListener("click",connectMarkets);
+
 $("logoutButton").addEventListener("click",()=>{
-sessionStorage.removeItem("ck_access_token");
-sessionStorage.removeItem("ck_pkce_verifier");
-sessionStorage.removeItem("ck_oauth_state");
-if(tradeSocket){tradeSocket.onclose=null;try{tradeSocket.close();}catch(e){}tradeSocket=null;}
-if(realSocket){realSocket.onclose=null;try{realSocket.close();}catch(e){}realSocket=null;}
-demoAccountId="";
-tradeBusy=false;pendingProposal=false;
-$("tradeButton").disabled=true;
-$("tradeButton").textContent="Connect Demo Account First";
-$("accountBalance").textContent="—";
-$("realBalance").textContent="—";
-show("realCurrency","Connect to load real balance.");
-show("realStatus","Logged out of this bot session.");
-show("accountStatus","Logged out of this bot session. Public market data remains available.");
-show("loginStatus","Logged out of this bot session.");
-show("tradeStatus","No new trade placed.");
-show("contractStatus","");
+  sessionGeneration++;
+
+  sessionStorage.removeItem("ck_access_token");
+  sessionStorage.removeItem("ck_pkce_verifier");
+  sessionStorage.removeItem("ck_oauth_state");
+
+  if(tradeSocket){
+    tradeSocket.onclose=null;
+    try{tradeSocket.close();}catch(e){}
+    tradeSocket=null;
+  }
+  if(realSocket){
+    realSocket.onclose=null;
+    try{realSocket.close();}catch(e){}
+    realSocket=null;
+  }
+
+  demoAccountId="";
+  realAccountId="";
+  demoCurrency="USD";
+  realCurrency="USD";
+  tradeBusy=false;
+  pendingProposal=false;
+  realTradeBusy=false;
+  realPendingProposal=false;
+  lastTradeRequestId=null;
+  lastRealTradeRequestId=null;
+
+  $("tradeButton").disabled=true;
+  $("tradeButton").textContent="Connect Demo Account First";
+  $("realTradeButton").disabled=true;
+  $("realTradeButton").textContent="Connect Real Account First";
+
+  $("accountBalance").textContent="—";
+  $("realBalance").textContent="—";
+
+  show("realCurrency","Connect to load real balance.");
+  show("realStatus","Logged out of this bot session.");
+  show("accountCurrency","Connect to load demo balance.");
+  show("accountStatus","Logged out. Public market data remains available.");
+  show("loginStatus","Logged out of this bot session.");
+  show("tradeStatus","No new demo purchase requested.");
+  show("realTradeStatus","Logged out. No new real purchase can be requested.");
+  show("contractStatus","");
+  show("realContractStatus","");
 });
+
 $("chartMarket").addEventListener("change",()=>{
-drawChart();
-if(marketSocket&&marketSocket.readyState===WebSocket.OPEN){
-marketSocket.send(JSON.stringify({ticks_history:$("chartMarket").value,count:100,end:"latest",style:"ticks"}));
-}
+  drawChart();
+  if(marketSocket&&marketSocket.readyState===WebSocket.OPEN){
+    marketSocket.send(JSON.stringify({
+      ticks_history:$("chartMarket").value,
+      count:100,
+      end:"latest",
+      style:"ticks"
+    }));
+  }
 });
 
 makeMarketCards();
