@@ -4,22 +4,45 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="deriv-site-verification" content="ded285725a66c864612bf8d91ba4de4b63642ce64f6dd2f14fed08d232275b4a">
-<title>CKTrader — TraderScheme Workspace</title>
+<title>TraderScheme — Free Deriv Workspace & Automated Tools</title>
 <meta name="theme-color" content="#07111f">
 <style>
-:root{--bg:#07111f;--panel:#101e30;--panel2:#14253a;--line:#263b53;--text:#eef5ff;--muted:#9bb0c8;--green:#27d99a;--red:#ff647c;--blue:#60a5fa;--gold:#f5c451}
+:root{--bg:#07111f;--panel:#101e30;--panel2:#14253a;--line:#263b53;--text:#eef5ff;--muted:#9bb0c8;--green:#27d99a;--red:#ff647c;--blue:#3b82f6;--blue-light:#60a5fa;--gold:#f5c451}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:15px Arial,Helvetica,sans-serif}
-header{padding:14px 18px;background:#0b1829;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:100}
-.head{max-width:1150px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.brand-area{display:flex;align-items:center;gap:12px}
-.brand{font-size:18px;font-weight:800;background:linear-gradient(90deg,#60a5fa,#27d99a);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.badge-v{font-size:11px;background:#1d4ed8;color:#fff;padding:2px 6px;border-radius:6px;font-weight:700}
-.nav-tabs{display:flex;gap:8px;align-items:center}
-.nav-btn{background:transparent;border:none;color:var(--muted);padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px}
-.nav-btn.active{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
-.acc-pill{background:#0a1727;border:1px solid var(--line);padding:6px 12px;border-radius:8px;font-size:13px;display:flex;align-items:center;gap:8px}
-main{max-width:1150px;margin:18px auto;padding:0 12px 40px}
+body{margin:0;background:var(--bg);color:var(--text);font:15px Arial,Helvetica,sans-serif;overflow-x:hidden}
+
+/* Top Ticker Marquee */
+.ticker-bar{background:#040d18;border-bottom:1px solid var(--line);padding:8px 12px;font-size:12px;display:flex;gap:24px;overflow-x:auto;white-space:nowrap;color:var(--muted)}
+.ticker-item{display:inline-flex;align-items:center;gap:6px}
+
+/* Header Navbar */
+header{padding:14px 20px;background:#0b1829;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:100}
+.head{max-width:1150px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-size:18px;font-weight:800;color:var(--text);display:flex;flex-direction:column}
+.brand span{font-size:10px;color:var(--red);font-weight:600;letter-spacing:1px}
+.nav-right{display:flex;gap:10px;align-items:center}
+.btn-outline{background:transparent;border:1px solid var(--line);color:var(--text);padding:8px 16px;border-radius:8px;font-weight:700;cursor:pointer}
+.btn-primary-glow{background:linear-gradient(135deg,#3b82f6,#2563eb);border:none;color:#fff;padding:8px 18px;border-radius:8px;font-weight:700;cursor:pointer;box-shadow:0 0 15px rgba(59,130,246,0.4)}
+
+/* Landing Hero Section */
+.hero-section{max-width:900px;margin:40px auto 20px;padding:0 16px;text-align:center}
+.pill-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(39,217,154,0.1);border:1px solid rgba(39,217,154,0.3);padding:6px 14px;border-radius:20px;font-size:12px;color:var(--green);font-weight:700;margin-bottom:20px}
+.hero-section h1{font-size:40px;line-height:1.2;font-weight:800;margin:0 0 16px;background:linear-gradient(90deg,#eef5ff,#60a5fa,#27d99a);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-section p{color:var(--muted);font-size:15px;max-width:650px;margin:0 auto 30px;line-height:1.6}
+
+/* Hero Action Buttons */
+.hero-cta{display:flex;flex-direction:column;gap:12px;max-width:480px;margin:0 auto 40px}
+.btn-huge-blue{background:linear-gradient(135deg,#60a5fa,#2563eb);color:#fff;border:none;padding:16px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(37,99,235,0.4);display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-huge-white{background:#eef5ff;color:#07111f;border:none;padding:16px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+
+/* Feature Grid Cards */
+.features-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;max-width:800px;margin:0 auto 50px;padding:0 16px}
+.feature-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;text-align:center}
+.feature-card .val{font-size:16px;font-weight:800;margin-bottom:4px}
+.feature-card .lbl{font-size:12px;color:var(--muted)}
+
+/* Trading Workspace Container (Hidden until logged in or opened) */
+#workspaceApp{display:none;max-width:1150px;margin:20px auto;padding:0 12px 40px}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0}
 .wide{grid-column:1/-1}
@@ -37,9 +60,6 @@ label{display:block;color:var(--muted);font-size:13px;margin:10px 0}
 .stat{font-size:22px;font-weight:800;margin:6px 0}
 .green{color:var(--green)}.red{color:var(--red)}.gold{color:var(--gold)}
 .status{font-size:13px;color:var(--muted);margin-top:9px;overflow-wrap:anywhere}
-.telemetry-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
-.tele-box{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}
-.tele-val{font-size:15px;font-weight:700;color:var(--green);margin-top:4px}
 .market-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 .market{padding:12px;border-radius:10px;background:var(--panel2);border:1px solid var(--line)}
 .price{font-size:16px;font-weight:800;margin-top:6px}
@@ -55,156 +75,134 @@ canvas{width:100%;height:180px;display:block;background:#091625;border-radius:10
 .bar-col{display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end}
 .bar-fill{width:100%;background:var(--blue);border-radius:3px 3px 0 0;min-height:4px}
 .bar-label{font-size:11px;color:var(--muted);margin-top:4px}
-/* Modal overlay styling */
-.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(4,11,20,0.85);display:none;justify-content:center;align-items:center;z-index:1000;padding:15px}
-.modal-content{background:var(--panel);border:1px solid var(--line);border-radius:16px;width:100%;max-width:650px;padding:22px;position:relative}
-.modal-close{position:absolute;top:15px;right:18px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer}
-@media(max-width:800px){.market-grid{grid-template-columns:repeat(2,1fr)}.telemetry-grid{grid-template-columns:1fr}}
+@media(max-width:800px){.features-grid{grid-template-columns:1fr}.market-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:650px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}}
 </style>
 </head>
 <body>
 
+<!-- Top Ticker Bar -->
+<div class="ticker-bar" id="tickerBar">
+  <div class="ticker-item">📈 Volatility 100 (1s): <span class="green" id="t1">—</span></div>
+  <div class="ticker-item">📊 Volatility 75 (1s): <span class="green" id="t2">—</span></div>
+  <div class="ticker-item">📉 Volatility 50 (1s): <span class="green" id="t3">—</span></div>
+  <div class="ticker-item">📊 Volatility 100: <span class="green" id="t4">—</span></div>
+</div>
+
+<!-- Navigation Header -->
 <header>
   <div class="head">
-    <div class="brand-area">
-      <div class="brand">CKTrader</div>
-      <div class="badge-v">v2.4</div>
-    </div>
-    <div class="nav-tabs">
-      <button class="nav-btn active" id="tabDashboard">Dashboard</button>
-      <button class="nav-btn" id="tabScanner">Scanner</button>
-      <button class="primary" id="loginBtn" style="padding:8px 14px;font-size:13px">Log In via Deriv</button>
-    </div>
-    <div class="acc-pill" id="accPill" style="display:none">
-      <span id="navAccName">DEMO</span>
-      <b id="navBalance" class="green">$0.00</b>
+    <div class="brand">traderscheme <span>POWERED BY DERIV</span></div>
+    <div class="nav-right" id="navRight">
+      <button class="btn-outline" id="navLoginBtn">Log In</button>
+      <button class="btn-primary-glow" id="navGetStartedBtn">Get Started</button>
     </div>
   </div>
 </header>
 
-<main>
-<div class="grid">
-
-<!-- HERO TELEMETRY PANEL -->
-<section class="panel wide">
-  <div class="row between">
-    <div>
-      <span style="font-size:12px;color:var(--green);font-weight:700">● AUTOMATED DERIV BOT ENGINE</span>
-      <h2 style="font-size:24px;margin:6px 0 4px">Structured Trading. Zero Emotion.</h2>
-      <p class="muted" style="margin:0">Configure automated strategies for Volatility Indices and Synthetic Markets using real-time WebSockets.</p>
+<!-- Landing Page Hero View -->
+<div id="landingView">
+  <section class="hero-section">
+    <div class="pill-badge">🟢 FREE STRATEGIES. REAL MARKET TOOLS.</div>
+    <h1>Trade with better structure</h1>
+    <p>Use manual trading, charts, copy tools, automation, and market analysis without jumping between separate apps.</p>
+    
+    <div class="hero-cta">
+      <button class="btn-huge-blue" id="heroLoginBtn">⚡ Log In and Trade</button>
+      <button class="btn-huge-white" id="heroGetStartedBtn">⚡ Create Free Account</button>
     </div>
-    <button id="logoutBtn" class="danger" disabled>Log Out</button>
-  </div>
-  <div class="telemetry-grid">
-    <div class="tele-box"><div class="muted small">SERVER LATENCY</div><div class="tele-val" id="latVal">24 ms</div></div>
-    <div class="tele-box"><div class="muted small">EXECUTION ENGINE</div><div class="tele-val" style="color:var(--blue)">High Speed</div></div>
-    <div class="tele-box"><div class="muted small">MARKET FEED</div><div class="tele-val" id="feedStatusVal">WebSocket Connected</div></div>
-  </div>
-</section>
+    <div id="loginStatus" class="status"></div>
+  </section>
 
-<!-- ACCOUNT CONNECTION PANEL -->
-<section class="panel">
-  <h2>Account & Connection</h2>
-  <label>Select Trading Account
-    <select id="accountSelect" disabled><option value="">Log in first to load accounts</option></select>
-  </label>
-  <div class="row between" style="margin-top:10px">
-    <div><div class="muted">Balance</div><div class="stat" id="balance">—</div></div>
-    <div><div class="muted">Type</div><div class="stat" id="accountType">—</div></div>
-    <button id="connectAccountBtn" class="blue" disabled>Connect Account</button>
+  <div class="features-grid">
+    <div class="feature-card"><div class="val">Free</div><div class="lbl">BOT TEMPLATES</div></div>
+    <div class="feature-card"><div class="val">24/7</div><div class="lbl">SYNTHETIC MARKET FOCUS</div></div>
+    <div class="feature-card"><div class="val">www.traderscheme.com</div><div class="lbl">BRANDED WORKSPACE</div></div>
+    <div class="feature-card"><div class="val">🟢 Live</div><div class="lbl">MARKET STATUS</div></div>
   </div>
-  <div class="status" id="accountStatus">Not connected to WebSocket feed.</div>
-</section>
-
-<!-- BOT CONTROL CENTER -->
-<section class="panel">
-  <h2>Bot Control Center</h2>
-  <label>Strategy / Algorithm
-    <select id="strategySelect">
-      <option value="nexus">Rise / Fall (Trend Momentum)</option>
-      <option value="digit_under">Over / Under (Digit Barrier)</option>
-      <option value="digit_even">Digit Parity Engine (Even/Odd)</option>
-    </select>
-  </label>
-  <div class="row">
-    <div style="flex:1"><label>Synthetic Market<select id="botSymbol"></select></label></div>
-    <div style="flex:1"><label>Ticks Duration<select id="botDuration"><option value="1">1 Tick</option><option value="3">3 Ticks</option><option value="5">5 Ticks</option></select></label></div>
-  </div>
-  <div class="row">
-    <div style="flex:1"><label>Initial Stake ($)<input id="botStake" type="number" min="0.35" step="0.01" value="10.00"></label></div>
-    <div style="flex:1"><label>Target Profit ($)<input id="targetProfit" type="number" min="0" step="0.01" value="50.00"></label></div>
-  </div>
-  <div class="row">
-    <div style="flex:1"><label>Stop Loss ($)<input id="maxLoss" type="number" min="0" step="0.01" value="30.00"></label></div>
-    <div style="flex:1"><label>Martingale Multiplier<input id="martingaleMultiplier" type="number" min="1" step="0.1" value="2.0"></label></div>
-  </div>
-  <label class="check" style="margin-top:12px">
-    <input id="botRealConfirm" type="checkbox">
-    <span>Authorize automated contract orders on real accounts.</span>
-  </label>
-  <div class="row" style="margin-top:12px">
-    <button class="primary" id="startBotBtn" disabled style="flex:1">Start Bot</button>
-    <button class="danger" id="stopBotBtn" disabled style="flex:1">Stop Bot</button>
-  </div>
-  <div id="botStatus" class="status">Bot is stopped.</div>
-</section>
-
-<!-- LIVE MARKETS & DIGIT ANALYZER -->
-<section class="panel wide">
-  <div class="row between">
-    <h2>Live Markets & Digit Analyzer</h2>
-    <button id="refreshMarketsBtn">Refresh Feed</button>
-  </div>
-  <div class="market-grid" id="markets"></div>
-  <p class="muted" style="margin:14px 0 4px">Last Digit Distribution (Last 100 Ticks):</p>
-  <div class="digit-bars" id="digitBars"></div>
-  <canvas id="chart" width="900" height="180" style="margin-top:12px"></canvas>
-  <div id="marketStatus" class="status">Connecting to live feed…</div>
-</section>
-
-<!-- SESSION SUMMARY & PERFORMANCE -->
-<section class="panel wide">
-  <div class="row" style="justify-content:space-around;text-align:center">
-    <div><div class="muted">TOTAL NET PROFIT</div><div class="stat green" id="sessionPL">$0.00</div></div>
-    <div><div class="muted">WINS / LOSSES</div><div class="stat" id="winLossCount">0 / 0</div></div>
-    <div><div class="muted">WIN RATE</div><div class="stat" id="winRate">0.0%</div></div>
-  </div>
-</section>
-
-<!-- TRADE HISTORY LOG -->
-<section class="panel wide">
-  <h2>Contract Log History</h2>
-  <div class="scroll">
-    <table>
-      <thead><tr><th>Time</th><th>Market</th><th>Contract</th><th>Stake</th><th>Status</th><th>P/L</th></tr></thead>
-      <tbody id="historyBody"><tr><td colspan="6">No trades logged yet.</td></tr></tbody>
-    </table>
-  </div>
-  <div id="tradeStatus" class="status">Trade activity renders here.</div>
-</section>
-
 </div>
-</main>
 
-<!-- SCANNER MODAL -->
-<div class="modal-overlay" id="scannerModal">
-  <div class="modal-content">
-    <button class="modal-close" id="closeScannerModal">&times;</button>
-    <h2>Entry Scanner</h2>
-    <p class="muted">Scan synthetic markets in real-time with algorithmic confirmation templates.</p>
-    <label>Select Scanner Strategy
-      <select id="scannerStrat">
-        <option value="over1">Over 1 / Under 8 Recovery Engine</option>
-        <option value="evenOdd">Parity Alternator Scanner</option>
-      </select>
-    </label>
-    <div class="row" style="margin-top:12px">
-      <div style="flex:1"><label>Scan Depth (Ticks)<input type="number" value="3000" id="scanDepth"></label></div>
-      <div style="flex:1"><label>Target Symbol<select id="scannerSymbol"></select></label></div>
-    </div>
-    <div class="status" id="scannerResultStatus" style="margin:14px 0">Status: Ready to scan market streams.</div>
-    <button class="primary full" id="executeScanBtn">Scan Markets Now</button>
+<!-- Main Trading Workspace App (Revealed on Login/Connect) -->
+<div id="workspaceApp">
+  <div class="grid">
+
+    <section class="panel wide">
+      <div class="row between">
+        <div>
+          <h2>Account Connection & Session</h2>
+          <div id="accountStatus" class="status">Select account and click Connect Account.</div>
+        </div>
+        <button id="logoutBtn" class="danger">Log Out</button>
+      </div>
+      <label>Trading Account
+        <select id="accountSelect"><option value="">Log in first</option></select>
+      </label>
+      <div class="row between" style="margin-top:10px">
+        <div><div class="muted">Balance</div><div class="stat" id="balance">—</div></div>
+        <div><div class="muted">Type</div><div class="stat" id="accountType">—</div></div>
+        <button id="connectAccountBtn" class="blue">Connect Account</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Bot Control Center</h2>
+      <label>Strategy Type
+        <select id="strategySelect">
+          <option value="nexus">Rise / Fall (Trend Momentum)</option>
+          <option value="digit_under">Over / Under (Digit Barrier)</option>
+          <option value="digit_even">Digit Parity Engine (Even/Odd)</option>
+        </select>
+      </label>
+      <label>Synthetic Market<select id="botSymbol"></select></label>
+      <div class="row">
+        <div style="flex:1"><label>Initial Stake ($)<input id="botStake" type="number" min="0.35" step="0.01" value="10"></label></div>
+        <div style="flex:1"><label>Target Profit ($)<input id="targetProfit" type="number" min="0" step="0.01" value="50"></label></div>
+      </div>
+      <div class="row">
+        <div style="flex:1"><label>Stop Loss ($)<input id="maxLoss" type="number" min="0" step="0.01" value="30"></label></div>
+        <div style="flex:1"><label>Martingale Multiplier<input id="martingaleMultiplier" type="number" min="1" step="0.1" value="2.0"></label></div>
+      </div>
+      <label class="check" style="margin-top:10px">
+        <input id="botRealConfirm" type="checkbox">
+        <span>Authorize automated real-money orders.</span>
+      </label>
+      <div class="row" style="margin-top:10px">
+        <button class="primary" id="startBotBtn" style="flex:1">Start Bot</button>
+        <button class="danger" id="stopBotBtn" style="flex:1" disabled>Stop Bot</button>
+      </div>
+      <div id="botStatus" class="status">Bot is stopped.</div>
+    </section>
+
+    <section class="panel">
+      <h2>Session Performance</h2>
+      <div class="muted">Total Net Profit</div><div class="stat green" id="sessionPL">$0.00</div>
+      <div class="muted">Wins / Losses</div><div class="stat" id="winLossCount">0 / 0</div>
+      <div class="muted">Win Rate</div><div class="stat" id="winRate">0.0%</div>
+      <button id="clearHistoryBtn" class="full" style="margin-top:16px">Clear Session History</button>
+    </section>
+
+    <section class="panel wide">
+      <div class="row between">
+        <h2>Live Markets & Digit Analyzer</h2><button id="refreshMarketsBtn">Refresh Feed</button>
+      </div>
+      <div class="market-grid" id="markets"></div>
+      <p class="muted" style="margin:14px 0 4px">Last Digit Distribution (Last 100 Ticks):</p>
+      <div class="digit-bars" id="digitBars"></div>
+      <canvas id="chart" width="900" height="180" style="margin-top:12px"></canvas>
+      <div id="marketStatus" class="status">Connecting to market feed...</div>
+    </section>
+
+    <section class="panel wide">
+      <h2>Contract Log History</h2>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Time</th><th>Market</th><th>Contract</th><th>Stake</th><th>Status</th><th>P/L</th></tr></thead>
+          <tbody id="historyBody"><tr><td colspan="6">No trades logged yet.</td></tr></tbody>
+        </table>
+      </div>
+      <div id="tradeStatus" class="status">Trade activity will render here.</div>
+    </section>
+
   </div>
 </div>
 
@@ -246,8 +244,6 @@ let openContracts = new Map();
 
 let botRunning = false;
 let botBusy = false;
-let botTrades = 0;
-let botSessionStartPL = 0;
 let botSessionPL = 0;
 let winsCount = 0;
 let lossesCount = 0;
@@ -278,16 +274,11 @@ function isRealAccount(a=selectedAccount) {
 }
 
 function sendWS(payload) {
-  if (!tradeWS || tradeWS.readyState !== WebSocket.OPEN) {
-    throw new Error("Trading connection closed.");
-  }
+  if (!tradeWS || tradeWS.readyState !== WebSocket.OPEN) throw new Error("Trading connection closed.");
   const id = requestId++;
   payload.req_id = id;
   return new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      pending.delete(id);
-      reject(new Error("Request timed out."));
-    }, 15000);
+    const timeout = setTimeout(() => { pending.delete(id); reject(new Error("Request timed out.")); }, 15000);
     pending.set(id, {resolve, reject, timeout});
     try { tradeWS.send(JSON.stringify(payload)); } catch (e) { clearTimeout(timeout); pending.delete(id); reject(e); }
   });
@@ -316,27 +307,19 @@ function randomString(size=64) {
   return Array.from(bytes, b => alphabet[b % alphabet.length]).join("");
 }
 
-// Bulletproof forced redirection login handler
 async function login() {
   try {
     setStatus("loginStatus", "Redirecting to Deriv login...", "gold");
     const verifier = randomString(64);
     const challenge = await sha256Base64Url(verifier);
     const state = randomString(32);
-    
     sessionStorage.setItem("ck_pkce_verifier", verifier);
     sessionStorage.setItem("ck_oauth_state", state);
 
     const params = new URLSearchParams({
-      response_type: "code",
-      client_id: APP_ID,
-      redirect_uri: REDIRECT_URI,
-      scope: "trade account_manage",
-      state: state,
-      code_challenge: challenge,
-      code_challenge_method: "S256"
+      response_type: "code", client_id: APP_ID, redirect_uri: REDIRECT_URI,
+      scope: "trade account_manage", state: state, code_challenge: challenge, code_challenge_method: "S256"
     });
-
     window.location.assign("https://auth.deriv.com/oauth2/auth?" + params.toString());
   } catch (e) {
     setStatus("loginStatus", "Could not start login: " + e.message, "red");
@@ -419,17 +402,18 @@ async function loadAccounts() {
       $("accountSelect").appendChild(opt);
     });
 
-    $("accountSelect").disabled = false;
-    $("logoutBtn").disabled = false;
-    $("loginBtn").textContent = "Connected";
-
     const preferred = accounts.find(isRealAccount) || accounts[0];
     selectedAccount = preferred;
     $("accountSelect").value = String(accountId(preferred) || "");
     updateAccountLabels();
-    setStatus("loginStatus", "Signed in successfully.");
-    $("connectAccountBtn").disabled = false;
-    setStatus("accountStatus", "Account loaded. Tap Connect Account.");
+
+    // Switch view from landing page to workspace app
+    $("landingView").style.display = "none";
+    $("workspaceApp").style.display = "block";
+    $("navRight").innerHTML = '<button class="btn-outline" id="headerLogout">Log Out</button>';
+    $("headerLogout").addEventListener("click", logout);
+
+    setStatus("accountStatus", "Accounts loaded. Tap Connect Account.");
   } catch (e) { setStatus("loginStatus", e.message, "red"); }
 }
 
@@ -438,16 +422,12 @@ function updateAccountLabels() {
   const real = isRealAccount(selectedAccount);
   $("accountType").textContent = real ? "REAL ACCOUNT" : "DEMO ACCOUNT";
   $("accountType").className = "stat " + (real ? "gold" : "green");
-  $("navAccName").textContent = real ? "REAL" : "DEMO";
-  $("accPill").style.display = "flex";
 }
 
 function closeTradeConnection() {
   if (tradeWS) { tradeWS.onclose = null; try { tradeWS.close(); } catch (_) {} }
   tradeWS = null;
   pending.clear();
-  $("startBotBtn").disabled = true;
-  stopBot("Connection closed.");
 }
 
 async function connectSelectedAccount() {
@@ -458,7 +438,7 @@ async function connectSelectedAccount() {
   updateAccountLabels();
   closeTradeConnection();
 
-  setStatus("accountStatus", "Establishing secure socket…");
+  setStatus("accountStatus", "Establishing secure socket connection…");
   try {
     const otpResult = await apiFetch("/trading/v1/options/accounts/" + encodeURIComponent(accountId(account)) + "/otp", {method:"POST"});
     const wsUrl = otpResult && otpResult.data && otpResult.data.url;
@@ -476,9 +456,7 @@ async function connectSelectedAccount() {
           const bal = Number(response.balance.balance);
           const curr = response.balance.currency || "USD";
           $("balance").textContent = money(bal, curr);
-          $("navBalance").textContent = money(bal, curr);
         }
-        $("startBotBtn").disabled = false;
         setStatus("accountStatus", "Connected and ready.", "green");
       } catch (e) { setStatus("accountStatus", "Balance sync error: " + e.message, "red"); }
     };
@@ -491,31 +469,27 @@ async function connectSelectedAccount() {
       handleTradeMessage(data);
     };
 
-    ws.onclose = () => { if (tradeWS === ws) { stopBot("Connection dropped."); setStatus("accountStatus", "Disconnected.", "red"); } };
+    ws.onclose = () => { if (tradeWS === ws) { setStatus("accountStatus", "Disconnected.", "red"); } };
   } catch (e) { setStatus("accountStatus", "Connection error: " + e.message, "red"); throw e; }
 }
 
-function logout(showMessage=true) {
-  stopBot("Logged out.");
+function logout() {
   closeTradeConnection();
   accessToken = ""; oauthExpiry = 0; accounts = []; selectedAccount = null;
   sessionStorage.removeItem("ck_deriv_access_token"); sessionStorage.removeItem("ck_deriv_expiry");
-  $("accountSelect").innerHTML = '<option value="">Log in first</option>';
-  $("accountSelect").disabled = true; $("connectAccountBtn").disabled = true; $("logoutBtn").disabled = true;
-  $("loginBtn").textContent = "Log In via Deriv"; $("balance").textContent = "—"; $("accountType").textContent = "—";
-  $("accPill").style.display = "none";
-  setStatus("accountStatus", "Not connected.");
+  $("workspaceApp").style.display = "none";
+  $("landingView").style.display = "block";
+  $("navRight").innerHTML = '<button class="btn-outline" id="navLoginBtn">Log In</button><button class="btn-primary-glow" id="navGetStartedBtn">Get Started</button>';
+  bindLandingButtons();
 }
 
 function connectPublicMarkets() {
   if (publicWS) { try { publicWS.close(); } catch (_) {} }
-  setStatus("marketStatus", "Connecting to live market stream…");
   const ws = new WebSocket(PUBLIC_WS_URL);
   publicWS = ws;
 
   ws.onopen = () => {
     if (publicWS !== ws) return;
-    setStatus("marketStatus", "Live feed connected.", "green");
     marketList.forEach(m => ws.send(JSON.stringify({ticks:m.symbol, subscribe:1})));
     renderMarkets();
   };
@@ -541,14 +515,23 @@ function connectPublicMarkets() {
       renderMarkets();
       renderDigitBars();
       drawChart();
+      updateTopTicker();
 
       if (botRunning && symbol === botSymbolActive) considerBotTrade();
     }
   };
 }
 
+function updateTopTicker() {
+  if (marketTicks["1HZ100V"]) $("t1").textContent = marketTicks["1HZ100V"].toFixed(2);
+  if (marketTicks["1HZ75V"]) $("t2").textContent = marketTicks["1HZ75V"].toFixed(2);
+  if (marketTicks["1HZ50V"]) $("t3").textContent = marketTicks["1HZ50V"].toFixed(2);
+  if (marketTicks["R_100"]) $("t4").textContent = marketTicks["R_100"].toFixed(2);
+}
+
 function renderMarkets() {
   const container = $("markets");
+  if (!container) return;
   container.innerHTML = "";
   marketList.slice(0,4).forEach(m => {
     const card = document.createElement("div");
@@ -563,6 +546,7 @@ function renderDigitBars() {
   const activeSym = $("botSymbol").value;
   const digits = digitHistory[activeSym] || [];
   const container = $("digitBars");
+  if (!container) return;
   container.innerHTML = "";
   const counts = Array(10).fill(0);
   digits.forEach(d => counts[d]++);
@@ -578,6 +562,7 @@ function renderDigitBars() {
 
 function drawChart() {
   const canvas = $("chart");
+  if (!canvas) return;
   const ctx = canvas.getContext("2d");
   const symbol = $("botSymbol").value;
   const points = chartPoints.filter(p => p.symbol === symbol).slice(-80);
@@ -600,7 +585,6 @@ async function placeBotTrade(contractType, symbol, stake, duration, barrier) {
   if (!selectedAccount || !tradeWS || tradeWS.readyState !== WebSocket.OPEN) throw new Error("Socket disconnected.");
   if (botBusy) throw new Error("Execution in progress.");
   if (openContracts.size > 0) throw new Error("Position open.");
-
   if (isRealAccount() && !$("botRealConfirm").checked) throw new Error("Check real account authorization box.");
 
   botBusy = true;
@@ -628,7 +612,6 @@ function handleTradeMessage(data) {
     const bal = Number(data.balance.balance);
     const curr = data.balance.currency || "USD";
     $("balance").textContent = money(bal, curr);
-    $("navBalance").textContent = money(bal, curr);
   }
   if (data.msg_type === "proposal_open_contract" && data.proposal_open_contract) {
     const c = data.proposal_open_contract;
@@ -669,6 +652,7 @@ function handleTradeMessage(data) {
 
 function updateHistory() {
   const body = $("historyBody");
+  if (!body) return;
   body.innerHTML = "";
   if (!completedTrades.length) { body.innerHTML = '<tr><td colspan="6">No trades logged yet.</td></tr>'; return; }
   completedTrades.slice(0, 25).forEach(t => {
@@ -691,6 +675,9 @@ function updateSummary() {
   $("winRate").textContent = rate + "%";
 }
 
+let botRunning = false;
+let botBusy = false;
+
 function considerBotTrade() {
   if (!botRunning || botBusy || openContracts.size > 0) return;
   const now = Date.now();
@@ -699,7 +686,6 @@ function considerBotTrade() {
 
   const strategy = $("strategySelect").value;
   const symbol = $("botSymbol").value;
-  const duration = $("botDuration").value;
   let contractType = "CALL", barrier = undefined;
 
   if (strategy === "digit_under") {
@@ -713,18 +699,17 @@ function considerBotTrade() {
     contractType = values[values.length-1] > values[values.length-3] ? "CALL" : "PUT";
   }
 
-  placeBotTrade(contractType, symbol, currentStake, duration, barrier).catch(e => {
+  placeBotTrade(contractType, symbol, currentStake, 1, barrier).catch(e => {
     setStatus("botStatus", "Bot trade error: " + e.message, "red");
   });
 }
 
 function startBot() {
   if (!selectedAccount || !tradeWS || tradeWS.readyState !== WebSocket.OPEN) {
-    setStatus("botStatus", "Connect account first.", "red"); return;
+    setStatus("botStatus", "Connect trading account first.", "red"); return;
   }
   botSymbolActive = $("botSymbol").value;
-  botRunning = true; botBusy = false; botTrades = 0;
-  botSessionPL = 0; winsCount = 0; lossesCount = 0;
+  botRunning = true; botBusy = false;
   currentStake = Number($("botStake").value) || 10;
   $("startBotBtn").disabled = true; $("stopBotBtn").disabled = false;
   setStatus("botStatus", "Bot running...", "green");
@@ -732,40 +717,44 @@ function startBot() {
 
 function stopBot(reason="Bot stopped.", type="") {
   botRunning = false;
-  $("startBotBtn").disabled = !selectedAccount || !tradeWS;
-  $("stopBotBtn").disabled = true;
+  $("startBotBtn").disabled = false; $("stopBotBtn").disabled = true;
   setStatus("botStatus", reason, type);
 }
 
 function fillMarketSelect(id) {
-  const sel = $(id); sel.innerHTML = "";
+  const sel = $(id);
+  if (!sel) return;
+  sel.innerHTML = "";
   marketList.forEach(m => {
     const opt = document.createElement("option"); opt.value = m.symbol; opt.textContent = m.name; sel.appendChild(opt);
   });
 }
 fillMarketSelect("botSymbol");
-fillMarketSelect("scannerSymbol");
 
-/* Tabs & Modals */
-$("tabDashboard").addEventListener("click", () => { $("tabDashboard").className="nav-btn active"; $("tabScanner").className="nav-btn"; $("scannerModal").style.display="none"; });
-$("tabScanner").addEventListener("click", () => { $("tabScanner").className="nav-btn active"; $("tabDashboard").className="nav-btn"; $("scannerModal").style.display="flex"; });
-$("closeScannerModal").addEventListener("click", () => { $("scannerModal").style.display="none"; $("tabScanner").className="nav-btn"; $("tabDashboard").className="nav-btn active"; });
+function bindLandingButtons() {
+  $("navLoginBtn").addEventListener("click", login);
+  $("navGetStartedBtn").addEventListener("click", login);
+  $("heroLoginBtn").addEventListener("click", login);
+  $("heroGetStartedBtn").addEventListener("click", login);
+}
 
+bindLandingButtons();
+$("logoutBtn").addEventListener("click", logout);
+$("connectAccountBtn").addEventListener("click", () => connectSelectedAccount().catch(e => setStatus("accountStatus", e.message, "red")));
 $("startBotBtn").addEventListener("click", startBot);
 $("stopBotBtn").addEventListener("click", () => stopBot("Stopped by user."));
-$("loginBtn").addEventListener("click", () => { if (accessToken && Date.now() < oauthExpiry) loadAccounts(); else login(); });
-$("logoutBtn").addEventListener("click", () => logout());
-$("connectAccountBtn").addEventListener("click", () => connectSelectedAccount().catch(e => setStatus("accountStatus", e.message, "red")));
-$("accountSelect").addEventListener("change", () => {
-  selectedAccount = accounts.find(a => String(accountId(a)) === $("accountSelect").value);
-  if (selectedAccount) { updateAccountLabels(); closeTradeConnection(); setStatus("accountStatus", "Account changed. Tap Connect."); }
-});
 $("refreshMarketsBtn").addEventListener("click", connectPublicMarkets);
 $("botSymbol").addEventListener("change", () => { renderDigitBars(); drawChart(); });
+$("clearHistoryBtn").addEventListener("click", () => {
+  if (!window.confirm("Clear session history?")) return;
+  completedTrades = []; botSessionPL = 0; winsCount = 0; lossesCount = 0;
+  updateHistory(); updateSummary();
+});
 
-renderMarkets();
 connectPublicMarkets();
-handleOAuthCallback().then(() => { if (accessToken && !selectedAccount) loadAccounts(); }).catch(e => setStatus("loginStatus", e.message, "red"));
+handleOAuthCallback().then(() => {
+  if (accessToken && !selectedAccount) loadAccounts();
+}).catch(e => setStatus("loginStatus", e.message, "red"));
 </script>
 </body>
 </html>
