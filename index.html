@@ -193,7 +193,7 @@ th{color:var(--muted)}canvas{width:100%;height:180px;display:block;background:#0
 <script>
 "use strict";
 
-const APP_ID = "34JjnKJzecylG5kwmjaXm";
+const APP_ID = "34MKk0BSq1Hz7mnKlIjHN";
 const REDIRECT_URI = "https://collinskipkorir9406-pixel.github.io/cktradindscheme/";
 const PUBLIC_WS_URL = "wss://api.derivws.com/trading/v1/options/ws/public";
 
@@ -300,7 +300,6 @@ function login() {
   }
 }
 
-// Directly parse accounts and tokens from Deriv's OAuth redirect hash
 async function handleOAuthCallback() {
   const hashStr = location.hash.substring(1);
   const searchStr = location.search.substring(1);
@@ -346,7 +345,7 @@ async function handleOAuthCallback() {
     $("accountSelect").innerHTML = "";
     accounts.forEach((a) => {
       const opt = document.createElement("option");
-      opt.value = a.token; // store token in option value
+      opt.value = a.token;
       opt.textContent = `${a.account_type.toUpperCase()} · ${a.account_id} (${a.currency})`;
       $("accountSelect").appendChild(opt);
     });
@@ -363,7 +362,6 @@ async function handleOAuthCallback() {
     $("connectAccountBtn").disabled = false;
     setStatus("accountStatus", "Account selected. Tap Connect Account.");
   } else {
-    // Check session storage cache
     const cached = sessionStorage.getItem("ck_deriv_accounts");
     if (cached) {
       try {
@@ -427,7 +425,6 @@ async function connectSelectedAccount() {
   setStatus("accountStatus", "Connecting securely via Deriv WebSocket…");
 
   try {
-    // Connect directly to Deriv API public/auth WS endpoint using authorize command
     const wsUrl = `wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`;
     if (attempt !== connectionAttempt) return;
     const ws = new WebSocket(wsUrl);
@@ -438,7 +435,6 @@ async function connectSelectedAccount() {
       setStatus("accountStatus", "Authorizing session with token…", "green");
 
       try {
-        // Authorize with token
         const authResponse = await sendWS({authorize: account.token});
         if (authResponse.error) throw new Error(authResponse.error.message);
 
@@ -858,7 +854,6 @@ $("startBotBtn").addEventListener("click", startBot);
 $("stopBotBtn").addEventListener("click", () => stopBot("Emergency stop activated."));
 $("loginBtn").addEventListener("click", () => {
   if (accessToken && (!oauthExpiry || Date.now() < oauthExpiry)) {
-    // Already logged in
     loadAccounts();
   } else {
     login();
