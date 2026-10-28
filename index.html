@@ -9,83 +9,81 @@
 <style>
 :root{--bg:#07111f;--panel:#101e30;--panel2:#14253a;--line:#263b53;--text:#eef5ff;--muted:#9bb0c8;--green:#27d99a;--red:#ff647c;--blue:#3b82f6;--blue-light:#60a5fa;--gold:#f5c451}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:14px Arial,Helvetica,sans-serif;overflow-x:hidden}
+body{margin:0;background:var(--bg);color:var(--text);font:15px Arial,Helvetica,sans-serif;overflow-x:hidden}
 
 /* Top Ticker Bar */
-.ticker-bar{background:#040d18;border-bottom:1px solid var(--line);padding:6px 10px;font-size:11px;display:flex;gap:20px;overflow-x:auto;white-space:nowrap;color:var(--muted)}
+.ticker-bar{background:#040d18;border-bottom:1px solid var(--line);padding:8px 12px;font-size:12px;display:flex;gap:24px;overflow-x:auto;white-space:nowrap;color:var(--muted)}
 .ticker-item{display:inline-flex;align-items:center;gap:6px}
 
 /* Header Navbar */
-header{padding:10px 14px;background:#0b1829;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:100}
-.head{max-width:1150px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:8px}
-.brand{font-size:16px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:6px}
-.brand-badge{background:#111e30;padding:2px 6px;border-radius:4px;border:1px solid var(--line);font-size:11px}
-.nav-center{display:flex;gap:4px;align-items:center;overflow-x:auto}
-.nav-tab{background:transparent;border:none;color:var(--muted);padding:6px 10px;border-radius:6px;font-weight:600;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+header{padding:12px 20px;background:#0b1829;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:100}
+.head{max-width:1150px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-size:18px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px}
+.brand-badge{background:#111e30;padding:4px 8px;border-radius:6px;border:1px solid var(--line);font-size:12px}
+.nav-center{display:flex;gap:6px;align-items:center;overflow-x:auto}
+.nav-tab{background:transparent;border:none;color:var(--muted);padding:8px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 .nav-tab.active{background:rgba(39,217,154,0.1);color:var(--green);border:1px solid rgba(39,217,154,0.3)}
-.nav-right{display:flex;gap:6px;align-items:center}
-.acc-dropdown{background:#0a1727;border:1px solid var(--line);padding:4px 8px;border-radius:6px;font-size:12px;display:flex;align-items:center;gap:6px}
+.nav-right{display:flex;gap:10px;align-items:center}
+.acc-dropdown{background:#0a1727;border:1px solid var(--line);padding:6px 12px;border-radius:8px;font-size:13px;display:flex;align-items:center;gap:8px;cursor:pointer}
 
 /* Landing Hero Section */
-#landingView{max-width:800px;margin:30px auto;padding:0 12px;text-align:center}
-.pill-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(39,217,154,0.1);border:1px solid rgba(39,217,154,0.3);padding:4px 10px;border-radius:16px;font-size:11px;color:var(--green);font-weight:700;margin-bottom:14px}
-#landingView h1{font-size:32px;line-height:1.2;font-weight:800;margin:0 0 12px;background:linear-gradient(90deg,#eef5ff,#60a5fa,#27d99a);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-#landingView p{color:var(--muted);font-size:13px;max-width:550px;margin:0 auto 20px;line-height:1.5}
-.hero-cta{display:flex;flex-direction:column;gap:12px;max-width:420px;margin:0 auto 30px}
-.btn-huge-blue{background:linear-gradient(135deg,#60a5fa,#2563eb);color:#fff;border:none;padding:12px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 15px rgba(37,99,235,0.3);display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
-.token-box{background:var(--panel);border:1px solid var(--line);padding:16px;border-radius:12px;margin-top:20px;text-align:left}
-.token-box h3{margin:0 0 6px;font-size:15px}
-.token-box p{color:var(--muted);font-size:12px;margin:0 0 12px}
+#landingView{max-width:900px;margin:40px auto 20px;padding:0 16px;text-align:center}
+.pill-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(39,217,154,0.1);border:1px solid rgba(39,217,154,0.3);padding:6px 14px;border-radius:20px;font-size:12px;color:var(--green);font-weight:700;margin-bottom:20px}
+#landingView h1{font-size:40px;line-height:1.2;font-weight:800;margin:0 0 16px;background:linear-gradient(90deg,#eef5ff,#60a5fa,#27d99a);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+#landingView p{color:var(--muted);font-size:15px;max-width:650px;margin:0 auto 30px;line-height:1.6}
+.hero-cta{display:flex;flex-direction:column;gap:12px;max-width:480px;margin:0 auto 40px}
+.btn-huge-blue{background:linear-gradient(135deg,#60a5fa,#2563eb);color:#fff;border:none;padding:16px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(37,99,235,0.4);display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn-huge-white{background:#eef5ff;color:#07111f;border:none;padding:16px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
 
-/* Dashboard View - 2x2 Grid */
-#dashboardView{display:none;max-width:1000px;margin:20px auto;padding:0 12px}
-.dash-welcome{text-align:center;margin-bottom:20px}
-.dash-welcome h2{font-size:22px;margin:0 0 4px}
-.dash-welcome p{color:var(--muted);font-style:italic;font-size:12px;margin:0}
-.dash-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.dash-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;position:relative;cursor:pointer;transition:border-color 0.2s}
+/* Dashboard View (01 & 02 on top, 03 & 04 below/behind) */
+#dashboardView{display:none;max-width:1100px;margin:30px auto;padding:0 16px}
+.dash-welcome{text-align:center;margin-bottom:30px}
+.dash-welcome h2{font-size:28px;margin:0 0 8px}
+.dash-welcome p{color:var(--muted);font-style:italic;font-size:14px;margin:0}
+.dash-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.dash-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;position:relative;cursor:pointer;transition:border-color 0.2s}
 .dash-card:hover{border-color:var(--blue)}
-.dash-card-num{font-size:11px;color:var(--muted);font-weight:700;margin-bottom:6px}
-.dash-card h3{font-size:15px;margin:0 0 4px}
-.dash-card p{color:var(--muted);font-size:12px;margin:0 0 12px}
-.dash-card-footer{display:flex;align-items:center;justify-content:space-between;color:var(--blue-light);font-size:12px;font-weight:700}
-.arrow-icon{background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px}
+.dash-card-num{font-size:13px;color:var(--muted);font-weight:700;margin-bottom:12px}
+.dash-card h3{font-size:18px;margin:0 0 6px}
+.dash-card p{color:var(--muted);font-size:13px;margin:0 0 20px}
+.dash-card-footer{display:flex;align-items:center;justify-content:space-between;color:var(--blue-light);font-size:13px;font-weight:700}
+.arrow-icon{background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center}
 
 /* Workspace Panels */
 .workspace-section{display:none;max-width:1100px;margin:20px auto;padding:0 12px 40px}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0}
 .wide{grid-column:1/-1}
-.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .between{justify-content:space-between}
-button,select,input{font:inherit;border-radius:8px;border:1px solid var(--line);padding:9px;background:#0a1727;color:var(--text);max-width:100%}
+button,select,input{font:inherit;border-radius:9px;border:1px solid var(--line);padding:11px;background:#0a1727;color:var(--text);max-width:100%}
 button{cursor:pointer;font-weight:700}
 button:disabled{opacity:.45;cursor:not-allowed}
 button.primary{background:var(--green);color:#04150f;border-color:var(--green)}
 button.blue{background:#1d4ed8;border-color:#3b82f6}
 button.danger{background:#541c2a;border-color:#9f344a}
-button.full{width:100%;margin-top:8px}
-select,input{width:100%;margin-top:4px}
-label{display:block;color:var(--muted);font-size:12px;margin:8px 0}
-.stat{font-size:18px;font-weight:800;margin:4px 0}
+button.full{width:100%;margin-top:10px}
+select,input{width:100%;margin-top:6px}
+label{display:block;color:var(--muted);font-size:13px;margin:10px 0}
+.stat{font-size:22px;font-weight:800;margin:6px 0}
 .green{color:var(--green)}.red{color:var(--red)}.gold{color:var(--gold)}
-.status{font-size:12px;color:var(--muted);margin-top:8px;overflow-wrap:anywhere}
-.market-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.market{padding:10px;border-radius:8px;background:var(--panel2);border:1px solid var(--line)}
-.price{font-size:14px;font-weight:800;margin-top:4px}
-.check{display:flex;align-items:flex-start;gap:8px;line-height:1.3}
+.status{font-size:13px;color:var(--muted);margin-top:9px;overflow-wrap:anywhere}
+.market-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.market{padding:12px;border-radius:10px;background:var(--panel2);border:1px solid var(--line)}
+.price{font-size:16px;font-weight:800;margin-top:6px}
+.check{display:flex;align-items:flex-start;gap:9px;line-height:1.4}
 .check input{width:auto;margin:2px 0 0}
-.small{font-size:11px}
+.small{font-size:12px}
 .scroll{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:12px;min-width:450px}
-th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:470px}
+th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left}
 th{color:var(--muted)}
-canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8px}
-.digit-bars{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;margin-top:8px;align-items:end;height:70px;background:#091625;padding:6px;border-radius:6px;border:1px solid var(--line)}
+canvas{width:100%;height:180px;display:block;background:#091625;border-radius:10px}
+.digit-bars{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-top:10px;align-items:end;height:80px;background:#091625;padding:8px;border-radius:8px;border:1px solid var(--line)}
 .bar-col{display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end}
-.bar-fill{width:100%;background:var(--blue);border-radius:2px 2px 0 0;min-height:4px}
-.bar-label{font-size:10px;color:var(--muted);margin-top:3px}
-@media(max-width:800px){.market-grid{grid-template-columns:repeat(2,1fr)}}
+.bar-fill{width:100%;background:var(--blue);border-radius:3px 3px 0 0;min-height:4px}
+.bar-label{font-size:11px;color:var(--muted);margin-top:4px}
+@media(max-width:800px){.dash-grid{grid-template-columns:1fr}.market-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:650px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}}
 </style>
 </head>
@@ -103,7 +101,7 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
 <header>
   <div class="head">
     <div class="brand">
-      <div style="background:#1d4ed8;color:#fff;padding:3px 6px;border-radius:4px;font-size:11px">TS</div>
+      <div style="background:#1d4ed8;color:#fff;padding:4px 8px;border-radius:6px;font-size:12px">TS</div>
       TraderScheme
       <div class="brand-badge" id="authBadgeStatus" style="color:var(--muted)">Not Logged In</div>
     </div>
@@ -114,36 +112,27 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
     </div>
 
     <div class="nav-right" id="navRight">
-      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34MKk0BSq1Hz7mnKlIjHN&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=trade+account_manage" class="btn-huge-blue" style="padding:6px 12px;font-size:12px;border-radius:6px;text-decoration:none">Log In</a>
+      <a href="#" id="navLoginBtn" class="btn-huge-blue" style="padding:8px 16px;font-size:13px;border-radius:8px;text-decoration:none">Log In</a>
     </div>
   </div>
 </header>
 
 <!-- 1. Landing View -->
 <div id="landingView">
-  <section>
+  <section style="max-width:800px;margin:40px auto;padding:0 16px;text-align:center">
     <div class="pill-badge">🟢 FREE STRATEGIES. REAL MARKET TOOLS.</div>
     <h1>Trade with better structure</h1>
     <p>Use manual trading, charts, copy tools, automation, and market analysis without jumping between separate apps.</p>
     
     <div class="hero-cta">
-      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34MKk0BSq1Hz7mnKlIjHN&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=trade+account_manage" class="btn-huge-blue">⚡ Log In via Deriv OAuth</a>
-      
-      <!-- Instant Token Login Box (Bypasses redirect lockups) -->
-      <div class="token-box">
-        <h3>Alternative Instant Login (API Token)</h3>
-        <p>If the OAuth redirect page holds you up, paste your Deriv API Token below:</p>
-        <div class="row">
-          <input type="password" id="manualTokenInput" placeholder="Paste API Token here..." style="flex:1;margin:0">
-          <button class="blue" id="manualTokenBtn" style="padding:9px 14px">Connect Token</button>
-        </div>
-        <div id="loginStatus" class="status"></div>
-      </div>
+      <a href="#" id="heroLoginBtn" class="btn-huge-blue">⚡ Log In and Trade</a>
+      <a href="#" id="heroGetStartedBtn" class="btn-huge-white">⚡ Create Free Account</a>
     </div>
+    <div id="loginStatus" class="status"></div>
   </section>
 </div>
 
-<!-- 2. Dashboard View -->
+<!-- 2. Dashboard View (01 & 02 top, 03 & 04 below) -->
 <div id="dashboardView">
   <div class="dash-welcome">
     <h2>Welcome to Traders</h2>
@@ -195,7 +184,7 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
       <label>Trading Account
         <select id="accountSelect"><option value="">Log in first</option></select>
       </label>
-      <div class="row between" style="margin-top:8px">
+      <div class="row between" style="margin-top:10px">
         <div><div class="muted">Balance</div><div class="stat" id="balance">—</div></div>
         <div><div class="muted">Type</div><div class="stat" id="accountType">—</div></div>
         <button id="connectAccountBtn" class="blue">Connect Account</button>
@@ -220,11 +209,11 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
         <div style="flex:1"><label>Stop Loss ($)<input id="maxLoss" type="number" min="0" step="0.01" value="30"></label></div>
         <div style="flex:1"><label>Martingale Multiplier<input id="martingaleMultiplier" type="number" min="1" step="0.1" value="2.0"></label></div>
       </div>
-      <label class="check" style="margin-top:8px">
+      <label class="check" style="margin-top:10px">
         <input id="botRealConfirm" type="checkbox">
         <span>Authorize automated real-money orders.</span>
       </label>
-      <div class="row" style="margin-top:8px">
+      <div class="row" style="margin-top:10px">
         <button class="primary" id="startBotBtn" style="flex:1">Start Bot</button>
         <button class="danger" id="stopBotBtn" style="flex:1" disabled>Stop Bot</button>
       </div>
@@ -236,7 +225,7 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
       <div class="muted">Total Net Profit</div><div class="stat green" id="sessionPL">$0.00</div>
       <div class="muted">Wins / Losses</div><div class="stat" id="winLossCount">0 / 0</div>
       <div class="muted">Win Rate</div><div class="stat" id="winRate">0.0%</div>
-      <button id="clearHistoryBtn" class="full" style="margin-top:12px">Clear Session History</button>
+      <button id="clearHistoryBtn" class="full" style="margin-top:16px">Clear Session History</button>
     </section>
 
     <section class="panel wide">
@@ -244,9 +233,9 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
         <h2>Live Markets & Digit Analyzer</h2><button id="refreshMarketsBtn">Refresh Feed</button>
       </div>
       <div class="market-grid" id="markets"></div>
-      <p class="muted" style="margin:10px 0 4px">Last Digit Distribution (Last 100 Ticks):</p>
+      <p class="muted" style="margin:14px 0 4px">Last Digit Distribution (Last 100 Ticks):</p>
       <div class="digit-bars" id="digitBars"></div>
-      <canvas id="chart" width="900" height="160" style="margin-top:10px"></canvas>
+      <canvas id="chart" width="900" height="180" style="margin-top:12px"></canvas>
       <div id="marketStatus" class="status">Connecting to market feed...</div>
     </section>
 
@@ -266,7 +255,7 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
 <script>
 "use strict";
 
-const APP_ID = "34MKk0BSq1Hz7mnKlIjHN";
+const APP_ID = "34JjnKJzecylG5kwmjaXm";
 const REDIRECT_URI = "https://collinskipkorir9406-pixel.github.io/cktradindscheme/";
 const WORKER_URL = "https://steep-snow-a539.collinskipkorir70.workers.dev/";
 const API_BASE = "https://api.derivws.com";
@@ -349,31 +338,63 @@ function settlePending(data) {
   else p.resolve(data);
 }
 
+function randomString(size=64) {
+  const bytes = crypto.getRandomValues(new Uint8Array(size));
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
+  return Array.from(bytes, b => alphabet[b % alphabet.length]).join("");
+}
+
+async function sha256Base64Url(value) {
+  const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  let binary = "";
+  new Uint8Array(hash).forEach(b => binary += String.fromCharCode(b));
+  return btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+}
+
+async function setupLoginLinks() {
+  const verifier = randomString(64);
+  const challenge = await sha256Base64Url(verifier);
+  const state = randomString(32);
+  
+  sessionStorage.setItem("ck_pkce_verifier", verifier);
+  sessionStorage.setItem("ck_oauth_state", state);
+
+  const params = new URLSearchParams({
+    response_type: "code",
+    client_id: APP_ID,
+    redirect_uri: REDIRECT_URI,
+    scope: "trade account_manage",
+    state: state,
+    code_challenge: challenge,
+    code_challenge_method: "S256"
+  });
+
+  const loginUrl = "https://auth.deriv.com/oauth2/auth?" + params.toString();
+
+  ["navLoginBtn", "heroLoginBtn", "heroGetStartedBtn"].forEach(id => {
+    const el = $(id);
+    if (el) el.href = loginUrl;
+  });
+}
+
 async function handleOAuthCallback() {
   const url = new URL(location.href);
   const error = url.searchParams.get("error");
   const code = url.searchParams.get("code");
-  const token1 = url.searchParams.get("token1");
-  
+  const returnedState = url.searchParams.get("state");
   if (error) { setStatus("loginStatus", "Login error: " + error, "red"); cleanCallbackURL(); return; }
-  
-  if (token1) {
-    accessToken = token1;
-    oauthExpiry = Date.now() + 3600 * 1000;
-    sessionStorage.setItem("ck_deriv_access_token", accessToken);
-    sessionStorage.setItem("ck_deriv_expiry", String(oauthExpiry));
-    cleanCallbackURL();
-    await loadAccounts();
-    return;
-  }
-
   if (!code) return;
 
-  setStatus("loginStatus", "Authenticating secure session…");
+  const expectedState = sessionStorage.getItem("ck_oauth_state");
+  const verifier = sessionStorage.getItem("ck_pkce_verifier");
+  if (!expectedState || returnedState !== expectedState || !verifier) {
+    setStatus("loginStatus", "Security validation failed.", "red"); cleanCallbackURL(); return;
+  }
+
   try {
     const response = await fetch(WORKER_URL, {
       method:"POST", headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({code, redirect_uri:REDIRECT_URI, client_id:APP_ID})
+      body:JSON.stringify({code, code_verifier:verifier, redirect_uri:REDIRECT_URI, client_id:APP_ID})
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || "Token exchange failed.");
@@ -384,6 +405,8 @@ async function handleOAuthCallback() {
     oauthExpiry = Date.now() + Number(result.expires_in || 3600) * 1000;
     sessionStorage.setItem("ck_deriv_access_token", accessToken);
     sessionStorage.setItem("ck_deriv_expiry", String(oauthExpiry));
+    sessionStorage.removeItem("ck_pkce_verifier");
+    sessionStorage.removeItem("ck_oauth_state");
     cleanCallbackURL();
     await loadAccounts();
   } catch (e) { setStatus("loginStatus", "Authentication failed: " + e.message, "red"); cleanCallbackURL(); }
@@ -391,13 +414,13 @@ async function handleOAuthCallback() {
 
 function cleanCallbackURL() {
   const url = new URL(location.href);
-  ["code","state","error","error_description","token1","acct1","cur1"].forEach(k => url.searchParams.delete(k));
+  ["code","state","error","error_description"].forEach(k => url.searchParams.delete(k));
   history.replaceState({}, document.title, url.pathname + url.search + url.hash);
 }
 
 async function apiFetch(path, options={}) {
   if (!accessToken) throw new Error("Not logged in.");
-  if (oauthExpiry && Date.now() >= oauthExpiry) { logout(); throw new Error("Session expired."); }
+  if (oauthExpiry && Date.now() >= oauthExpiry) { logout(false); throw new Error("Session expired."); }
   const headers = Object.assign({"Authorization":"Bearer " + accessToken, "Accept":"application/json"}, options.headers || {});
   const response = await fetch(API_BASE + path, {...options, headers});
   let data = {};
@@ -444,7 +467,7 @@ async function loadAccounts() {
         <span id="navCurrBadge" style="color:var(--green)">USD</span>
         <b id="navBalBadge">$0.00</b>
       </div>
-      <button class="btn-outline" id="headerLogout" style="padding:4px 8px;font-size:11px">Log Out</button>
+      <button class="btn-outline" id="headerLogout" style="padding:6px 12px;font-size:12px">Log Out</button>
     `;
     $("headerLogout").addEventListener("click", logout);
   } catch (e) { setStatus("loginStatus", e.message, "red"); }
@@ -508,11 +531,17 @@ async function connectSelectedAccount() {
   } catch (e) { setStatus("accountStatus", "Connection error: " + e.message, "red"); throw e; }
 }
 
-function logout() {
+async function logout() {
   closeTradeConnection();
   accessToken = ""; oauthExpiry = 0; accounts = []; selectedAccount = null;
   sessionStorage.removeItem("ck_deriv_access_token"); sessionStorage.removeItem("ck_deriv_expiry");
-  location.reload();
+  $("dashboardView").style.display = "none";
+  $("workspaceView").style.display = "none";
+  $("landingView").style.display = "block";
+  $("navCenterTabs").style.display = "none";
+  $("authBadgeStatus").textContent = "Not Logged In";
+  $("navRight").innerHTML = '<a href="#" id="navLoginBtn" class="btn-huge-blue" style="padding:8px 16px;font-size:13px;border-radius:8px;text-decoration:none">Log In</a>';
+  await setupLoginLinks();
 }
 
 function connectPublicMarkets() {
@@ -701,7 +730,7 @@ function updateHistory() {
 
 function updateSummary() {
   $("sessionPL").textContent = money(botSessionPL);
-  $("sessionPL"].className = "stat " + (botSessionPL >= 0 ? "green" : "red");
+  $("sessionPL").className = "stat " + (botSessionPL >= 0 ? "green" : "red");
   $("winLossCount").textContent = winsCount + " / " + lossesCount;
   const total = winsCount + lossesCount;
   const rate = total > 0 ? ((winsCount / total) * 100).toFixed(1) : "0.0";
@@ -789,6 +818,7 @@ $("cardSpeedBot").addEventListener("click", () => switchView("workspace"));
 $("cardManual").addEventListener("click", () => switchView("workspace"));
 $("cardPremium").addEventListener("click", () => alert("Premium strategies module loading soon."));
 
+setupLoginLinks();
 $("connectAccountBtn").addEventListener("click", () => connectSelectedAccount().catch(e => setStatus("accountStatus", e.message, "red")));
 $("startBotBtn").addEventListener("click", startBot);
 $("stopBotBtn").addEventListener("click", () => stopBot("Stopped by user."));
@@ -798,22 +828,6 @@ $("clearHistoryBtn").addEventListener("click", () => {
   if (!window.confirm("Clear session history?")) return;
   completedTrades = []; botSessionPL = 0; winsCount = 0; lossesCount = 0;
   updateHistory(); updateSummary();
-});
-
-// Manual Token Button Listener
-$("manualTokenBtn").addEventListener("click", async () => {
-  const token = $("manualTokenInput").value.trim();
-  if (!token) { setStatus("loginStatus", "Please enter a valid token.", "red"); return; }
-  setStatus("loginStatus", "Validating token...", "blue");
-  try {
-    accessToken = token;
-    oauthExpiry = Date.now() + 3600 * 1000;
-    sessionStorage.setItem("ck_deriv_access_token", accessToken);
-    sessionStorage.setItem("ck_deriv_expiry", String(oauthExpiry));
-    await loadAccounts();
-  } catch (e) {
-    setStatus("loginStatus", "Invalid token: " + e.message, "red");
-  }
 });
 
 connectPublicMarkets();
