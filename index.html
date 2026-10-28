@@ -35,7 +35,7 @@ header{padding:10px 14px;background:#0b1829;border-bottom:1px solid var(--line);
 .btn-huge-blue{background:linear-gradient(135deg,#60a5fa,#2563eb);color:#fff;border:none;padding:12px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 15px rgba(37,99,235,0.3);display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
 .btn-huge-white{background:#eef5ff;color:#07111f;border:none;padding:12px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
 
-/* Dashboard View - 2x2 Compact Grid */
+/* Dashboard View - 2x2 Grid */
 #dashboardView{display:none;max-width:1000px;margin:20px auto;padding:0 12px}
 .dash-welcome{text-align:center;margin-bottom:20px}
 .dash-welcome h2{font-size:22px;margin:0 0 4px}
@@ -112,8 +112,8 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
     </div>
 
     <div class="nav-right" id="navRight">
-      <!-- Direct hardcoded link to guarantee mobile response -->
-      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&l=EN&brand=deriv" id="navLoginBtn" class="btn-huge-blue" style="padding:6px 12px;font-size:12px;border-radius:6px;text-decoration:none">Log In</a>
+      <!-- Full OAuth Redirect URL with App ID: 34MKk0BSq1Hz7mnKlIjHN -->
+      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34MKk0BSq1Hz7mnKlIjHN&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=trade+account_manage" id="navLoginBtn" class="btn-huge-blue" style="padding:6px 12px;font-size:12px;border-radius:6px;text-decoration:none">Log In</a>
     </div>
   </div>
 </header>
@@ -126,15 +126,15 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
     <p>Use manual trading, charts, copy tools, automation, and market analysis without jumping between separate apps.</p>
     
     <div class="hero-cta">
-      <!-- Direct hardcoded link -->
-      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&l=EN&brand=deriv" id="heroLoginBtn" class="btn-huge-blue">⚡ Log In and Trade</a>
-      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&l=EN&brand=deriv" id="heroGetStartedBtn" class="btn-huge-white">⚡ Create Free Account</a>
+      <!-- Direct links using 34MKk0BSq1Hz7mnKlIjHN -->
+      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34MKk0BSq1Hz7mnKlIjHN&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=trade+account_manage" id="heroLoginBtn" class="btn-huge-blue">⚡ Log In and Trade</a>
+      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34MKk0BSq1Hz7mnKlIjHN&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=trade+account_manage" id="heroGetStartedBtn" class="btn-huge-white">⚡ Create Free Account</a>
     </div>
     <div id="loginStatus" class="status"></div>
   </section>
 </div>
 
-<!-- 2. Dashboard View (Compact 2x2 Grid) -->
+<!-- 2. Dashboard View -->
 <div id="dashboardView">
   <div class="dash-welcome">
     <h2>Welcome to Traders</h2>
@@ -257,7 +257,7 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
 <script>
 "use strict";
 
-const APP_ID = "34JjnKJzecylG5kwmjaXm";
+const APP_ID = "34MKk0BSq1Hz7mnKlIjHN";
 const REDIRECT_URI = "https://collinskipkorir9406-pixel.github.io/cktradindscheme/";
 const WORKER_URL = "https://steep-snow-a539.collinskipkorir70.workers.dev/";
 const API_BASE = "https://api.derivws.com";
@@ -344,12 +344,24 @@ async function handleOAuthCallback() {
   const url = new URL(location.href);
   const error = url.searchParams.get("error");
   const code = url.searchParams.get("code");
+  const token1 = url.searchParams.get("token1");
+  
   if (error) { setStatus("loginStatus", "Login error: " + error, "red"); cleanCallbackURL(); return; }
+  
+  if (token1) {
+    accessToken = token1;
+    oauthExpiry = Date.now() + 3600 * 1000;
+    sessionStorage.setItem("ck_deriv_access_token", accessToken);
+    sessionStorage.setItem("ck_deriv_expiry", String(oauthExpiry));
+    cleanCallbackURL();
+    await loadAccounts();
+    return;
+  }
+
   if (!code) return;
 
   setStatus("loginStatus", "Authenticating secure session…");
   try {
-    // If authorization code comes back directly, exchange it via worker
     const response = await fetch(WORKER_URL, {
       method:"POST", headers:{"Content-Type":"application/json"},
       body:JSON.stringify({code, redirect_uri:REDIRECT_URI, client_id:APP_ID})
@@ -370,13 +382,13 @@ async function handleOAuthCallback() {
 
 function cleanCallbackURL() {
   const url = new URL(location.href);
-  ["code","state","error","error_description"].forEach(k => url.searchParams.delete(k));
+  ["code","state","error","error_description","token1","acct1","cur1"].forEach(k => url.searchParams.delete(k));
   history.replaceState({}, document.title, url.pathname + url.search + url.hash);
 }
 
 async function apiFetch(path, options={}) {
   if (!accessToken) throw new Error("Not logged in.");
-  if (oauthExpiry && Date.now() >= oauthExpiry) { logout(false); throw new Error("Session expired."); }
+  if (oauthExpiry && Date.now() >= oauthExpiry) { logout(); throw new Error("Session expired."); }
   const headers = Object.assign({"Authorization":"Bearer " + accessToken, "Accept":"application/json"}, options.headers || {});
   const response = await fetch(API_BASE + path, {...options, headers});
   let data = {};
@@ -487,7 +499,7 @@ async function connectSelectedAccount() {
   } catch (e) { setStatus("accountStatus", "Connection error: " + e.message, "red"); throw e; }
 }
 
-async function logout() {
+function logout() {
   closeTradeConnection();
   accessToken = ""; oauthExpiry = 0; accounts = []; selectedAccount = null;
   sessionStorage.removeItem("ck_deriv_access_token"); sessionStorage.removeItem("ck_deriv_expiry");
@@ -496,7 +508,7 @@ async function logout() {
   $("landingView").style.display = "block";
   $("navCenterTabs").style.display = "none";
   $("authBadgeStatus").textContent = "Not Logged In";
-  $("navRight").innerHTML = '<a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&l=EN&brand=deriv" id="navLoginBtn" class="btn-huge-blue" style="padding:6px 12px;font-size:12px;border-radius:6px;text-decoration:none">Log In</a>';
+  $("navRight").innerHTML = '<a href="https://oauth.deriv.com/oauth2/authorize?app_id=34MKk0BSq1Hz7mnKlIjHN&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=trade+account_manage" id="navLoginBtn" class="btn-huge-blue" style="padding:6px 12px;font-size:12px;border-radius:6px;text-decoration:none">Log In</a>';
 }
 
 function connectPublicMarkets() {
@@ -685,7 +697,7 @@ function updateHistory() {
 
 function updateSummary() {
   $("sessionPL").textContent = money(botSessionPL);
-  $("sessionPL"].className = "stat " + (botSessionPL >= 0 ? "green" : "red");
+  $("sessionPL").className = "stat " + (botSessionPL >= 0 ? "green" : "red");
   $("winLossCount").textContent = winsCount + " / " + lossesCount;
   const total = winsCount + lossesCount;
   const rate = total > 0 ? ((winsCount / total) * 100).toFixed(1) : "0.0";
