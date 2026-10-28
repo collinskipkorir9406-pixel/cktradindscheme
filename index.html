@@ -195,8 +195,6 @@ th{color:var(--muted)}canvas{width:100%;height:180px;display:block;background:#0
 
 const APP_ID = "34JjnKJzecylG5kwmjaXm";
 const REDIRECT_URI = "https://collinskipkorir9406-pixel.github.io/cktradindscheme/";
-const WORKER_URL = "https://steep-snow-a539.collinskipkorir70.workers.dev/";
-const API_BASE = "https://api.derivws.com";
 const PUBLIC_WS_URL = "wss://api.derivws.com/trading/v1/options/ws/public";
 
 const $ = id => document.getElementById(id);
@@ -256,8 +254,8 @@ function accountId(a=selectedAccount) {
 function isRealAccount(a=selectedAccount) {
   if (!a) return false;
   const type = String(a.account_type || a.type || "").toLowerCase();
-  const group = String(a.group || "").toLowerCase();
-  return type === "real" || type === "live" || group === "real";
+  const id = String(accountId(a) || "").toLowerCase();
+  return type === "real" || type === "live" || !id.startsWith("vr");
 }
 
 function sendWS(payload) {
@@ -302,102 +300,54 @@ function login() {
   }
 }
 
+// Directly parse accounts and tokens from Deriv's OAuth redirect hash
 async function handleOAuthCallback() {
-  const url = new URL(location.href);
+  const hashStr = location.hash.substring(1);
+  const searchStr = location.search.substring(1);
+  const params = new URLSearchParams(hashStr || searchStr);
 
-  // 1. Check token in URL hash fragment returned by Deriv
-  const hashParams = new URLSearchParams(location.hash.substring(1));
-  const tokenFromHash = hashParams.get("token1");
-  if (tokenFromHash) {
-    accessToken = tokenFromHash;
-    oauthExpiry = Date.now() + 3600 * 1000;
-    sessionStorage.setItem("ck_deriv_access_token", accessToken);
-    sessionStorage.setItem("ck_deriv_expiry", String(oauthExpiry));
-    cleanCallbackURL();
-    await loadAccounts();
-    return;
-  }
-
-  // 2. Check token in query search parameters
-  const tokenFromQuery = url.searchParams.get("token1");
-  if (tokenFromQuery) {
-    accessToken = tokenFromQuery;
-    oauthExpiry = Date.now() + 3600 * 1000;
-    sessionStorage.setItem("ck_deriv_access_token", accessToken);
-    sessionStorage.setItem("ck_deriv_expiry", String(oauthExpiry));
-    cleanCallbackURL();
-    await loadAccounts();
-    return;
-  }
-
-  // 3. Fallback code check
-  const code = url.searchParams.get("code");
-  if (!code) return;
-
-  setStatus("loginStatus", "Completing login sync...");
-  try {
-    const response = await fetch(WORKER_URL, {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({code, redirect_uri: REDIRECT_URI, client_id: APP_ID})
+  let extractedAccounts = [];
+  let i = 1;
+  while (true) {
+    const token = params.get(`token${i}`);
+    const acct = params.get(`acct${i}`);
+    const cur = params.get(`cur${i}`);
+    if (!token && !acct) break;
+    extractedAccounts.push({
+      account_id: acct || `Account ${i}`,
+      token: token,
+      currency: (cur || "USD").toUpperCase(),
+      account_type: acct && acct.toLowerCase().startsWith("vr") ? "demo" : "real"
     });
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.error || "Token exchange failed.");
+    i++;
+  }
 
-    accessToken = result.access_token || result.token;
-    if (!accessToken) throw new Error("No token returned.");
+  const singleToken = params.get("token1") || params.get("access_token");
+  if (extractedAccounts.length === 0 && singleToken) {
+    extractedAccounts.push({
+      account_id: params.get("acct1") || "Account 1",
+      token: singleToken,
+      currency: (params.get("cur1") || "USD").toUpperCase(),
+      account_type: "real"
+    });
+  }
 
+  if (extractedAccounts.length > 0) {
+    accounts = extractedAccounts;
+    accessToken = accounts[0].token;
     oauthExpiry = Date.now() + 3600 * 1000;
+
     sessionStorage.setItem("ck_deriv_access_token", accessToken);
     sessionStorage.setItem("ck_deriv_expiry", String(oauthExpiry));
-    cleanCallbackURL();
-    await loadAccounts();
-  } catch (e) {
-    setStatus("loginStatus", "Login error: " + e.message, "red");
-    cleanCallbackURL();
-  }
-}
+    sessionStorage.setItem("ck_deriv_accounts", JSON.stringify(accounts));
 
-function cleanCallbackURL() {
-  const url = new URL(location.href);
-  ["code","state","error","error_description","token1","acct1","cur1"].forEach(k => url.searchParams.delete(k));
-  history.replaceState({}, document.title, url.pathname + url.search + url.hash);
-}
-
-async function apiFetch(path, options={}) {
-  if (!accessToken) throw new Error("Please log in to Deriv first.");
-  if (oauthExpiry && Date.now() >= oauthExpiry) {
-    logout(false);
-    throw new Error("Your login has expired. Please log in again.");
-  }
-  const headers = Object.assign({"Authorization":"Bearer " + accessToken, "Accept":"application/json"}, options.headers || {});
-  const response = await fetch(API_BASE + path, {...options, headers});
-  let data = {};
-  try { data = await response.json(); } catch (_) {}
-  if (!response.ok) throw new Error(data.message || "Deriv API request failed.");
-  return data;
-}
-
-function findAccounts(result) {
-  if (Array.isArray(result)) return result;
-  if (Array.isArray(result.data)) return result.data;
-  if (result.data && Array.isArray(result.data.accounts)) return result.data.accounts;
-  return [];
-}
-
-async function loadAccounts() {
-  try {
-    const result = await apiFetch("/trading/v1/options/accounts");
-    accounts = findAccounts(result);
-    if (!accounts.length) throw new Error("No accounts found.");
+    history.replaceState({}, document.title, location.pathname);
 
     $("accountSelect").innerHTML = "";
-    accounts.forEach((a, i) => {
-      const id = accountId(a);
-      const type = String(a.account_type || a.type || "account").toUpperCase();
+    accounts.forEach((a) => {
       const opt = document.createElement("option");
-      opt.value = String(id || "");
-      opt.textContent = type + " · " + (id || "Account " + (i+1)) + (a.currency ? " " + a.currency : "");
+      opt.value = a.token; // store token in option value
+      opt.textContent = `${a.account_type.toUpperCase()} · ${a.account_id} (${a.currency})`;
       $("accountSelect").appendChild(opt);
     });
 
@@ -405,16 +355,38 @@ async function loadAccounts() {
     $("logoutBtn").disabled = false;
     $("loginBtn").textContent = "Connected to Deriv";
 
-    const preferred = accounts.find(isRealAccount) || accounts[0];
-    selectedAccount = preferred;
-    $("accountSelect").value = String(accountId(preferred) || "");
+    selectedAccount = accounts[0];
+    $("accountSelect").value = selectedAccount.token;
     updateAccountLabels();
 
-    setStatus("loginStatus", "Signed in successfully.");
+    setStatus("loginStatus", "Signed in successfully. Select account and tap Connect.");
     $("connectAccountBtn").disabled = false;
     setStatus("accountStatus", "Account selected. Tap Connect Account.");
-  } catch (e) {
-    setStatus("loginStatus", e.message, "red");
+  } else {
+    // Check session storage cache
+    const cached = sessionStorage.getItem("ck_deriv_accounts");
+    if (cached) {
+      try {
+        accounts = JSON.parse(cached);
+        if (accounts.length > 0) {
+          accessToken = accounts[0].token;
+          $("accountSelect").innerHTML = "";
+          accounts.forEach((a) => {
+            const opt = document.createElement("option");
+            opt.value = a.token;
+            opt.textContent = `${a.account_type.toUpperCase()} · ${a.account_id} (${a.currency})`;
+            $("accountSelect").appendChild(opt);
+          });
+          $("accountSelect").disabled = false;
+          $("logoutBtn").disabled = false;
+          $("loginBtn").textContent = "Connected to Deriv";
+          selectedAccount = accounts[0];
+          $("accountSelect").value = selectedAccount.token;
+          updateAccountLabels();
+          $("connectAccountBtn").disabled = false;
+        }
+      } catch (_) {}
+    }
   }
 }
 
@@ -442,39 +414,45 @@ function closeTradeConnection() {
 }
 
 async function connectSelectedAccount() {
-  const id = $("accountSelect").value;
-  const account = accounts.find(a => String(accountId(a)) === String(id));
-  if (!account) throw new Error("Select a valid account.");
+  const tokenVal = $("accountSelect").value;
+  const account = accounts.find(a => a.token === tokenVal) || accounts[0];
+  if (!account || !account.token) throw new Error("Select a valid account.");
+  
   selectedAccount = account;
+  accessToken = account.token;
   updateAccountLabels();
   closeTradeConnection();
 
   const attempt = connectionAttempt;
-  setStatus("accountStatus", "Connecting securely…");
+  setStatus("accountStatus", "Connecting securely via Deriv WebSocket…");
 
   try {
-    const otpResult = await apiFetch("/trading/v1/options/accounts/" + encodeURIComponent(accountId(account)) + "/otp", {method:"POST"});
-    const wsUrl = otpResult && otpResult.data && otpResult.data.url;
-    if (!wsUrl || !wsUrl.startsWith("wss://")) throw new Error("Invalid secure socket URL.");
-
+    // Connect directly to Deriv API public/auth WS endpoint using authorize command
+    const wsUrl = `wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`;
     if (attempt !== connectionAttempt) return;
     const ws = new WebSocket(wsUrl);
     tradeWS = ws;
 
     ws.onopen = async () => {
       if (tradeWS !== ws) return;
-      setStatus("accountStatus", "Connection active. Syncing balance…", "green");
+      setStatus("accountStatus", "Authorizing session with token…", "green");
+
       try {
-        const response = await sendWS({balance:1, subscribe:1});
-        if (response.balance) {
-          balanceValue = Number(response.balance.balance);
-          $("balance").textContent = money(balanceValue, response.balance.currency);
+        // Authorize with token
+        const authResponse = await sendWS({authorize: account.token});
+        if (authResponse.error) throw new Error(authResponse.error.message);
+
+        const balanceResponse = await sendWS({balance:1, subscribe:1});
+        if (balanceResponse.balance) {
+          balanceValue = Number(balanceResponse.balance.balance);
+          $("balance").textContent = money(balanceValue, balanceResponse.balance.currency);
         }
+
         $("manualTradeBtn").disabled = false;
         $("startBotBtn").disabled = false;
-        setStatus("accountStatus", "Ready for trading.", "green");
+        setStatus("accountStatus", "Account connected and ready for trading.", "green");
       } catch (e) {
-        setStatus("accountStatus", "Sync error: " + e.message, "red");
+        setStatus("accountStatus", "Authorization error: " + e.message, "red");
       }
     };
 
@@ -510,6 +488,7 @@ function logout(showMessage=true) {
   selectedAccount = null;
   sessionStorage.removeItem("ck_deriv_access_token");
   sessionStorage.removeItem("ck_deriv_expiry");
+  sessionStorage.removeItem("ck_deriv_accounts");
   $("accountSelect").innerHTML = '<option value="">Log in first</option>';
   $("accountSelect").disabled = true;
   $("connectAccountBtn").disabled = true;
@@ -879,6 +858,7 @@ $("startBotBtn").addEventListener("click", startBot);
 $("stopBotBtn").addEventListener("click", () => stopBot("Emergency stop activated."));
 $("loginBtn").addEventListener("click", () => {
   if (accessToken && (!oauthExpiry || Date.now() < oauthExpiry)) {
+    // Already logged in
     loadAccounts();
   } else {
     login();
@@ -887,7 +867,8 @@ $("loginBtn").addEventListener("click", () => {
 $("logoutBtn").addEventListener("click", () => logout());
 $("connectAccountBtn").addEventListener("click", () => connectSelectedAccount().catch(e => setStatus("accountStatus", e.message, "red")));
 $("accountSelect").addEventListener("change", () => {
-  selectedAccount = accounts.find(a => String(accountId(a)) === $("accountSelect").value);
+  const tokenVal = $("accountSelect").value;
+  selectedAccount = accounts.find(a => a.token === tokenVal);
   if (selectedAccount) { updateAccountLabels(); closeTradeConnection(); setStatus("accountStatus", "Account changed. Tap Connect."); }
 });
 $("refreshMarketsBtn").addEventListener("click", connectPublicMarkets);
@@ -933,7 +914,7 @@ $("clearHistoryBtn").addEventListener("click", () => {
 
 renderMarkets();
 connectPublicMarkets();
-handleOAuthCallback().then(() => { if (accessToken && !selectedAccount) loadAccounts(); }).catch(e => setStatus("loginStatus", e.message, "red"));
+handleOAuthCallback();
 </script>
 </body>
 </html>
