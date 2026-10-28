@@ -41,7 +41,7 @@ header{padding:14px 20px;background:#0b1829;border-bottom:1px solid var(--line);
 .feature-card .val{font-size:16px;font-weight:800;margin-bottom:4px}
 .feature-card .lbl{font-size:12px;color:var(--muted)}
 
-/* Trading Workspace Container (Hidden until logged in or opened) */
+/* Trading Workspace Container */
 #workspaceApp{display:none;max-width:1150px;margin:20px auto;padding:0 12px 40px}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0}
@@ -122,7 +122,7 @@ canvas{width:100%;height:180px;display:block;background:#091625;border-radius:10
   </div>
 </div>
 
-<!-- Main Trading Workspace App (Revealed on Login/Connect) -->
+<!-- Main Trading Workspace App -->
 <div id="workspaceApp">
   <div class="grid">
 
@@ -294,6 +294,12 @@ function settlePending(data) {
   else p.resolve(data);
 }
 
+function randomString(size=64) {
+  const bytes = crypto.getRandomValues(new Uint8Array(size));
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
+  return Array.from(bytes, b => alphabet[b % alphabet.length]).join("");
+}
+
 async function sha256Base64Url(value) {
   const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
   let binary = "";
@@ -301,25 +307,27 @@ async function sha256Base64Url(value) {
   return btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 }
 
-function randomString(size=64) {
-  const bytes = crypto.getRandomValues(new Uint8Array(size));
-  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
-  return Array.from(bytes, b => alphabet[b % alphabet.length]).join("");
-}
-
+// Direct bulletproof login redirect function
 async function login() {
   try {
     setStatus("loginStatus", "Redirecting to Deriv login...", "gold");
     const verifier = randomString(64);
     const challenge = await sha256Base64Url(verifier);
     const state = randomString(32);
+    
     sessionStorage.setItem("ck_pkce_verifier", verifier);
     sessionStorage.setItem("ck_oauth_state", state);
 
     const params = new URLSearchParams({
-      response_type: "code", client_id: APP_ID, redirect_uri: REDIRECT_URI,
-      scope: "trade account_manage", state: state, code_challenge: challenge, code_challenge_method: "S256"
+      response_type: "code",
+      client_id: APP_ID,
+      redirect_uri: REDIRECT_URI,
+      scope: "trade account_manage",
+      state: state,
+      code_challenge: challenge,
+      code_challenge_method: "S256"
     });
+
     window.location.assign("https://auth.deriv.com/oauth2/auth?" + params.toString());
   } catch (e) {
     setStatus("loginStatus", "Could not start login: " + e.message, "red");
@@ -407,7 +415,6 @@ async function loadAccounts() {
     $("accountSelect").value = String(accountId(preferred) || "");
     updateAccountLabels();
 
-    // Switch view from landing page to workspace app
     $("landingView").style.display = "none";
     $("workspaceApp").style.display = "block";
     $("navRight").innerHTML = '<button class="btn-outline" id="headerLogout">Log Out</button>';
@@ -732,10 +739,15 @@ function fillMarketSelect(id) {
 fillMarketSelect("botSymbol");
 
 function bindLandingButtons() {
-  $("navLoginBtn").addEventListener("click", login);
-  $("navGetStartedBtn").addEventListener("click", login);
-  $("heroLoginBtn").addEventListener("click", login);
-  $("heroGetStartedBtn").addEventListener("click", login);
+  const handleLoginClick = (e) => {
+    e.preventDefault();
+    login();
+  };
+  
+  if ($("navLoginBtn")) $("navLoginBtn").onclick = handleLoginClick;
+  if ($("navGetStartedBtn")) $("navGetStartedBtn").onclick = handleLoginClick;
+  if ($("heroLoginBtn")) $("heroLoginBtn").onclick = handleLoginClick;
+  if ($("heroGetStartedBtn")) $("heroGetStartedBtn").onclick = handleLoginClick;
 }
 
 bindLandingButtons();
