@@ -222,7 +222,7 @@ let requestId = 1;
 let pending = new Map();
 let marketTicks = {};
 let chartPoints = [];
-let digitHistory = {}; // symbol -> array of last digits
+let digitHistory = {};
 let completedTrades = [];
 let openContracts = new Map();
 
@@ -292,38 +292,11 @@ function settlePending(data) {
   else p.resolve(data);
 }
 
-async function sha256Base64Url(value) {
-  const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
-  let binary = "";
-  new Uint8Array(hash).forEach(b => binary += String.fromCharCode(b));
-  return btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
-}
-
-function randomString(size=64) {
-  const bytes = crypto.getRandomValues(new Uint8Array(size));
-  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
-  return Array.from(bytes, b => alphabet[b % alphabet.length]).join("");
-}
-
-async function login() {
+function login() {
   try {
-    const verifier = randomString(64);
-    const challenge = await sha256Base64Url(verifier);
-    const state = randomString(32);
-    sessionStorage.setItem("ck_pkce_verifier", verifier);
-    sessionStorage.setItem("ck_oauth_state", state);
-
-    const params = new URLSearchParams({
-      response_type:"code",
-      client_id:APP_ID,
-      redirect_uri:REDIRECT_URI,
-      scope:"trade account_manage",
-      state,
-      code_challenge:challenge,
-      code_challenge_method:"S256"
-    });
-
-    location.href = "https://auth.deriv.com/oauth2/auth?" + params.toString();
+    const authUrl = `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&l=en&brand=deriv`;
+    setStatus("loginStatus", "Redirecting to Deriv login page...");
+    window.location.assign(authUrl);
   } catch (e) {
     setStatus("loginStatus", "Could not start login: " + e.message, "red");
   }
@@ -331,60 +304,50 @@ async function login() {
 
 async function handleOAuthCallback() {
   const url = new URL(location.href);
-  const error = url.searchParams.get("error");
-  const code = url.searchParams.get("code");
-  const returnedState = url.searchParams.get("state");
-
-  if (error) {
-    setStatus("loginStatus", "Deriv login failed: " + error, "red");
-    cleanCallbackURL();
-    return;
+  const tokenMatch = url.searchParams.get("token1") || location.hash.match(/token1=([^&]+)/);
+  if (tokenMatch) {
+    const token = tokenMatch[1] || tokenMatch;
+    if (token) {
+      accessToken = token;
+      oauthExpiry = Date.now() + 3600 * 1000;
+      sessionStorage.setItem("ck_deriv_access_token", accessToken);
+      sessionStorage.setItem("ck_deriv_expiry", String(oauthExpiry));
+      cleanCallbackURL();
+      await loadAccounts();
+      return;
+    }
   }
+
+  const code = url.searchParams.get("code");
   if (!code) return;
 
-  const expectedState = sessionStorage.getItem("ck_oauth_state");
-  const verifier = sessionStorage.getItem("ck_pkce_verifier");
-
-  if (!expectedState || returnedState !== expectedState || !verifier) {
-    setStatus("loginStatus", "Login security check failed. Tap Log In and try again.", "red");
-    cleanCallbackURL();
-    return;
-  }
-
-  setStatus("loginStatus", "Completing secure Deriv login…");
+  setStatus("loginStatus", "Completing login sync...");
   try {
     const response = await fetch(WORKER_URL, {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({code, code_verifier:verifier, redirect_uri:REDIRECT_URI, client_id:APP_ID})
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({code, redirect_uri: REDIRECT_URI, client_id: APP_ID})
     });
-
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || "Token exchange failed.");
 
-    const token = result.access_token || result.accessToken || result.token || (result.data && result.data.access_token);
-    if (!token) throw new Error("Worker did not return an access token.");
+    accessToken = result.access_token || result.token;
+    if (!accessToken) throw new Error("No token returned.");
 
-    accessToken = token;
-    const expiresIn = Number(result.expires_in || 3600);
-    oauthExpiry = Date.now() + expiresIn * 1000;
-
+    oauthExpiry = Date.now() + 3600 * 1000;
     sessionStorage.setItem("ck_deriv_access_token", accessToken);
     sessionStorage.setItem("ck_deriv_expiry", String(oauthExpiry));
-    sessionStorage.removeItem("ck_pkce_verifier");
-    sessionStorage.removeItem("ck_oauth_state");
-
     cleanCallbackURL();
     await loadAccounts();
   } catch (e) {
-    setStatus("loginStatus", "Login connection error: " + e.message, "red");
+    setStatus("loginStatus", "Login error: " + e.message, "red");
     cleanCallbackURL();
   }
 }
 
 function cleanCallbackURL() {
   const url = new URL(location.href);
-  ["code","state","error","error_description"].forEach(k => url.searchParams.delete(k));
+  ["code","state","error","error_description","token1","acct1","cur1"].forEach(k => url.searchParams.delete(k));
   history.replaceState({}, document.title, url.pathname + url.search + url.hash);
 }
 
@@ -575,7 +538,6 @@ function connectPublicMarkets() {
       chartPoints.push({symbol, quote, time:Date.now()});
       if (chartPoints.length > 1000) chartPoints.shift();
 
-      // Extract last digit for digit tools
       const quoteStr = quote.toFixed(6);
       const lastDigit = parseInt(quoteStr.slice(-1), 10);
       if (!digitHistory[symbol]) digitHistory[symbol] = [];
@@ -627,4 +589,338 @@ function renderDigitBars() {
 
 function drawChart() {
   const canvas = $("chart");
-  const ctx = canvas
+  const ctx = canvas.getContext("2d");
+  const symbol = $("manualSymbol").value;
+  const points = chartPoints.filter(p => p.symbol === symbol).slice(-60);
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = "#091625";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  if (points.length < 2) return;
+  const values = points.map(p => p.quote);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = max - min || 1;
+
+  ctx.strokeStyle = "#27d99a";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  points.forEach((p,i) => {
+    const x = 10 + i * (canvas.width-20)/(points.length-1);
+    const y = canvas.height-14 - ((p.quote-min)/span)*(canvas.height-28);
+    if (i === 0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+}
+
+async function placeTrade({symbol, contractType, stake, duration, barrier, source}) {
+  if (!selectedAccount || !tradeWS || tradeWS.readyState !== WebSocket.OPEN) {
+    throw new Error("Connect your Deriv account first.");
+  }
+  if (botBusy) throw new Error("Trade execution in progress.");
+  if (openContracts.size > 0) throw new Error("Wait for active open contract to settle.");
+  if (!Number.isFinite(stake) || stake < 0.35) throw new Error("Minimum stake is 0.35.");
+
+  if (isRealAccount()) {
+    const confirmed = source === "bot" ? $("botRealConfirm").checked : $("realConfirm").checked;
+    if (!confirmed) throw new Error("Please check the real-account confirmation box.");
+  }
+
+  botBusy = true;
+  if (source === "manual") setStatus("manualStatus", "Requesting price quote...");
+
+  try {
+    const currency = selectedAccount.currency || "USD";
+    const req = {
+      proposal: 1,
+      amount: stake,
+      basis: "stake",
+      contract_type: contractType,
+      currency,
+      duration: Number(duration),
+      duration_unit: "t",
+      underlying_symbol: symbol
+    };
+    if (barrier !== undefined && barrier !== "") req.barrier = String(barrier);
+
+    const proposalResponse = await sendWS(req);
+    const proposal = proposalResponse.proposal;
+    if (!proposal || !proposal.id) throw new Error("Invalid quote received from server.");
+
+    const buyResponse = await sendWS({buy: proposal.id, price: Number(proposal.ask_price)});
+    const contract = buyResponse.buy;
+    if (!contract || !contract.contract_id) throw new Error("Order rejected by server.");
+
+    openContracts.set(String(contract.contract_id), {
+      contract_id: contract.contract_id,
+      symbol, contractType, stake, source, currency,
+      startTime: Date.now()
+    });
+
+    updateSummary();
+    setStatus("tradeStatus", "Order placed (#" + contract.contract_id + "). Monitoring outcome...", "green");
+    if (source === "manual") setStatus("manualStatus", "Active contract #" + contract.contract_id, "green");
+
+    await sendWS({proposal_open_contract: 1, contract_id: contract.contract_id, subscribe: 1});
+  } finally {
+    botBusy = false;
+  }
+}
+
+function handleTradeMessage(data) {
+  if (data.msg_type === "balance" && data.balance) {
+    balanceValue = Number(data.balance.balance);
+    $("balance").textContent = money(balanceValue, data.balance.currency);
+  }
+
+  if (data.msg_type === "proposal_open_contract" && data.proposal_open_contract) {
+    const c = data.proposal_open_contract;
+    const key = String(c.contract_id);
+    const local = openContracts.get(key);
+    if (!local) return;
+
+    if (c.is_sold || ["won", "lost", "sold"].includes(c.status)) {
+      const profit = Number(c.profit || 0);
+      completedTrades.unshift({
+        time: new Date().toLocaleTimeString(),
+        symbol: local.symbol,
+        contract: local.contractType,
+        stake: local.stake,
+        result: c.status || (profit >= 0 ? "won" : "lost"),
+        profit
+      });
+
+      if (completedTrades.length > 100) completedTrades.pop();
+      botSessionPL += profit;
+      openContracts.delete(key);
+
+      updateHistory();
+      updateSummary();
+
+      if (local.source === "bot") {
+        const mult = Number($("martingaleMultiplier").value) || 2.0;
+        const baseStake = Number($("botStake").value) || 1;
+        if (profit < 0) {
+          currentStake = Number((currentStake * mult).toFixed(2));
+        } else {
+          currentStake = baseStake;
+        }
+      }
+
+      setStatus("tradeStatus", "Contract settled: " + (c.status || "closed") + ", P/L " + money(profit, local.currency), profit >= 0 ? "green" : "red");
+
+      const maxLoss = Math.max(0, Number($("maxLoss").value) || 0);
+      const targetProfit = Math.max(0, Number($("targetProfit").value) || 0);
+
+      if (botRunning) {
+        if (maxLoss > 0 && botSessionPL - botSessionStartPL <= -maxLoss) {
+          stopBot("Session loss limit hit. Bot stopped.");
+        } else if (targetProfit > 0 && botSessionPL - botSessionStartPL >= targetProfit) {
+          stopBot("Target profit reached! Bot stopped securely.", "green");
+        }
+      }
+    }
+  }
+}
+
+function updateHistory() {
+  const body = $("historyBody");
+  body.innerHTML = "";
+  if (!completedTrades.length) {
+    body.innerHTML = '<tr><td colspan="6">No completed trades yet.</td></tr>';
+    return;
+  }
+  completedTrades.slice(0, 30).forEach(t => {
+    const tr = document.createElement("tr");
+    [t.time, t.symbol, t.contract, money(t.stake), t.result, money(t.profit)].forEach((v, i) => {
+      const td = document.createElement("td");
+      td.textContent = v;
+      if (i === 5) td.className = t.profit >= 0 ? "green" : "red";
+      tr.appendChild(td);
+    });
+    body.appendChild(tr);
+  });
+}
+
+function updateSummary() {
+  $("tradeCount").textContent = String(completedTrades.length);
+  $("sessionPL").textContent = money(botSessionPL);
+  $("sessionPL").className = "stat " + (botSessionPL >= 0 ? "green" : "red");
+  $("openCount").textContent = String(openContracts.size);
+}
+
+function getBotSignal(strategy, symbol) {
+  const values = chartPoints.filter(p => p.symbol === symbol).map(p => p.quote).slice(-30);
+  const digits = digitHistory[symbol] || [];
+
+  if (strategy === "digit_under") {
+    if (digits.length < 5) return null;
+    return { contractType: "DIGITUNDER", barrier: "7" };
+  } else if (strategy === "digit_even") {
+    if (digits.length < 5) return null;
+    return { contractType: "DIGITEVEN" };
+  } else {
+    if (values.length < 15) return null;
+    const fast = values[values.length - 1] - values[values.length - 5];
+    if (fast > 0) return { contractType: "CALL" };
+    if (fast < 0) return { contractType: "PUT" };
+  }
+  return null;
+}
+
+function considerBotTrade() {
+  if (!botRunning || botBusy || openContracts.size > 0) return;
+  const now = Date.now();
+  if (now - lastBotTickAt < 4000) return;
+  lastBotTickAt = now;
+
+  if (botTrades >= Number($("maxTrades").value)) {
+    stopBot("Max trade count completed.");
+    return;
+  }
+
+  const symbol = $("botSymbol").value;
+  const sig = getBotSignal($("strategySelect").value, symbol);
+  if (!sig) return;
+
+  botTrades++;
+  setStatus("botStatus", "Executing automated signal (" + sig.contractType + ") at stake " + currentStake + "...", "green");
+
+  placeTrade({
+    symbol,
+    contractType: sig.contractType,
+    stake: currentStake,
+    duration: 1,
+    barrier: sig.barrier,
+    source: "bot"
+  }).catch(e => {
+    botTrades = Math.max(0, botTrades - 1);
+    setStatus("botStatus", "Bot execution error: " + e.message, "red");
+  });
+}
+
+function startBot() {
+  if (!selectedAccount || !tradeWS || tradeWS.readyState !== WebSocket.OPEN) {
+    setStatus("botStatus", "Connect account before running bot.", "red");
+    return;
+  }
+  if (isRealAccount() && !$("botRealConfirm").checked) {
+    setStatus("botStatus", "Check real-account automation confirmation.", "red");
+    return;
+  }
+
+  botSymbolActive = $("botSymbol").value;
+  botRunning = true;
+  botBusy = false;
+  botTrades = 0;
+  botSessionStartPL = botSessionPL;
+  currentStake = Number($("botStake").value) || 1;
+
+  $("startBotBtn").disabled = true;
+  $("stopBotBtn").disabled = false;
+  setStatus("botStatus", "Bot is running live session...", "green");
+}
+
+function stopBot(reason="Bot stopped manually.", type="") {
+  botRunning = false;
+  $("startBotBtn").disabled = !selectedAccount || !tradeWS || tradeWS.readyState !== WebSocket.OPEN;
+  $("stopBotBtn").disabled = true;
+  setStatus("botStatus", reason, type);
+}
+
+function fillMarketSelect(id) {
+  const sel = $(id);
+  sel.innerHTML = "";
+  marketList.forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = m.symbol;
+    opt.textContent = m.name;
+    sel.appendChild(opt);
+  });
+}
+fillMarketSelect("manualSymbol");
+fillMarketSelect("botSymbol");
+
+$("manualContractType").addEventListener("change", e => {
+  const val = e.target.value;
+  $("manualDigitWrapper").style.display = ["DIGITMATCH", "DIGITDIFF", "DIGITOVER", "DIGITUNDER"].includes(val) ? "block" : "none";
+});
+
+$("manualTradeBtn").addEventListener("click", async () => {
+  try {
+    await placeTrade({
+      symbol: $("manualSymbol").value,
+      contractType: $("manualContractType").value,
+      stake: Number($("manualStake").value),
+      duration: Number($("manualDuration").value),
+      barrier: $("manualDigitWrapper").style.display === "block" ? $("manualDigit").value : undefined,
+      source: "manual"
+    });
+  } catch (e) {
+    setStatus("manualStatus", e.message, "red");
+  }
+});
+
+$("startBotBtn").addEventListener("click", startBot);
+$("stopBotBtn").addEventListener("click", () => stopBot("Emergency stop activated."));
+$("loginBtn").addEventListener("click", () => {
+  if (accessToken && (!oauthExpiry || Date.now() < oauthExpiry)) {
+    loadAccounts();
+  } else {
+    login();
+  }
+});
+$("logoutBtn").addEventListener("click", () => logout());
+$("connectAccountBtn").addEventListener("click", () => connectSelectedAccount().catch(e => setStatus("accountStatus", e.message, "red")));
+$("accountSelect").addEventListener("change", () => {
+  selectedAccount = accounts.find(a => String(accountId(a)) === $("accountSelect").value);
+  if (selectedAccount) { updateAccountLabels(); closeTradeConnection(); setStatus("accountStatus", "Account changed. Tap Connect."); }
+});
+$("refreshMarketsBtn").addEventListener("click", connectPublicMarkets);
+$("manualSymbol").addEventListener("change", () => { renderDigitBars(); drawChart(); });
+
+$("saveConfigBtn").addEventListener("click", () => {
+  const cfg = {
+    strategy: $("strategySelect").value,
+    botStake: $("botStake").value,
+    maxTrades: $("maxTrades").value,
+    targetProfit: $("targetProfit").value,
+    maxLoss: $("maxLoss").value,
+    martingale: $("martingaleMultiplier").value
+  };
+  localStorage.setItem("ck_pro_config", JSON.stringify(cfg));
+  setStatus("configStatus", "Configuration saved successfully.", "green");
+});
+
+$("loadConfigBtn").addEventListener("click", () => {
+  try {
+    const c = JSON.parse(localStorage.getItem("ck_pro_config") || "null");
+    if (!c) throw new Error("No saved setup found.");
+    $("strategySelect").value = c.strategy || "nexus";
+    $("botStake").value = c.botStake || "1";
+    $("maxTrades").value = c.maxTrades || "10";
+    $("targetProfit").value = c.targetProfit || "10";
+    $("maxLoss").value = c.maxLoss || "5";
+    $("martingaleMultiplier").value = c.martingale || "2.0";
+    setStatus("configStatus", "Configuration loaded.", "green");
+  } catch (e) {
+    setStatus("configStatus", e.message, "red");
+  }
+});
+
+$("clearHistoryBtn").addEventListener("click", () => {
+  if (!window.confirm("Clear session history and records?")) return;
+  completedTrades = [];
+  botSessionPL = 0;
+  updateHistory();
+  updateSummary();
+  setStatus("tradeStatus", "History cleared.");
+});
+
+renderMarkets();
+connectPublicMarkets();
+handleOAuthCallback().then(() => { if (accessToken && !selectedAccount) loadAccounts(); }).catch(e => setStatus("loginStatus", e.message, "red"));
+</script>
+</body>
+</html>
