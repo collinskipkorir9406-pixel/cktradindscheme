@@ -187,7 +187,7 @@ canvas{width:100%;height:180px;display:block;background:#091625;border-radius:10
 </div>
 </main>
 
-<!-- SCANNER MODAL (TRADERSCHEME STYLE) -->
+<!-- SCANNER MODAL -->
 <div class="modal-overlay" id="scannerModal">
   <div class="modal-content">
     <button class="modal-close" id="closeScannerModal">&times;</button>
@@ -316,19 +316,31 @@ function randomString(size=64) {
   return Array.from(bytes, b => alphabet[b % alphabet.length]).join("");
 }
 
+// Bulletproof forced redirection login handler
 async function login() {
   try {
+    setStatus("loginStatus", "Redirecting to Deriv login...", "gold");
     const verifier = randomString(64);
     const challenge = await sha256Base64Url(verifier);
     const state = randomString(32);
+    
     sessionStorage.setItem("ck_pkce_verifier", verifier);
     sessionStorage.setItem("ck_oauth_state", state);
+
     const params = new URLSearchParams({
-      response_type:"code", client_id:APP_ID, redirect_uri:REDIRECT_URI,
-      scope:"trade account_manage", state, code_challenge:challenge, code_challenge_method:"S256"
+      response_type: "code",
+      client_id: APP_ID,
+      redirect_uri: REDIRECT_URI,
+      scope: "trade account_manage",
+      state: state,
+      code_challenge: challenge,
+      code_challenge_method: "S256"
     });
-    location.href = "https://auth.deriv.com/oauth2/auth?" + params.toString();
-  } catch (e) { setStatus("loginStatus", "Login error: " + e.message, "red"); }
+
+    window.location.assign("https://auth.deriv.com/oauth2/auth?" + params.toString());
+  } catch (e) {
+    setStatus("loginStatus", "Could not start login: " + e.message, "red");
+  }
 }
 
 async function handleOAuthCallback() {
@@ -464,7 +476,7 @@ async function connectSelectedAccount() {
           const bal = Number(response.balance.balance);
           const curr = response.balance.currency || "USD";
           $("balance").textContent = money(bal, curr);
-          $("navBalance.green" || "navBalance").textContent = money(bal, curr);
+          $("navBalance").textContent = money(bal, curr);
         }
         $("startBotBtn").disabled = false;
         setStatus("accountStatus", "Connected and ready.", "green");
@@ -672,7 +684,7 @@ function updateHistory() {
 
 function updateSummary() {
   $("sessionPL").textContent = money(botSessionPL);
-  $("sessionPL"].className = "stat " + (botSessionPL >= 0 ? "green" : "red");
+  $("sessionPL").className = "stat " + (botSessionPL >= 0 ? "green" : "red");
   $("winLossCount").textContent = winsCount + " / " + lossesCount;
   const total = winsCount + lossesCount;
   const rate = total > 0 ? ((winsCount / total) * 100).toFixed(1) : "0.0";
