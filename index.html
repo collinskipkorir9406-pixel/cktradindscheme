@@ -112,7 +112,8 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
     </div>
 
     <div class="nav-right" id="navRight">
-      <a href="#" id="navLoginBtn" class="btn-huge-blue" style="padding:6px 12px;font-size:12px;border-radius:6px;text-decoration:none">Log In</a>
+      <!-- Direct hardcoded link to guarantee mobile response -->
+      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&l=EN&brand=deriv" id="navLoginBtn" class="btn-huge-blue" style="padding:6px 12px;font-size:12px;border-radius:6px;text-decoration:none">Log In</a>
     </div>
   </div>
 </header>
@@ -125,14 +126,15 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
     <p>Use manual trading, charts, copy tools, automation, and market analysis without jumping between separate apps.</p>
     
     <div class="hero-cta">
-      <a href="#" id="heroLoginBtn" class="btn-huge-blue">⚡ Log In and Trade</a>
-      <a href="#" id="heroGetStartedBtn" class="btn-huge-white">⚡ Create Free Account</a>
+      <!-- Direct hardcoded link -->
+      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&l=EN&brand=deriv" id="heroLoginBtn" class="btn-huge-blue">⚡ Log In and Trade</a>
+      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&l=EN&brand=deriv" id="heroGetStartedBtn" class="btn-huge-white">⚡ Create Free Account</a>
     </div>
     <div id="loginStatus" class="status"></div>
   </section>
 </div>
 
-<!-- 2. Dashboard View (Compact 2x2 Grid: 01 & 02 top, 03 & 04 bottom) -->
+<!-- 2. Dashboard View (Compact 2x2 Grid) -->
 <div id="dashboardView">
   <div class="dash-welcome">
     <h2>Welcome to Traders</h2>
@@ -338,63 +340,19 @@ function settlePending(data) {
   else p.resolve(data);
 }
 
-function randomString(size=64) {
-  const bytes = crypto.getRandomValues(new Uint8Array(size));
-  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
-  return Array.from(bytes, b => alphabet[b % alphabet.length]).join("");
-}
-
-async function sha256Base64Url(value) {
-  const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
-  let binary = "";
-  new Uint8Array(hash).forEach(b => binary += String.fromCharCode(b));
-  return btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
-}
-
-async function setupLoginLinks() {
-  const verifier = randomString(64);
-  const challenge = await sha256Base64Url(verifier);
-  const state = randomString(32);
-  
-  sessionStorage.setItem("ck_pkce_verifier", verifier);
-  sessionStorage.setItem("ck_oauth_state", state);
-
-  const params = new URLSearchParams({
-    response_type: "code",
-    client_id: APP_ID,
-    redirect_uri: REDIRECT_URI,
-    scope: "trade account_manage",
-    state: state,
-    code_challenge: challenge,
-    code_challenge_method: "S256"
-  });
-
-  const loginUrl = "https://auth.deriv.com/oauth2/auth?" + params.toString();
-
-  ["navLoginBtn", "heroLoginBtn", "heroGetStartedBtn"].forEach(id => {
-    const el = $(id);
-    if (el) el.href = loginUrl;
-  });
-}
-
 async function handleOAuthCallback() {
   const url = new URL(location.href);
   const error = url.searchParams.get("error");
   const code = url.searchParams.get("code");
-  const returnedState = url.searchParams.get("state");
   if (error) { setStatus("loginStatus", "Login error: " + error, "red"); cleanCallbackURL(); return; }
   if (!code) return;
 
-  const expectedState = sessionStorage.getItem("ck_oauth_state");
-  const verifier = sessionStorage.getItem("ck_pkce_verifier");
-  if (!expectedState || returnedState !== expectedState || !verifier) {
-    setStatus("loginStatus", "Security validation failed.", "red"); cleanCallbackURL(); return;
-  }
-
+  setStatus("loginStatus", "Authenticating secure session…");
   try {
+    // If authorization code comes back directly, exchange it via worker
     const response = await fetch(WORKER_URL, {
       method:"POST", headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({code, code_verifier:verifier, redirect_uri:REDIRECT_URI, client_id:APP_ID})
+      body:JSON.stringify({code, redirect_uri:REDIRECT_URI, client_id:APP_ID})
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || "Token exchange failed.");
@@ -405,8 +363,6 @@ async function handleOAuthCallback() {
     oauthExpiry = Date.now() + Number(result.expires_in || 3600) * 1000;
     sessionStorage.setItem("ck_deriv_access_token", accessToken);
     sessionStorage.setItem("ck_deriv_expiry", String(oauthExpiry));
-    sessionStorage.removeItem("ck_pkce_verifier");
-    sessionStorage.removeItem("ck_oauth_state");
     cleanCallbackURL();
     await loadAccounts();
   } catch (e) { setStatus("loginStatus", "Authentication failed: " + e.message, "red"); cleanCallbackURL(); }
@@ -540,8 +496,7 @@ async function logout() {
   $("landingView").style.display = "block";
   $("navCenterTabs").style.display = "none";
   $("authBadgeStatus").textContent = "Not Logged In";
-  $("navRight").innerHTML = '<a href="#" id="navLoginBtn" class="btn-huge-blue" style="padding:6px 12px;font-size:12px;border-radius:6px;text-decoration:none">Log In</a>';
-  await setupLoginLinks();
+  $("navRight").innerHTML = '<a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&l=EN&brand=deriv" id="navLoginBtn" class="btn-huge-blue" style="padding:6px 12px;font-size:12px;border-radius:6px;text-decoration:none">Log In</a>';
 }
 
 function connectPublicMarkets() {
@@ -818,7 +773,6 @@ $("cardSpeedBot").addEventListener("click", () => switchView("workspace"));
 $("cardManual").addEventListener("click", () => switchView("workspace"));
 $("cardPremium").addEventListener("click", () => alert("Premium strategies module loading soon."));
 
-setupLoginLinks();
 $("connectAccountBtn").addEventListener("click", () => connectSelectedAccount().catch(e => setStatus("accountStatus", e.message, "red")));
 $("startBotBtn").addEventListener("click", startBot);
 $("stopBotBtn").addEventListener("click", () => stopBot("Stopped by user."));
