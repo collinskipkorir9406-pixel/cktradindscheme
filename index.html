@@ -11,7 +11,7 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:15px Arial,Helvetica,sans-serif;overflow-x:hidden}
 
-/* Top Ticker Marquee */
+/* Top Ticker Bar */
 .ticker-bar{background:#040d18;border-bottom:1px solid var(--line);padding:8px 12px;font-size:12px;display:flex;gap:24px;overflow-x:auto;white-space:nowrap;color:var(--muted)}
 .ticker-item{display:inline-flex;align-items:center;gap:6px}
 
@@ -21,8 +21,8 @@ header{padding:14px 20px;background:#0b1829;border-bottom:1px solid var(--line);
 .brand{font-size:18px;font-weight:800;color:var(--text);display:flex;flex-direction:column}
 .brand span{font-size:10px;color:var(--red);font-weight:600;letter-spacing:1px}
 .nav-right{display:flex;gap:10px;align-items:center}
-.btn-outline{background:transparent;border:1px solid var(--line);color:var(--text);padding:8px 16px;border-radius:8px;font-weight:700;cursor:pointer}
-.btn-primary-glow{background:linear-gradient(135deg,#3b82f6,#2563eb);border:none;color:#fff;padding:8px 18px;border-radius:8px;font-weight:700;cursor:pointer;box-shadow:0 0 15px rgba(59,130,246,0.4)}
+.btn-outline{background:transparent;border:1px solid var(--line);color:var(--text);padding:8px 16px;border-radius:8px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block}
+.btn-primary-glow{background:linear-gradient(135deg,#3b82f6,#2563eb);border:none;color:#fff;padding:8px 18px;border-radius:8px;font-weight:700;cursor:pointer;box-shadow:0 0 15px rgba(59,130,246,0.4);text-decoration:none;display:inline-block}
 
 /* Landing Hero Section */
 .hero-section{max-width:900px;margin:40px auto 20px;padding:0 16px;text-align:center}
@@ -32,8 +32,8 @@ header{padding:14px 20px;background:#0b1829;border-bottom:1px solid var(--line);
 
 /* Hero Action Buttons */
 .hero-cta{display:flex;flex-direction:column;gap:12px;max-width:480px;margin:0 auto 40px}
-.btn-huge-blue{background:linear-gradient(135deg,#60a5fa,#2563eb);color:#fff;border:none;padding:16px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(37,99,235,0.4);display:flex;align-items:center;justify-content:center;gap:8px}
-.btn-huge-white{background:#eef5ff;color:#07111f;border:none;padding:16px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-huge-blue{background:linear-gradient(135deg,#60a5fa,#2563eb);color:#fff;border:none;padding:16px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(37,99,235,0.4);display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn-huge-white{background:#eef5ff;color:#07111f;border:none;padding:16px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
 
 /* Feature Grid Cards */
 .features-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;max-width:800px;margin:0 auto 50px;padding:0 16px}
@@ -94,8 +94,8 @@ canvas{width:100%;height:180px;display:block;background:#091625;border-radius:10
   <div class="head">
     <div class="brand">traderscheme <span>POWERED BY DERIV</span></div>
     <div class="nav-right" id="navRight">
-      <button class="btn-outline" id="navLoginBtn">Log In</button>
-      <button class="btn-primary-glow" id="navGetStartedBtn">Get Started</button>
+      <a href="#" id="navLoginBtn" class="btn-outline">Log In</a>
+      <a href="#" id="navGetStartedBtn" class="btn-primary-glow">Get Started</a>
     </div>
   </div>
 </header>
@@ -108,8 +108,8 @@ canvas{width:100%;height:180px;display:block;background:#091625;border-radius:10
     <p>Use manual trading, charts, copy tools, automation, and market analysis without jumping between separate apps.</p>
     
     <div class="hero-cta">
-      <button class="btn-huge-blue" id="heroLoginBtn">⚡ Log In and Trade</button>
-      <button class="btn-huge-white" id="heroGetStartedBtn">⚡ Create Free Account</button>
+      <a href="#" id="heroLoginBtn" class="btn-huge-blue">⚡ Log In and Trade</a>
+      <a href="#" id="heroGetStartedBtn" class="btn-huge-white">⚡ Create Free Account</a>
     </div>
     <div id="loginStatus" class="status"></div>
   </section>
@@ -242,8 +242,6 @@ let digitHistory = {};
 let completedTrades = [];
 let openContracts = new Map();
 
-let botRunning = false;
-let botBusy = false;
 let botSessionPL = 0;
 let winsCount = 0;
 let lossesCount = 0;
@@ -307,31 +305,31 @@ async function sha256Base64Url(value) {
   return btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 }
 
-// Direct bulletproof login redirect function
-async function login() {
-  try {
-    setStatus("loginStatus", "Redirecting to Deriv login...", "gold");
-    const verifier = randomString(64);
-    const challenge = await sha256Base64Url(verifier);
-    const state = randomString(32);
-    
-    sessionStorage.setItem("ck_pkce_verifier", verifier);
-    sessionStorage.setItem("ck_oauth_state", state);
+// Guaranteed direct redirect login function using standard links
+async function setupLoginLinks() {
+  const verifier = randomString(64);
+  const challenge = await sha256Base64Url(verifier);
+  const state = randomString(32);
+  
+  sessionStorage.setItem("ck_pkce_verifier", verifier);
+  sessionStorage.setItem("ck_oauth_state", state);
 
-    const params = new URLSearchParams({
-      response_type: "code",
-      client_id: APP_ID,
-      redirect_uri: REDIRECT_URI,
-      scope: "trade account_manage",
-      state: state,
-      code_challenge: challenge,
-      code_challenge_method: "S256"
-    });
+  const params = new URLSearchParams({
+    response_type: "code",
+    client_id: APP_ID,
+    redirect_uri: REDIRECT_URI,
+    scope: "trade account_manage",
+    state: state,
+    code_challenge: challenge,
+    code_challenge_method: "S256"
+  });
 
-    window.location.assign("https://auth.deriv.com/oauth2/auth?" + params.toString());
-  } catch (e) {
-    setStatus("loginStatus", "Could not start login: " + e.message, "red");
-  }
+  const loginUrl = "https://auth.deriv.com/oauth2/auth?" + params.toString();
+
+  ["navLoginBtn", "navGetStartedBtn", "heroLoginBtn", "heroGetStartedBtn"].forEach(id => {
+    const el = $(id);
+    if (el) el.href = loginUrl;
+  });
 }
 
 async function handleOAuthCallback() {
@@ -480,14 +478,14 @@ async function connectSelectedAccount() {
   } catch (e) { setStatus("accountStatus", "Connection error: " + e.message, "red"); throw e; }
 }
 
-function logout() {
+async function logout() {
   closeTradeConnection();
   accessToken = ""; oauthExpiry = 0; accounts = []; selectedAccount = null;
   sessionStorage.removeItem("ck_deriv_access_token"); sessionStorage.removeItem("ck_deriv_expiry");
   $("workspaceApp").style.display = "none";
   $("landingView").style.display = "block";
-  $("navRight").innerHTML = '<button class="btn-outline" id="navLoginBtn">Log In</button><button class="btn-primary-glow" id="navGetStartedBtn">Get Started</button>';
-  bindLandingButtons();
+  $("navRight").innerHTML = '<a href="#" id="navLoginBtn" class="btn-outline">Log In</a><a href="#" id="navGetStartedBtn" class="btn-primary-glow">Get Started</a>';
+  await setupLoginLinks();
 }
 
 function connectPublicMarkets() {
@@ -738,20 +736,7 @@ function fillMarketSelect(id) {
 }
 fillMarketSelect("botSymbol");
 
-function bindLandingButtons() {
-  const handleLoginClick = (e) => {
-    e.preventDefault();
-    login();
-  };
-  
-  if ($("navLoginBtn")) $("navLoginBtn").onclick = handleLoginClick;
-  if ($("navGetStartedBtn")) $("navGetStartedBtn").onclick = handleLoginClick;
-  if ($("heroLoginBtn")) $("heroLoginBtn").onclick = handleLoginClick;
-  if ($("heroGetStartedBtn")) $("heroGetStartedBtn").onclick = handleLoginClick;
-}
-
-bindLandingButtons();
-$("logoutBtn").addEventListener("click", logout);
+setupLoginLinks();
 $("connectAccountBtn").addEventListener("click", () => connectSelectedAccount().catch(e => setStatus("accountStatus", e.message, "red")));
 $("startBotBtn").addEventListener("click", startBot);
 $("stopBotBtn").addEventListener("click", () => stopBot("Stopped by user."));
