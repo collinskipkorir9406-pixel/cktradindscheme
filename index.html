@@ -304,20 +304,33 @@ function login() {
 
 async function handleOAuthCallback() {
   const url = new URL(location.href);
-  const tokenMatch = url.searchParams.get("token1") || location.hash.match(/token1=([^&]+)/);
-  if (tokenMatch) {
-    const token = tokenMatch[1] || tokenMatch;
-    if (token) {
-      accessToken = token;
-      oauthExpiry = Date.now() + 3600 * 1000;
-      sessionStorage.setItem("ck_deriv_access_token", accessToken);
-      sessionStorage.setItem("ck_deriv_expiry", String(oauthExpiry));
-      cleanCallbackURL();
-      await loadAccounts();
-      return;
-    }
+
+  // 1. Check token in URL hash fragment returned by Deriv
+  const hashParams = new URLSearchParams(location.hash.substring(1));
+  const tokenFromHash = hashParams.get("token1");
+  if (tokenFromHash) {
+    accessToken = tokenFromHash;
+    oauthExpiry = Date.now() + 3600 * 1000;
+    sessionStorage.setItem("ck_deriv_access_token", accessToken);
+    sessionStorage.setItem("ck_deriv_expiry", String(oauthExpiry));
+    cleanCallbackURL();
+    await loadAccounts();
+    return;
   }
 
+  // 2. Check token in query search parameters
+  const tokenFromQuery = url.searchParams.get("token1");
+  if (tokenFromQuery) {
+    accessToken = tokenFromQuery;
+    oauthExpiry = Date.now() + 3600 * 1000;
+    sessionStorage.setItem("ck_deriv_access_token", accessToken);
+    sessionStorage.setItem("ck_deriv_expiry", String(oauthExpiry));
+    cleanCallbackURL();
+    await loadAccounts();
+    return;
+  }
+
+  // 3. Fallback code check
   const code = url.searchParams.get("code");
   if (!code) return;
 
