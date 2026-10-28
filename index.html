@@ -11,7 +11,7 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:15px Arial,Helvetica,sans-serif;overflow-x:hidden}
 
-/* Top Ticker Marquee */
+/* Top Ticker Bar */
 .ticker-bar{background:#040d18;border-bottom:1px solid var(--line);padding:8px 12px;font-size:12px;display:flex;gap:24px;overflow-x:auto;white-space:nowrap;color:var(--muted)}
 .ticker-item{display:inline-flex;align-items:center;gap:6px}
 
@@ -35,7 +35,7 @@ header{padding:12px 20px;background:#0b1829;border-bottom:1px solid var(--line);
 .btn-huge-blue{background:linear-gradient(135deg,#60a5fa,#2563eb);color:#fff;border:none;padding:16px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(37,99,235,0.4);display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
 .btn-huge-white{background:#eef5ff;color:#07111f;border:none;padding:16px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
 
-/* Logged-In Dashboard View */
+/* Logged-In Dashboard View (Matching your screenshot layout) */
 #dashboardView{display:none;max-width:1100px;margin:30px auto;padding:0 16px}
 .dash-welcome{text-align:center;margin-bottom:30px}
 .dash-welcome h2{font-size:28px;margin:0 0 8px}
@@ -49,7 +49,7 @@ header{padding:12px 20px;background:#0b1829;border-bottom:1px solid var(--line);
 .dash-card-footer{display:flex;align-items:center;justify-content:space-between;color:var(--blue-light);font-size:13px;font-weight:700}
 .arrow-icon{background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center}
 
-/* Workspace Panels (Hidden/Shown via tabs) */
+/* Workspace Panels */
 .workspace-section{display:none;max-width:1100px;margin:20px auto;padding:0 12px 40px}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0}
@@ -109,7 +109,6 @@ canvas{width:100%;height:180px;display:block;background:#091625;border-radius:10
     <div class="nav-center" id="navCenterTabs" style="display:none">
       <button class="nav-tab active" id="tabDashBtn">🏠 Dashboard</button>
       <button class="nav-tab" id="tabBotBtn">⚙️ Bot Builder</button>
-      <button class="nav-tab" id="tabVoltBtn">⚡ Volt AI</button>
     </div>
 
     <div class="nav-right" id="navRight">
@@ -118,7 +117,7 @@ canvas{width:100%;height:180px;display:block;background:#091625;border-radius:10
   </div>
 </header>
 
-<!-- 1. Landing View (Before Login) -->
+<!-- 1. Landing View -->
 <div id="landingView">
   <section style="max-width:800px;margin:40px auto;padding:0 16px;text-align:center">
     <div class="pill-badge">🟢 FREE STRATEGIES. REAL MARKET TOOLS.</div>
@@ -133,7 +132,7 @@ canvas{width:100%;height:180px;display:block;background:#091625;border-radius:10
   </section>
 </div>
 
-<!-- 2. Dashboard View (After Login - matches your screenshot!) -->
+<!-- 2. Dashboard View (Cards 01, 02 on top; 03, 04 behind/below) -->
 <div id="dashboardView">
   <div class="dash-welcome">
     <h2>Welcome to Traders</h2>
@@ -171,7 +170,7 @@ canvas{width:100%;height:180px;display:block;background:#091625;border-radius:10
   </div>
 </div>
 
-<!-- 3. Bot Builder / Trading Workspace Section -->
+<!-- 3. Bot Builder Workspace Section -->
 <div id="workspaceView" class="workspace-section">
   <div class="grid">
     <section class="panel wide">
@@ -458,14 +457,13 @@ async function loadAccounts() {
     $("accountSelect").value = String(accountId(preferred) || "");
     updateAccountLabels();
 
-    // Show Dashboard View (matches your screenshot!)
     $("landingView").style.display = "none";
     $("dashboardView").style.display = "block";
     $("workspaceView").style.display = "none";
     $("navCenterTabs").style.display = "flex";
     $("authBadgeStatus").textContent = "Connected";
     $("navRight").innerHTML = `
-      <div class="acc-dropdown" id="accDropdownChip">
+      <div class="acc-dropdown">
         <span id="navCurrBadge" style="color:var(--green)">USD</span>
         <b id="navBalBadge">$0.00</b>
       </div>
@@ -795,7 +793,7 @@ function fillMarketSelect(id) {
 }
 fillMarketSelect("botSymbol");
 
-/* Navigation and View Switcher */
+/* Navigation Switcher */
 function switchView(viewName) {
   $("landingView").style.display = "none";
   $("dashboardView").style.display = "none";
