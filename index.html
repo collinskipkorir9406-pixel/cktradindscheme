@@ -4,45 +4,53 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="deriv-site-verification" content="ded285725a66c864612bf8d91ba4de4b63642ce64f6dd2f14fed08d232275b4a">
-<title>TraderScheme — Free Deriv Workspace & Automated Tools</title>
+<title>TraderScheme — Workspace Dashboard</title>
 <meta name="theme-color" content="#07111f">
 <style>
 :root{--bg:#07111f;--panel:#101e30;--panel2:#14253a;--line:#263b53;--text:#eef5ff;--muted:#9bb0c8;--green:#27d99a;--red:#ff647c;--blue:#3b82f6;--blue-light:#60a5fa;--gold:#f5c451}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:15px Arial,Helvetica,sans-serif;overflow-x:hidden}
 
-/* Top Ticker Bar */
+/* Top Ticker Marquee */
 .ticker-bar{background:#040d18;border-bottom:1px solid var(--line);padding:8px 12px;font-size:12px;display:flex;gap:24px;overflow-x:auto;white-space:nowrap;color:var(--muted)}
 .ticker-item{display:inline-flex;align-items:center;gap:6px}
 
 /* Header Navbar */
-header{padding:14px 20px;background:#0b1829;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:100}
+header{padding:12px 20px;background:#0b1829;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:100}
 .head{max-width:1150px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.brand{font-size:18px;font-weight:800;color:var(--text);display:flex;flex-direction:column}
-.brand span{font-size:10px;color:var(--red);font-weight:600;letter-spacing:1px}
+.brand{font-size:18px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px}
+.brand-badge{background:#111e30;padding:4px 8px;border-radius:6px;border:1px solid var(--line);font-size:12px}
+.nav-center{display:flex;gap:6px;align-items:center;overflow-x:auto}
+.nav-tab{background:transparent;border:none;color:var(--muted);padding:8px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.nav-tab.active{background:rgba(39,217,154,0.1);color:var(--green);border:1px solid rgba(39,217,154,0.3)}
 .nav-right{display:flex;gap:10px;align-items:center}
-.btn-outline{background:transparent;border:1px solid var(--line);color:var(--text);padding:8px 16px;border-radius:8px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block}
-.btn-primary-glow{background:linear-gradient(135deg,#3b82f6,#2563eb);border:none;color:#fff;padding:8px 18px;border-radius:8px;font-weight:700;cursor:pointer;box-shadow:0 0 15px rgba(59,130,246,0.4);text-decoration:none;display:inline-block}
+.acc-dropdown{background:#0a1727;border:1px solid var(--line);padding:6px 12px;border-radius:8px;font-size:13px;display:flex;align-items:center;gap:8px;cursor:pointer}
 
 /* Landing Hero Section */
-.hero-section{max-width:900px;margin:40px auto 20px;padding:0 16px;text-align:center}
+#landingView{max-width:900px;margin:40px auto 20px;padding:0 16px;text-align:center}
 .pill-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(39,217,154,0.1);border:1px solid rgba(39,217,154,0.3);padding:6px 14px;border-radius:20px;font-size:12px;color:var(--green);font-weight:700;margin-bottom:20px}
-.hero-section h1{font-size:40px;line-height:1.2;font-weight:800;margin:0 0 16px;background:linear-gradient(90deg,#eef5ff,#60a5fa,#27d99a);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero-section p{color:var(--muted);font-size:15px;max-width:650px;margin:0 auto 30px;line-height:1.6}
-
-/* Hero Action Buttons */
+#landingView h1{font-size:40px;line-height:1.2;font-weight:800;margin:0 0 16px;background:linear-gradient(90deg,#eef5ff,#60a5fa,#27d99a);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+#landingView p{color:var(--muted);font-size:15px;max-width:650px;margin:0 auto 30px;line-height:1.6}
 .hero-cta{display:flex;flex-direction:column;gap:12px;max-width:480px;margin:0 auto 40px}
 .btn-huge-blue{background:linear-gradient(135deg,#60a5fa,#2563eb);color:#fff;border:none;padding:16px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(37,99,235,0.4);display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
 .btn-huge-white{background:#eef5ff;color:#07111f;border:none;padding:16px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
 
-/* Feature Grid Cards */
-.features-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;max-width:800px;margin:0 auto 50px;padding:0 16px}
-.feature-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;text-align:center}
-.feature-card .val{font-size:16px;font-weight:800;margin-bottom:4px}
-.feature-card .lbl{font-size:12px;color:var(--muted)}
+/* Logged-In Dashboard View */
+#dashboardView{display:none;max-width:1100px;margin:30px auto;padding:0 16px}
+.dash-welcome{text-align:center;margin-bottom:30px}
+.dash-welcome h2{font-size:28px;margin:0 0 8px}
+.dash-welcome p{color:var(--muted);font-style:italic;font-size:14px;margin:0}
+.dash-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.dash-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;position:relative;cursor:pointer;transition:border-color 0.2s}
+.dash-card:hover{border-color:var(--blue)}
+.dash-card-num{font-size:13px;color:var(--muted);font-weight:700;margin-bottom:12px}
+.dash-card h3{font-size:18px;margin:0 0 6px}
+.dash-card p{color:var(--muted);font-size:13px;margin:0 0 20px}
+.dash-card-footer{display:flex;align-items:center;justify-content:space-between;color:var(--blue-light);font-size:13px;font-weight:700}
+.arrow-icon{background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center}
 
-/* Trading Workspace Container */
-#workspaceApp{display:none;max-width:1150px;margin:20px auto;padding:0 12px 40px}
+/* Workspace Panels (Hidden/Shown via tabs) */
+.workspace-section{display:none;max-width:1100px;margin:20px auto;padding:0 12px 40px}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0}
 .wide{grid-column:1/-1}
@@ -75,34 +83,44 @@ canvas{width:100%;height:180px;display:block;background:#091625;border-radius:10
 .bar-col{display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end}
 .bar-fill{width:100%;background:var(--blue);border-radius:3px 3px 0 0;min-height:4px}
 .bar-label{font-size:11px;color:var(--muted);margin-top:4px}
-@media(max-width:800px){.features-grid{grid-template-columns:1fr}.market-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:800px){.dash-grid{grid-template-columns:1fr}.market-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:650px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}}
 </style>
 </head>
 <body>
 
 <!-- Top Ticker Bar -->
-<div class="ticker-bar" id="tickerBar">
+<div class="ticker-bar">
   <div class="ticker-item">📈 Volatility 100 (1s): <span class="green" id="t1">—</span></div>
   <div class="ticker-item">📊 Volatility 75 (1s): <span class="green" id="t2">—</span></div>
   <div class="ticker-item">📉 Volatility 50 (1s): <span class="green" id="t3">—</span></div>
   <div class="ticker-item">📊 Volatility 100: <span class="green" id="t4">—</span></div>
 </div>
 
-<!-- Navigation Header -->
+<!-- Header Navbar -->
 <header>
   <div class="head">
-    <div class="brand">traderscheme <span>POWERED BY DERIV</span></div>
+    <div class="brand">
+      <div style="background:#1d4ed8;color:#fff;padding:4px 8px;border-radius:6px;font-size:12px">TS</div>
+      TraderScheme
+      <div class="brand-badge" id="authBadgeStatus" style="color:var(--muted)">Not Logged In</div>
+    </div>
+    
+    <div class="nav-center" id="navCenterTabs" style="display:none">
+      <button class="nav-tab active" id="tabDashBtn">🏠 Dashboard</button>
+      <button class="nav-tab" id="tabBotBtn">⚙️ Bot Builder</button>
+      <button class="nav-tab" id="tabVoltBtn">⚡ Volt AI</button>
+    </div>
+
     <div class="nav-right" id="navRight">
-      <a href="#" id="navLoginBtn" class="btn-outline">Log In</a>
-      <a href="#" id="navGetStartedBtn" class="btn-primary-glow">Get Started</a>
+      <a href="#" id="navLoginBtn" class="btn-huge-blue" style="padding:8px 16px;font-size:13px;border-radius:8px;text-decoration:none">Log In</a>
     </div>
   </div>
 </header>
 
-<!-- Landing Page Hero View -->
+<!-- 1. Landing View (Before Login) -->
 <div id="landingView">
-  <section class="hero-section">
+  <section style="max-width:800px;margin:40px auto;padding:0 16px;text-align:center">
     <div class="pill-badge">🟢 FREE STRATEGIES. REAL MARKET TOOLS.</div>
     <h1>Trade with better structure</h1>
     <p>Use manual trading, charts, copy tools, automation, and market analysis without jumping between separate apps.</p>
@@ -113,19 +131,49 @@ canvas{width:100%;height:180px;display:block;background:#091625;border-radius:10
     </div>
     <div id="loginStatus" class="status"></div>
   </section>
+</div>
 
-  <div class="features-grid">
-    <div class="feature-card"><div class="val">Free</div><div class="lbl">BOT TEMPLATES</div></div>
-    <div class="feature-card"><div class="val">24/7</div><div class="lbl">SYNTHETIC MARKET FOCUS</div></div>
-    <div class="feature-card"><div class="val">www.traderscheme.com</div><div class="lbl">BRANDED WORKSPACE</div></div>
-    <div class="feature-card"><div class="val">🟢 Live</div><div class="lbl">MARKET STATUS</div></div>
+<!-- 2. Dashboard View (After Login - matches your screenshot!) -->
+<div id="dashboardView">
+  <div class="dash-welcome">
+    <h2>Welcome to Traders</h2>
+    <p>"The market rewards patience and punishes impatience."</p>
+  </div>
+  
+  <div class="dash-grid">
+    <div class="dash-card" id="cardLoadBot">
+      <div class="dash-card-num">01</div>
+      <h3>Load Bot</h3>
+      <p>Open your trading strategy</p>
+      <div class="dash-card-footer"><span>Choose a bot</span><div class="arrow-icon">↗</div></div>
+    </div>
+
+    <div class="dash-card" id="cardPremium">
+      <div class="dash-card-num">02</div>
+      <h3>Premium Bots</h3>
+      <p>Exclusive automated strategies</p>
+      <div class="dash-card-footer"><span>Explore premium bots</span><div class="arrow-icon">↗</div></div>
+    </div>
+
+    <div class="dash-card" id="cardSpeedBot">
+      <div class="dash-card-num">03</div>
+      <h3>Speed Bot</h3>
+      <p>One-click automated trading</p>
+      <div class="dash-card-footer"><span>Launch Speed Bot</span><div class="arrow-icon">↗</div></div>
+    </div>
+
+    <div class="dash-card" id="cardManual">
+      <div class="dash-card-num">04</div>
+      <h3>Manual Trading</h3>
+      <p>Full control, trade your way</p>
+      <div class="dash-card-footer"><span>Start manual trading</span><div class="arrow-icon">↗</div></div>
+    </div>
   </div>
 </div>
 
-<!-- Main Trading Workspace App -->
-<div id="workspaceApp">
+<!-- 3. Bot Builder / Trading Workspace Section -->
+<div id="workspaceView" class="workspace-section">
   <div class="grid">
-
     <section class="panel wide">
       <div class="row between">
         <div>
@@ -202,7 +250,6 @@ canvas{width:100%;height:180px;display:block;background:#091625;border-radius:10
       </div>
       <div id="tradeStatus" class="status">Trade activity will render here.</div>
     </section>
-
   </div>
 </div>
 
@@ -305,7 +352,6 @@ async function sha256Base64Url(value) {
   return btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 }
 
-// Guaranteed direct redirect login function using standard links
 async function setupLoginLinks() {
   const verifier = randomString(64);
   const challenge = await sha256Base64Url(verifier);
@@ -326,7 +372,7 @@ async function setupLoginLinks() {
 
   const loginUrl = "https://auth.deriv.com/oauth2/auth?" + params.toString();
 
-  ["navLoginBtn", "navGetStartedBtn", "heroLoginBtn", "heroGetStartedBtn"].forEach(id => {
+  ["navLoginBtn", "heroLoginBtn", "heroGetStartedBtn"].forEach(id => {
     const el = $(id);
     if (el) el.href = loginUrl;
   });
@@ -346,7 +392,6 @@ async function handleOAuthCallback() {
     setStatus("loginStatus", "Security validation failed.", "red"); cleanCallbackURL(); return;
   }
 
-  setStatus("loginStatus", "Authenticating secure session…");
   try {
     const response = await fetch(WORKER_URL, {
       method:"POST", headers:{"Content-Type":"application/json"},
@@ -413,12 +458,20 @@ async function loadAccounts() {
     $("accountSelect").value = String(accountId(preferred) || "");
     updateAccountLabels();
 
+    // Show Dashboard View (matches your screenshot!)
     $("landingView").style.display = "none";
-    $("workspaceApp").style.display = "block";
-    $("navRight").innerHTML = '<button class="btn-outline" id="headerLogout">Log Out</button>';
+    $("dashboardView").style.display = "block";
+    $("workspaceView").style.display = "none";
+    $("navCenterTabs").style.display = "flex";
+    $("authBadgeStatus").textContent = "Connected";
+    $("navRight").innerHTML = `
+      <div class="acc-dropdown" id="accDropdownChip">
+        <span id="navCurrBadge" style="color:var(--green)">USD</span>
+        <b id="navBalBadge">$0.00</b>
+      </div>
+      <button class="btn-outline" id="headerLogout" style="padding:6px 12px;font-size:12px">Log Out</button>
+    `;
     $("headerLogout").addEventListener("click", logout);
-
-    setStatus("accountStatus", "Accounts loaded. Tap Connect Account.");
   } catch (e) { setStatus("loginStatus", e.message, "red"); }
 }
 
@@ -461,6 +514,8 @@ async function connectSelectedAccount() {
           const bal = Number(response.balance.balance);
           const curr = response.balance.currency || "USD";
           $("balance").textContent = money(bal, curr);
+          if ($("navBalBadge")) $("navBalBadge").textContent = "$" + bal.toFixed(2);
+          if ($("navCurrBadge")) $("navCurrBadge").textContent = curr;
         }
         setStatus("accountStatus", "Connected and ready.", "green");
       } catch (e) { setStatus("accountStatus", "Balance sync error: " + e.message, "red"); }
@@ -482,9 +537,12 @@ async function logout() {
   closeTradeConnection();
   accessToken = ""; oauthExpiry = 0; accounts = []; selectedAccount = null;
   sessionStorage.removeItem("ck_deriv_access_token"); sessionStorage.removeItem("ck_deriv_expiry");
-  $("workspaceApp").style.display = "none";
+  $("dashboardView").style.display = "none";
+  $("workspaceView").style.display = "none";
   $("landingView").style.display = "block";
-  $("navRight").innerHTML = '<a href="#" id="navLoginBtn" class="btn-outline">Log In</a><a href="#" id="navGetStartedBtn" class="btn-primary-glow">Get Started</a>';
+  $("navCenterTabs").style.display = "none";
+  $("authBadgeStatus").textContent = "Not Logged In";
+  $("navRight").innerHTML = '<a href="#" id="navLoginBtn" class="btn-huge-blue" style="padding:8px 16px;font-size:13px;border-radius:8px;text-decoration:none">Log In</a>';
   await setupLoginLinks();
 }
 
@@ -617,6 +675,7 @@ function handleTradeMessage(data) {
     const bal = Number(data.balance.balance);
     const curr = data.balance.currency || "USD";
     $("balance").textContent = money(bal, curr);
+    if ($("navBalBadge")) $("navBalBadge").textContent = "$" + bal.toFixed(2);
   }
   if (data.msg_type === "proposal_open_contract" && data.proposal_open_contract) {
     const c = data.proposal_open_contract;
@@ -735,6 +794,31 @@ function fillMarketSelect(id) {
   });
 }
 fillMarketSelect("botSymbol");
+
+/* Navigation and View Switcher */
+function switchView(viewName) {
+  $("landingView").style.display = "none";
+  $("dashboardView").style.display = "none";
+  $("workspaceView").style.display = "none";
+
+  $("tabDashBtn").className = "nav-tab";
+  $("tabBotBtn").className = "nav-tab";
+
+  if (viewName === "dash") {
+    $("dashboardView").style.display = "block";
+    $("tabDashBtn").className = "nav-tab active";
+  } else if (viewName === "workspace") {
+    $("workspaceView").style.display = "block";
+    $("tabBotBtn").className = "nav-tab active";
+  }
+}
+
+$("tabDashBtn").addEventListener("click", () => switchView("dash"));
+$("tabBotBtn").addEventListener("click", () => switchView("workspace"));
+$("cardLoadBot").addEventListener("click", () => switchView("workspace"));
+$("cardSpeedBot").addEventListener("click", () => switchView("workspace"));
+$("cardManual").addEventListener("click", () => switchView("workspace"));
+$("cardPremium").addEventListener("click", () => alert("Premium strategies module loading soon."));
 
 setupLoginLinks();
 $("connectAccountBtn").addEventListener("click", () => connectSelectedAccount().catch(e => setStatus("accountStatus", e.message, "red")));
