@@ -104,7 +104,7 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
     </div>
 
     <div class="nav-right" id="navRight">
-      <button id="navLoginBtn" class="btn-huge-blue" style="padding:6px 12px;font-size:12px;border-radius:6px;">Log In</button>
+      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34MKk0BSq1Hz7mnKlIjHN&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=trade+account_manage" id="navLoginBtn" class="btn-huge-blue" style="padding:6px 12px;font-size:12px;border-radius:6px;text-decoration:none">Log In</a>
     </div>
   </div>
 </header>
@@ -116,8 +116,8 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
     <p>Use manual trading, charts, copy tools, automation, and market analysis without jumping between separate apps.</p>
     
     <div class="hero-cta">
-      <button id="heroLoginBtn" class="btn-huge-blue">⚡ Log In and Trade</button>
-      <button id="heroGetStartedBtn" class="btn-huge-white">⚡ Create Free Account</button>
+      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34MKk0BSq1Hz7mnKlIjHN&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=trade+account_manage" id="heroLoginBtn" class="btn-huge-blue" style="text-decoration:none">⚡ Log In and Trade</a>
+      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34MKk0BSq1Hz7mnKlIjHN&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=trade+account_manage" id="heroGetStartedBtn" class="btn-huge-white" style="text-decoration:none">⚡ Create Free Account</a>
     </div>
     <div id="loginStatus" class="status"></div>
   </section>
@@ -284,10 +284,6 @@ let currentStake = 10;
 let lastBotTickAt = 0;
 let botSymbolActive = "";
 let lastDrawTime = 0;
-
-function redirectToOAuth() {
-  window.location.href = `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=trade+account_manage`;
-}
 
 function setStatus(id, message, type="") {
   const el = $(id);
@@ -493,8 +489,7 @@ function logout() {
   $("landingView").style.display = "block";
   $("navCenterTabs").style.display = "none";
   $("authBadgeStatus").textContent = "Not Logged In";
-  $("navRight").innerHTML = `<button id="navLoginBtn" class="btn-huge-blue" style="padding:6px 12px;font-size:12px;border-radius:6px;">Log In</button>`;
-  $("navLoginBtn").addEventListener("click", redirectToOAuth);
+  $("navRight").innerHTML = `<a href="https://oauth.deriv.com/oauth2/authorize?app_id=34MKk0BSq1Hz7mnKlIjHN&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=trade+account_manage" id="navLoginBtn" class="btn-huge-blue" style="padding:6px 12px;font-size:12px;border-radius:6px;text-decoration:none">Log In</a>`;
 }
 
 function connectPublicMarkets() {
@@ -774,10 +769,6 @@ $("cardLoadBot").addEventListener("click", () => switchView("workspace"));
 $("cardSpeedBot").addEventListener("click", () => switchView("workspace"));
 $("cardManual").addEventListener("click", () => switchView("workspace"));
 $("cardPremium").addEventListener("click", () => switchView("workspace"));
-
-$("navLoginBtn").addEventListener("click", redirectToOAuth);
-$("heroLoginBtn").addEventListener("click", redirectToOAuth);
-$("heroGetStartedBtn").addEventListener("click", redirectToOAuth);
 
 $("connectAccountBtn").addEventListener("click", () => connectSelectedAccount().catch(e => setStatus("accountStatus", e.message, "red")));
 $("startBotBtn").addEventListener("click", startBot);
