@@ -104,7 +104,7 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
     </div>
 
     <div class="nav-right" id="navRight">
-      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=trade+account_manage" id="navLoginBtn" class="btn-huge-blue" style="padding:6px 12px;font-size:12px;border-radius:6px;text-decoration:none">Log In</a>
+      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=read+trade+payments+admin" id="navLoginBtn" class="btn-huge-blue" style="padding:6px 12px;font-size:12px;border-radius:6px;text-decoration:none">Log In</a>
     </div>
   </div>
 </header>
@@ -116,8 +116,8 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
     <p>Use manual trading, charts, copy tools, automation, and market analysis without jumping between separate apps.</p>
     
     <div class="hero-cta">
-      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=trade+account_manage" id="heroLoginBtn" class="btn-huge-blue" style="text-decoration:none">⚡ Log In and Trade</a>
-      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=trade+account_manage" id="heroGetStartedBtn" class="btn-huge-white" style="text-decoration:none">⚡ Create Free Account</a>
+      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=read+trade+payments+admin" id="heroLoginBtn" class="btn-huge-blue" style="text-decoration:none">⚡ Log In and Trade</a>
+      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=read+trade+payments+admin" id="heroGetStartedBtn" class="btn-huge-white" style="text-decoration:none">⚡ Create Free Account</a>
     </div>
     <div id="loginStatus" class="status"></div>
   </section>
@@ -331,7 +331,10 @@ function settlePending(data) {
 async function handleOAuthCallback() {
   const url = new URL(location.href);
   const error = url.searchParams.get("error");
+  
+  // Deriv returns tokens in URL query params: token1, acct1, token2, acct2...
   const token1 = url.searchParams.get("token1");
+  const acct1 = url.searchParams.get("acct1");
   
   if (error) { 
     setStatus("loginStatus", "Login error: " + error, "red"); 
@@ -341,9 +344,11 @@ async function handleOAuthCallback() {
   
   if (token1) {
     accessToken = token1;
-    oauthExpiry = Date.now() + 3600 * 1000;
+    oauthExpiry = Date.now() + 3600 * 24 * 1000; // 24hr session length
     sessionStorage.setItem("ck_deriv_access_token", accessToken);
     sessionStorage.setItem("ck_deriv_expiry", String(oauthExpiry));
+    if (acct1) sessionStorage.setItem("ck_deriv_acct1", acct1);
+    
     cleanCallbackURL();
     await loadAccounts();
     return;
@@ -352,7 +357,7 @@ async function handleOAuthCallback() {
 
 function cleanCallbackURL() {
   const url = new URL(location.href);
-  ["code","state","error","error_description","token1","acct1","cur1"].forEach(k => url.searchParams.delete(k));
+  ["code","state","error","error_description","token1","acct1","cur1","token2","acct2","cur2","token3","acct3","cur3","token4","acct4","cur4"].forEach(k => url.searchParams.delete(k));
   history.replaceState({}, document.title, url.pathname + url.search + url.hash);
 }
 
@@ -483,13 +488,13 @@ async function connectSelectedAccount() {
 function logout() {
   closeTradeConnection();
   accessToken = ""; oauthExpiry = 0; accounts = []; selectedAccount = null;
-  sessionStorage.removeItem("ck_deriv_access_token"); sessionStorage.removeItem("ck_deriv_expiry");
+  sessionStorage.removeItem("ck_deriv_access_token"); sessionStorage.removeItem("ck_deriv_expiry"); sessionStorage.removeItem("ck_deriv_acct1");
   $("dashboardView").style.display = "none";
   $("workspaceView").style.display = "none";
   $("landingView").style.display = "block";
   $("navCenterTabs").style.display = "none";
   $("authBadgeStatus").textContent = "Not Logged In";
-  $("navRight").innerHTML = `<a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=trade+account_manage" id="navLoginBtn" class="btn-huge-blue" style="padding:6px 12px;font-size:12px;border-radius:6px;text-decoration:none">Log In</a>`;
+  $("navRight").innerHTML = `<a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=read+trade+payments+admin" id="navLoginBtn" class="btn-huge-blue" style="padding:6px 12px;font-size:12px;border-radius:6px;text-decoration:none">Log In</a>`;
 }
 
 function connectPublicMarkets() {
@@ -683,7 +688,7 @@ function updateHistory() {
 
 function updateSummary() {
   $("sessionPL").textContent = money(botSessionPL);
-  $("sessionPL"].className = "stat " + (botSessionPL >= 0 ? "green" : "red");
+  $("sessionPL").className = "stat " + (botSessionPL >= 0 ? "green" : "red");
   $("winLossCount").textContent = winsCount + " / " + lossesCount;
   const total = winsCount + lossesCount;
   const rate = total > 0 ? ((winsCount / total) * 100).toFixed(1) : "0.0";
