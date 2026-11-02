@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="deriv-site-verification" content="ded285725a66c864612bf8d91ba4de4b63642ce64f6dd2f14fed08d232275b4a">
 <title>TraderScheme — Workspace Dashboard</title>
 <meta name="theme-color" content="#07111f">
 <style>
@@ -10,9 +11,11 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:14px Arial,Helvetica,sans-serif;overflow-x:hidden}
 
+/* Top Ticker Bar */
 .ticker-bar{background:#040d18;border-bottom:1px solid var(--line);padding:6px 10px;font-size:11px;display:flex;gap:20px;overflow-x:auto;white-space:nowrap;color:var(--muted)}
 .ticker-item{display:inline-flex;align-items:center;gap:6px}
 
+/* Header Navbar */
 header{padding:10px 14px;background:#0b1829;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:100}
 .head{max-width:1150px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:8px}
 .brand{font-size:16px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:6px}
@@ -23,6 +26,7 @@ header{padding:10px 14px;background:#0b1829;border-bottom:1px solid var(--line);
 .nav-right{display:flex;gap:6px;align-items:center}
 .acc-dropdown{background:#0a1727;border:1px solid var(--line);padding:4px 8px;border-radius:6px;font-size:12px;display:flex;align-items:center;gap:6px}
 
+/* Landing Hero Section */
 #landingView{max-width:900px;margin:30px auto;padding:0 12px;text-align:center}
 .pill-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(39,217,154,0.1);border:1px solid rgba(39,217,154,0.3);padding:4px 10px;border-radius:16px;font-size:11px;color:var(--green);font-weight:700;margin-bottom:14px}
 #landingView h1{font-size:32px;line-height:1.2;font-weight:800;margin:0 0 12px;background:linear-gradient(90deg,#eef5ff,#60a5fa,#27d99a);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
@@ -31,6 +35,7 @@ header{padding:10px 14px;background:#0b1829;border-bottom:1px solid var(--line);
 .btn-huge-blue{background:linear-gradient(135deg,#60a5fa,#2563eb);color:#fff;border:none;padding:12px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 15px rgba(37,99,235,0.3);display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
 .btn-huge-white{background:#eef5ff;color:#07111f;border:none;padding:12px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
 
+/* Dashboard View - 2x2 Compact Grid */
 #dashboardView{display:none;max-width:1000px;margin:20px auto;padding:0 12px}
 .dash-welcome{text-align:center;margin-bottom:20px}
 .dash-welcome h2{font-size:22px;margin:0 0 4px}
@@ -44,6 +49,7 @@ header{padding:10px 14px;background:#0b1829;border-bottom:1px solid var(--line);
 .dash-card-footer{display:flex;align-items:center;justify-content:space-between;color:var(--blue-light);font-size:12px;font-weight:700}
 .arrow-icon{background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px}
 
+/* Workspace Panels */
 .workspace-section{display:none;max-width:1100px;margin:20px auto;padding:0 12px 40px}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0}
@@ -83,6 +89,7 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
 </head>
 <body>
 
+<!-- Top Ticker Bar -->
 <div class="ticker-bar">
   <div class="ticker-item">📈 Volatility 100 (1s): <span class="green" id="t1">—</span></div>
   <div class="ticker-item">📊 Volatility 75 (1s): <span class="green" id="t2">—</span></div>
@@ -90,6 +97,7 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
   <div class="ticker-item">📊 Volatility 100: <span class="green" id="t4">—</span></div>
 </div>
 
+<!-- Header Navbar -->
 <header>
   <div class="head">
     <div class="brand">
@@ -104,11 +112,12 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
     </div>
 
     <div class="nav-right" id="navRight">
-      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=trade+account_manage+admin+payments" id="navLoginBtn" class="btn-huge-blue" style="padding:6px 12px;font-size:12px;border-radius:6px;text-decoration:none">Log In</a>
+      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34MKk0BSq1Hz7mnKlIjHN&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=trade+account_manage" id="navLoginBtn" class="btn-huge-blue" style="padding:6px 12px;font-size:12px;border-radius:6px;text-decoration:none">Log In</a>
     </div>
   </div>
 </header>
 
+<!-- 1. Landing View -->
 <div id="landingView">
   <section>
     <div class="pill-badge">🟢 FREE STRATEGIES. REAL MARKET TOOLS.</div>
@@ -116,13 +125,14 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
     <p>Use manual trading, charts, copy tools, automation, and market analysis without jumping between separate apps.</p>
     
     <div class="hero-cta">
-      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=trade+account_manage+admin+payments" id="heroLoginBtn" class="btn-huge-blue" style="text-decoration:none">⚡ Log In and Trade</a>
-      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=trade+account_manage+admin+payments" id="heroGetStartedBtn" class="btn-huge-white" style="text-decoration:none">⚡ Create Free Account</a>
+      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34MKk0BSq1Hz7mnKlIjHN&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=trade+account_manage" id="heroLoginBtn" class="btn-huge-blue">⚡ Log In and Trade</a>
+      <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34MKk0BSq1Hz7mnKlIjHN&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=trade+account_manage" id="heroGetStartedBtn" class="btn-huge-white">⚡ Create Free Account</a>
     </div>
     <div id="loginStatus" class="status"></div>
   </section>
 </div>
 
+<!-- 2. Dashboard View -->
 <div id="dashboardView">
   <div class="dash-welcome">
     <h2>Welcome to Traders</h2>
@@ -160,6 +170,7 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
   </div>
 </div>
 
+<!-- 3. Bot Builder Workspace Section -->
 <div id="workspaceView" class="workspace-section">
   <div class="grid">
     <section class="panel wide">
@@ -244,8 +255,9 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
 <script>
 "use strict";
 
-const APP_ID = "34JjnKJzecylG5kwmjaXm";
+const APP_ID = "34MKk0BSq1Hz7mnKlIjHN";
 const REDIRECT_URI = "https://collinskipkorir9406-pixel.github.io/cktradindscheme/";
+const WORKER_URL = "https://steep-snow-a539.collinskipkorir70.workers.dev/";
 const API_BASE = "https://api.derivws.com";
 const PUBLIC_WS_URL = "wss://api.derivws.com/trading/v1/options/ws/public";
 
@@ -268,7 +280,6 @@ let accounts = [];
 let selectedAccount = null;
 let tradeWS = null;
 let publicWS = null;
-let pingInterval = null;
 let requestId = 1;
 let pending = new Map();
 let marketTicks = {};
@@ -283,7 +294,6 @@ let lossesCount = 0;
 let currentStake = 10;
 let lastBotTickAt = 0;
 let botSymbolActive = "";
-let lastDrawTime = 0;
 
 function setStatus(id, message, type="") {
   const el = $(id);
@@ -331,31 +341,46 @@ function settlePending(data) {
 async function handleOAuthCallback() {
   const url = new URL(location.href);
   const error = url.searchParams.get("error");
+  const code = url.searchParams.get("code");
   const token1 = url.searchParams.get("token1");
-  const acct1 = url.searchParams.get("acct1");
   
-  if (error) { 
-    setStatus("loginStatus", "Login error: " + error, "red"); 
-    cleanCallbackURL(); 
-    return; 
-  }
+  if (error) { setStatus("loginStatus", "Login error: " + error, "red"); cleanCallbackURL(); return; }
   
   if (token1) {
     accessToken = token1;
-    oauthExpiry = Date.now() + 3600 * 24 * 1000;
+    oauthExpiry = Date.now() + 3600 * 1000;
     sessionStorage.setItem("ck_deriv_access_token", accessToken);
     sessionStorage.setItem("ck_deriv_expiry", String(oauthExpiry));
-    if (acct1) sessionStorage.setItem("ck_deriv_acct1", acct1);
-    
     cleanCallbackURL();
     await loadAccounts();
     return;
   }
+
+  if (!code) return;
+
+  setStatus("loginStatus", "Authenticating secure session…");
+  try {
+    const response = await fetch(WORKER_URL, {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({code, redirect_uri:REDIRECT_URI, client_id:APP_ID})
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || "Token exchange failed.");
+    const token = result.access_token || result.accessToken || (result.data && result.data.access_token);
+    if (!token) throw new Error("No token returned.");
+
+    accessToken = token;
+    oauthExpiry = Date.now() + Number(result.expires_in || 3600) * 1000;
+    sessionStorage.setItem("ck_deriv_access_token", accessToken);
+    sessionStorage.setItem("ck_deriv_expiry", String(oauthExpiry));
+    cleanCallbackURL();
+    await loadAccounts();
+  } catch (e) { setStatus("loginStatus", "Authentication failed: " + e.message, "red"); cleanCallbackURL(); }
 }
 
 function cleanCallbackURL() {
   const url = new URL(location.href);
-  ["code","state","error","error_description","token1","acct1","cur1","token2","acct2","cur2","token3","acct3","cur3","token4","acct4","cur4"].forEach(k => url.searchParams.delete(k));
+  ["code","state","error","error_description","token1","acct1","cur1"].forEach(k => url.searchParams.delete(k));
   history.replaceState({}, document.title, url.pathname + url.search + url.hash);
 }
 
@@ -422,7 +447,6 @@ function updateAccountLabels() {
 }
 
 function closeTradeConnection() {
-  if (pingInterval) { clearInterval(pingInterval); pingInterval = null; }
   if (tradeWS) { tradeWS.onclose = null; try { tradeWS.close(); } catch (_) {} }
   tradeWS = null;
   pending.clear();
@@ -448,11 +472,6 @@ async function connectSelectedAccount() {
     ws.onopen = async () => {
       if (tradeWS !== ws) return;
       setStatus("accountStatus", "Socket active. Syncing balance…", "green");
-      
-      pingInterval = setInterval(() => {
-        if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ ping: 1 }));
-      }, 30000);
-
       try {
         const response = await sendWS({balance:1, subscribe:1});
         if (response.balance) {
@@ -474,25 +493,20 @@ async function connectSelectedAccount() {
       handleTradeMessage(data);
     };
 
-    ws.onclose = () => { 
-      if (tradeWS === ws) { 
-        setStatus("accountStatus", "Disconnected.", "red");
-        if (botRunning) stopBot("Connection lost! Bot stopped automatically for safety.", "red");
-      } 
-    };
+    ws.onclose = () => { if (tradeWS === ws) { setStatus("accountStatus", "Disconnected.", "red"); } };
   } catch (e) { setStatus("accountStatus", "Connection error: " + e.message, "red"); throw e; }
 }
 
 function logout() {
   closeTradeConnection();
   accessToken = ""; oauthExpiry = 0; accounts = []; selectedAccount = null;
-  sessionStorage.removeItem("ck_deriv_access_token"); sessionStorage.removeItem("ck_deriv_expiry"); sessionStorage.removeItem("ck_deriv_acct1");
+  sessionStorage.removeItem("ck_deriv_access_token"); sessionStorage.removeItem("ck_deriv_expiry");
   $("dashboardView").style.display = "none";
   $("workspaceView").style.display = "none";
   $("landingView").style.display = "block";
   $("navCenterTabs").style.display = "none";
   $("authBadgeStatus").textContent = "Not Logged In";
-  $("navRight").innerHTML = `<a href="https://oauth.deriv.com/oauth2/authorize?app_id=34JjnKJzecylG5kwmjaXm&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=trade+account_manage+admin+payments" id="navLoginBtn" class="btn-huge-blue" style="padding:6px 12px;font-size:12px;border-radius:6px;text-decoration:none">Log In</a>`;
+  $("navRight").innerHTML = '<a href="https://oauth.deriv.com/oauth2/authorize?app_id=34MKk0BSq1Hz7mnKlIjHN&redirect_uri=https://collinskipkorir9406-pixel.github.io/cktradindscheme/&scope=trade+account_manage" id="navLoginBtn" class="btn-huge-blue" style="padding:6px 12px;font-size:12px;border-radius:6px;text-decoration:none">Log In</a>';
 }
 
 function connectPublicMarkets() {
@@ -526,14 +540,9 @@ function connectPublicMarkets() {
 
       renderMarkets();
       renderDigitBars();
-      
-      const now = Date.now();
-      if (now - lastDrawTime > 100) {
-        drawChart();
-        lastDrawTime = now;
-      }
-      
+      drawChart();
       updateTopTicker();
+
       if (botRunning && symbol === botSymbolActive) considerBotTrade();
     }
   };
@@ -686,7 +695,7 @@ function updateHistory() {
 
 function updateSummary() {
   $("sessionPL").textContent = money(botSessionPL);
-  $("sessionPL").className = "stat " + (botSessionPL >= 0 ? "green" : "red");
+  $("sessionPL"].className = "stat " + (botSessionPL >= 0 ? "green" : "red");
   $("winLossCount").textContent = winsCount + " / " + lossesCount;
   const total = winsCount + lossesCount;
   const rate = total > 0 ? ((winsCount / total) * 100).toFixed(1) : "0.0";
@@ -749,6 +758,7 @@ function fillMarketSelect(id) {
 }
 fillMarketSelect("botSymbol");
 
+/* Navigation Switcher */
 function switchView(viewName) {
   $("landingView").style.display = "none";
   $("dashboardView").style.display = "none";
@@ -771,7 +781,7 @@ $("tabBotBtn").addEventListener("click", () => switchView("workspace"));
 $("cardLoadBot").addEventListener("click", () => switchView("workspace"));
 $("cardSpeedBot").addEventListener("click", () => switchView("workspace"));
 $("cardManual").addEventListener("click", () => switchView("workspace"));
-$("cardPremium").addEventListener("click", () => switchView("workspace"));
+$("cardPremium").addEventListener("click", () => switchView("workspace")); // Fixed alert to open workspace smoothly
 
 $("connectAccountBtn").addEventListener("click", () => connectSelectedAccount().catch(e => setStatus("accountStatus", e.message, "red")));
 $("startBotBtn").addEventListener("click", startBot);
@@ -790,4 +800,4 @@ handleOAuthCallback().then(() => {
 }).catch(e => setStatus("loginStatus", e.message, "red"));
 </script>
 </body>
-</html>
+  </html>
