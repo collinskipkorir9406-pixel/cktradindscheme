@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="deriv-site-verification" content="ded285725a66c864612bf8d91ba4de4b63642ce64f6dd2f14fed08d232275b4a">
-<title>CK Trading Bot - Automated Workspace</title>
+<title>CK Trading Bot - TraderScheme Edition</title>
 <style>
 :root{color-scheme:dark;--bg:#07111f;--panel:#101d30;--inner:#14243a;--text:#f3f7ff;--muted:#9bacc5;--blue:#4f8cff;--green:#31d49a;--red:#ff6b78;--border:#263852}
 *{box-sizing:border-box}
@@ -54,6 +54,11 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 .gold .card-link{color:#ffdc29}.cyan .card-link{color:#20ddeb}.purple .card-link{color:#c49aff}
 .card-arrow{display:grid;place-items:center;width:32px;height:32px;border:1px solid currentColor;border-radius:50%;font-size:20px}
 #accountDashboard[hidden]{display:none!important}
+.scanner-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}
+.scanner-table th,.scanner-table td{padding:10px;border:1px solid var(--border);text-align:left}
+.scanner-table th{background:var(--inner);color:#75b7ff}
+.tag-bull{color:var(--green);font-weight:bold}
+.tag-bear{color:var(--red);font-weight:bold}
 .ai-fab{position:fixed;right:18px;bottom:24px;z-index:20;width:68px;height:68px;border-radius:50%;padding:0;background:radial-gradient(circle at 35% 25%,#d9a7ff,#9149c8 60%,#4e247b);border:2px solid rgba(232,190,255,.8);box-shadow:0 0 22px rgba(185,93,255,.55);font-size:28px;color:white}
 .ai-dot{position:absolute;width:11px;height:11px;right:7px;top:7px;border-radius:50%;background:#31d49a;border:2px solid #182139}
 .ai-help{position:fixed;right:16px;bottom:102px;width:min(320px,calc(100vw - 32px));z-index:19;background:#101d30;border:1px solid #395274;border-radius:16px;padding:17px;box-shadow:0 12px 40px #0009}
@@ -64,22 +69,43 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 <body>
 <header>
 <div class="wrap top">
-<div><h1>CK Trading Bot</h1><div class="muted small">POWERED BY DERIV · AUTOMATED WORKSPACE</div></div>
-<span class="badge">LIVE ENGINE ACTIVE</span>
+<div><h1>CK Trading Bot</h1><div class="muted small">TRADERSCHEME COMMUNITY EDITION · AI WORKSPACE</div></div>
+<span class="badge">SCANNER &amp; BOT ACTIVE</span>
 </div>
 </header>
 
 <main class="wrap">
 <section class="panel hero">
-<div class="eyebrow">● TRADERSCHEME &nbsp; / &nbsp; AUTOMATED WORKSPACE</div>
-<h2 class="hero-title">Center for automations</h2>
-<p class="hero-quote">“Protect your capital. Every trade starts with automated risk controls.”</p>
+<div class="eyebrow">● TRADERSCHEME &nbsp; / &nbsp; OFFICIAL BOT WORKSPACE</div>
+<h2 class="hero-title">Center for automations &amp; AI scanners</h2>
+<p class="hero-quote">“Protect your capital. Every trade starts with automated risk controls and verified signals.”</p>
 <div class="actions">
 <button id="loginButton">Log In and Trade</button>
 <button id="refreshButton" class="secondary">Refresh Live Markets</button>
 <button id="logoutButton" class="secondary">Log Out</button>
 </div>
 <div id="loginStatus" class="status">Not connected to an account. Log in to access automated workspaces.</div>
+</section>
+
+<!-- NEW TRADERSCHEME FEATURE: AI MARKET SCANNER PANEL -->
+<section class="panel">
+<h2>AI Market Trend Scanner</h2>
+<p class="muted small">Real-time sentiment scan across all Volatility and Synthetic indices to spot momentum directions.</p>
+<div style="overflow-x:auto;">
+  <table class="scanner-table">
+    <thead>
+      <tr>
+        <th>Market Asset</th>
+        <th>Latest Price</th>
+        <th>Trend Status</th>
+        <th>Action Filter</th>
+      </tr>
+    </thead>
+    <tbody id="scannerBody">
+      <tr><td colspan="4">Initializing market scanner feeds…</td></tr>
+    </tbody>
+  </table>
+</div>
 </section>
 
 <section class="feature-grid" aria-label="Trading tools">
@@ -234,18 +260,18 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 
 <section class="panel">
 <h2>Safety &amp; Compliance</h2>
-<div class="notice">Independent third-party interface. Automated bots execute trades based on live indicator algorithms. Real-money accounts risk your actual capital. Ensure you monitor your Max Daily Loss limit closely. Trading involves substantial risk of loss.</div>
+<div class="notice">Independent third-party interface inspired by TraderScheme. Automated bots execute trades based on live indicator algorithms. Real-money accounts risk your actual capital. Ensure you monitor your Max Daily Loss limit closely. Trading involves substantial risk of loss.</div>
 </section>
 </main>
 
 <div class="ai-help" id="aiHelp" hidden>
-<h3>CK AI Assistant</h3>
+<h3>TraderScheme AI Assistant</h3>
 <p>I can help you navigate automated EMA, Premium, and Speed bots as well as your risk controls.</p>
 <button type="button" id="aiLoginHelp" class="secondary">Login help</button>
 <button type="button" id="aiClose" class="secondary">Close</button>
 </div>
-<button class="ai-fab" id="aiButton" type="button" aria-label="Open CK AI Assistant">AI<span class="ai-dot"></span></button>
-<footer>CK Trading Bot · Automated Engine · Not an official Deriv website</footer>
+<button class="ai-fab" id="aiButton" type="button" aria-label="Open AI Assistant">AI<span class="ai-dot"></span></button>
+<footer>TraderScheme Community Workspace · Powered by Deriv API · Not an official Deriv website</footer>
 
 <script>
 "use strict";
@@ -324,6 +350,44 @@ function makeMarketCards() {
   });
 }
 
+function updateMarketScanner() {
+  const tbody = $("scannerBody");
+  if (!tbody) return;
+  tbody.replaceChildren();
+
+  MARKET_LIST.forEach(m => {
+    const history = chartHistory[m.symbol] || [];
+    const currentPrice = prices[m.symbol] || (history.length ? history[history.length - 1] : 0);
+    const prevPrice = history.length > 5 ? history[history.length - 5] : currentPrice;
+    
+    let trend = "Neutral";
+    let trendClass = "";
+    if (currentPrice > prevPrice) {
+      trend = "Bullish Momentum";
+      trendClass = "tag-bull";
+    } else if (currentPrice < prevPrice) {
+      trend = "Bearish Momentum";
+      trendClass = "tag-bear";
+    }
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><strong>${m.name}</strong></td>
+      <td>${currentPrice ? currentPrice.toFixed(5) : "Scanning..."}</td>
+      <td><span class="${trendClass}">${trend}</span></td>
+      <td><button class="secondary" style="padding:4px 8px;font-size:11px;" onclick="selectScannerMarket('${m.symbol}')">Trade / Chart</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+window.selectScannerMarket = function(symbol) {
+  $("chartMarket").value = symbol;
+  $("tradeMarket").value = symbol;
+  $("botMarket").value = symbol;
+  $("chartMarket").scrollIntoView({behavior:"smooth", block:"center"});
+};
+
 function connectMarkets() {
   marketGeneration++;
   const generation = marketGeneration;
@@ -332,7 +396,7 @@ function connectMarkets() {
     try { marketSocket.onclose = null; marketSocket.close(); } catch(e) {}
   }
 
-  show("marketStatus", "Connecting to public market data & loading history…");
+  show("marketStatus", "Connecting to TraderScheme market data & scanner feeds…");
   try {
     marketSocket = new WebSocket(MARKET_WS_URL);
   } catch(e) {
@@ -343,7 +407,7 @@ function connectMarkets() {
   const socket = marketSocket;
   socket.onopen = () => {
     if (generation !== marketGeneration) return;
-    show("marketStatus", "Connected. Subscribing to live feeds & history…");
+    show("marketStatus", "Connected. Subscribing to live feeds & AI scanner history…");
     MARKET_LIST.forEach(m => {
       socket.send(JSON.stringify({ticks: m.symbol, subscribe: 1}));
       socket.send(JSON.stringify({ticks_history: m.symbol, count: 100, end: "latest", style: "ticks"}));
@@ -355,9 +419,7 @@ function connectMarkets() {
     let d;
     try { d = JSON.parse(event.data); } catch(e) { return; }
 
-    if (d.error) {
-      return;
-    }
+    if (d.error) return;
 
     if (d.msg_type === "tick" && d.tick) {
       const t = d.tick;
@@ -375,12 +437,14 @@ function connectMarkets() {
 
       if (s === $("chartMarket").value) drawChart();
       evaluateAutomatedBots(s, q);
+      updateMarketScanner();
     }
 
     if (d.msg_type === "history" && d.history && Array.isArray(d.history.prices)) {
       const sym = d.echo_req && d.echo_req.ticks_history ? d.echo_req.ticks_history : $("chartMarket").value;
       chartHistory[sym] = d.history.prices.map(Number).filter(Number.isFinite).slice(-100);
       if (sym === $("chartMarket").value) drawChart();
+      updateMarketScanner();
     }
   };
 
@@ -624,7 +688,7 @@ function accountType(a) {
 }
 
 async function loadAccountsAndConnectDemo(accessToken) {
-  show("accountStatus", "Loading Deriv Options accounts…");
+  show("accountStatus", "Loading TraderScheme Deriv accounts…");
   try {
     const response = await fetch("https://api.derivws.com/trading/v1/options/accounts", {
       headers:{Authorization:"Bearer " + accessToken}
