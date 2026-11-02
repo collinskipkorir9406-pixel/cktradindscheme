@@ -244,10 +244,8 @@ canvas{width:100%;height:160px;display:block;background:#091625;border-radius:8p
 <script>
 "use strict";
 
-// --- CONFIGURATION CONSTANTS ---
-const APP_ID = "YOUR_PRODUCTION_APP_ID"; 
-const REDIRECT_URI = "https://yourdomain.com/";
-const WORKER_URL = "https://your-worker-name.workers.dev/";
+const APP_ID = "34MKk0BSq1Hz7mnKlIjHN";
+const REDIRECT_URI = "https://collinskipkorir9406-pixel.github.io/cktradindscheme/";
 const API_BASE = "https://api.derivws.com";
 const PUBLIC_WS_URL = "wss://api.derivws.com/trading/v1/options/ws/public";
 
@@ -287,10 +285,8 @@ let lastBotTickAt = 0;
 let botSymbolActive = "";
 let lastDrawTime = 0;
 
-function generateOAuthURL() {
-  const state = Math.random().toString(36).substring(2) + Date.now().toString(36);
-  sessionStorage.setItem("oauth_state", state);
-  return `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=trade+account_manage&state=${state}`;
+function redirectToOAuth() {
+  window.location.href = `https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=trade+account_manage`;
 }
 
 function setStatus(id, message, type="") {
@@ -339,39 +335,22 @@ function settlePending(data) {
 async function handleOAuthCallback() {
   const url = new URL(location.href);
   const error = url.searchParams.get("error");
-  const code = url.searchParams.get("code");
-  const returnedState = url.searchParams.get("state");
-  const savedState = sessionStorage.getItem("oauth_state");
-
-  if (error) { setStatus("loginStatus", "Login error: " + error, "red"); cleanCallbackURL(); return; }
-
-  if (code) {
-    if (!returnedState || returnedState !== savedState) {
-      setStatus("loginStatus", "CSRF Security Warning: Invalid state parameter.", "red");
-      cleanCallbackURL();
-      return;
-    }
-    sessionStorage.removeItem("oauth_state");
-    setStatus("loginStatus", "Authenticating secure session…");
-
-    try {
-      const response = await fetch(WORKER_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code, redirect_uri: REDIRECT_URI, client_id: APP_ID })
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Token exchange failed.");
-      const token = result.access_token || result.accessToken;
-      if (!token) throw new Error("No token returned.");
-
-      accessToken = token;
-      oauthExpiry = Date.now() + Number(result.expires_in || 3600) * 1000;
-      sessionStorage.setItem("ck_deriv_access_token", accessToken);
-      sessionStorage.setItem("ck_deriv_expiry", String(oauthExpiry));
-      cleanCallbackURL();
-      await loadAccounts();
-    } catch (e) { setStatus("loginStatus", "Authentication failed: " + e.message, "red"); cleanCallbackURL(); }
+  const token1 = url.searchParams.get("token1");
+  
+  if (error) { 
+    setStatus("loginStatus", "Login error: " + error, "red"); 
+    cleanCallbackURL(); 
+    return; 
+  }
+  
+  if (token1) {
+    accessToken = token1;
+    oauthExpiry = Date.now() + 3600 * 1000;
+    sessionStorage.setItem("ck_deriv_access_token", accessToken);
+    sessionStorage.setItem("ck_deriv_expiry", String(oauthExpiry));
+    cleanCallbackURL();
+    await loadAccounts();
+    return;
   }
 }
 
@@ -471,7 +450,6 @@ async function connectSelectedAccount() {
       if (tradeWS !== ws) return;
       setStatus("accountStatus", "Socket active. Syncing balance…", "green");
       
-      // Start ping heartbeat
       pingInterval = setInterval(() => {
         if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ ping: 1 }));
       }, 30000);
@@ -551,7 +529,6 @@ function connectPublicMarkets() {
       renderMarkets();
       renderDigitBars();
       
-      // Throttle canvas draw to 10 FPS
       const now = Date.now();
       if (now - lastDrawTime > 100) {
         drawChart();
@@ -711,7 +688,7 @@ function updateHistory() {
 
 function updateSummary() {
   $("sessionPL").textContent = money(botSessionPL);
-  $("sessionPL").className = "stat " + (botSessionPL >= 0 ? "green" : "red");
+  $("sessionPL"].className = "stat " + (botSessionPL >= 0 ? "green" : "red");
   $("winLossCount").textContent = winsCount + " / " + lossesCount;
   const total = winsCount + lossesCount;
   const rate = total > 0 ? ((winsCount / total) * 100).toFixed(1) : "0.0";
@@ -789,10 +766,6 @@ function switchView(viewName) {
     $("workspaceView").style.display = "block";
     $("tabBotBtn").className = "nav-tab active";
   }
-}
-
-function redirectToOAuth() {
-  window.location.href = generateOAuthURL();
 }
 
 $("tabDashBtn").addEventListener("click", () => switchView("dash"));
