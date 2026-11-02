@@ -281,7 +281,7 @@ let sessionPnL = 0;
 let maxDailyLoss = 50;
 
 // Active Bot Engine State
-let activeBotInstance = null; // { type: 'ema'|'premium'|'speed', symbol, stake, multiplier, maxLoss }
+let activeBotInstance = null;
 
 function show(id, message) {
   const el = $(id);
@@ -382,7 +382,6 @@ function connectMarkets() {
       show("marketStatus", "Live feed connected · " + new Date().toLocaleTimeString());
       drawChart();
 
-      // Trigger Automated Trading Engine evaluation on tick if connected
       evaluateAutomatedBots(s, q);
     }
 
@@ -398,7 +397,6 @@ function connectMarkets() {
   };
 }
 
-// Indicator Calculation Helper: Exponential Moving Average (EMA)
 function calculateEMA(data, period) {
   if (!data || data.length === 0) return 0;
   const k = 2 / (period + 1);
@@ -409,16 +407,15 @@ function calculateEMA(data, period) {
   return ema;
 }
 
-// Automated Bot Trading Dispatcher
 function evaluateAutomatedBots(symbol, currentPrice) {
   if (!activeBotInstance || tradeBusy) return;
   if (activeBotInstance.symbol !== symbol) return;
   if (sessionPnL <= -maxDailyLoss) return;
 
   const history = chartHistory[symbol] || [];
-  if (history.length < 20) return; // Need enough data for EMA
+  if (history.length < 20) return;
 
-  let signal = null; // 'MULTUP' or 'MULTDOWN'
+  let signal = null;
 
   if (activeBotInstance.type === 'ema' || activeBotInstance.type === 'premium_1') {
     const fastEMA = calculateEMA(history, 5);
@@ -429,12 +426,10 @@ function evaluateAutomatedBots(symbol, currentPrice) {
       signal = 'MULTDOWN';
     }
   } else if (activeBotInstance.type === 'premium_2') {
-    // Momentum Scalper Strategy
     const recentDiff = history[history.length - 1] - history[history.length - 3];
     if (recentDiff > 0.5) signal = 'MULTUP';
     else if (recentDiff < -0.5) signal = 'MULTDOWN';
   } else if (activeBotInstance.type === 'premium_3' || activeBotInstance.type === 'speed') {
-    // Mean Reversion / Speed Momentum
     const movingAvg = history.reduce((a,b)=>a+b,0) / history.length;
     if (currentPrice < movingAvg * 0.999) signal = 'MULTUP';
     else if (currentPrice > movingAvg * 1.001) signal = 'MULTDOWN';
@@ -499,7 +494,6 @@ function drawChart() {
   });
   ctx.stroke();
 
-  // Draw EMA overlay on chart
   if (v.length >= 15) {
     ctx.beginPath();
     ctx.strokeStyle = "#31d49a";
@@ -567,41 +561,57 @@ async function processOAuthCallback() {
   if (oauthError) {
     show("loginStatus", "Deriv login error: " + (params.get("error_description") || oauthError).slice(0,180));
     history.replaceState({}, document.title, REDIRECT_URI);
+    sessionStorage.removeItem("ck_oauth_state");
+    sessionStorage.removeItem("ck_pkce_verifier");
     return;
   }
+
   if (!code) return;
 
   const savedState = sessionStorage.getItem("ck_oauth_state");
   const verifier = sessionStorage.getItem("ck_pkce_verifier");
+
   if (!savedState || state !== savedState || !verifier) {
+    show("loginStatus", "Session expired or state mismatch. Please click 'Log In and Trade' again.");
     history.replaceState({}, document.title, REDIRECT_URI);
+    sessionStorage.removeItem("ck_oauth_state");
+    sessionStorage.removeItem("ck_pkce_verifier");
     return;
   }
 
   sessionStorage.removeItem("ck_oauth_state");
-  show("loginStatus", "Exchanging authorization code…");
+  show("loginStatus", "Exchanging authorization code...");
 
   try {
     const response = await fetch(TOKEN_WORKER, {
       method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({code, code_verifier: verifier, client_id: CLIENT_ID, redirect_uri: REDIRECT_URI})
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        code: code,
+        code_verifier: verifier,
+        client_id: CLIENT_ID,
+        redirect_uri: REDIRECT_URI
+      })
     });
-    let result = await response.json();
+
+    const result = await response.json();
     sessionStorage.removeItem("ck_pkce_verifier");
     history.replaceState({}, document.title, REDIRECT_URI);
 
     if (!response.ok || !result || !result.access_token) {
-      show("loginStatus", "Token exchange failed.");
+      const errMsg = result.provider_error || result.error || ("HTTP " + response.status);
+      show("loginStatus", "Login Failed: " + errMsg);
       return;
     }
 
     sessionStorage.setItem("ck_access_token", result.access_token);
     currentAccessToken = result.access_token;
     await loadAccountsAndConnectDemo(result.access_token);
-  } catch(e) {
+
+  } catch (e) {
     sessionStorage.removeItem("ck_pkce_verifier");
     history.replaceState({}, document.title, REDIRECT_URI);
+    show("loginStatus", "Network error contacting Token Worker. Try logging in again.");
   }
 }
 
@@ -656,6 +666,7 @@ async function connectAccountByType(type, requireConfirmation = true) {
 
     socket.onopen = () => {
       show("activeAccountStatus", "ACTIVE ACCOUNT: " + (type === "real" ? "REAL MONEY" : "DEMO PRACTICE") + " · " + id);
+      show("loginStatus", "Connected successfully.");
       $("accountDashboard").hidden = false;
       $("tradeButton").disabled = false;
       socket.send(JSON.stringify({balance:1, subscribe:1, req_id:++requestId}));
@@ -677,7 +688,6 @@ async function connectAccountByType(type, requireConfirmation = true) {
       }
 
       if (m.msg_type === "proposal" && m.proposal) {
-        // Automatically execute proposal for automated bots, or ask confirmation for manual
         if (activeBotInstance) {
           tradeSocket.send(JSON.stringify({ buy: m.proposal.id, price: m.proposal.ask_price, req_id: ++requestId }));
         } else {
@@ -707,7 +717,6 @@ async function connectAccountByType(type, requireConfirmation = true) {
   }
 }
 
-// Manual Trading Button Handler
 $("tradeButton").addEventListener("click", () => {
   if (!tradeSocket || tradeSocket.readyState !== WebSocket.OPEN || tradeBusy) return;
   const stake = Number($("tradeStake").value);
@@ -732,7 +741,6 @@ function confirmAndBuyManual(proposal) {
   }
 }
 
-// Workspace Navigation & Bot Launch Handlers
 function openCardWorkspace(name) {
   const panel = $("cardWorkspace");
   ["loadBotPanel","premiumPanel","speedPanel"].forEach(id => $(id).hidden = true);
@@ -764,7 +772,6 @@ $("speedBotCard").addEventListener("click", () => openCardWorkspace("speed"));
 $("manualCard").addEventListener("click", () => openCardWorkspace("manual"));
 $("closeCardWorkspace").addEventListener("click", () => $("cardWorkspace").hidden = true);
 
-// Start EMA Bot
 $("startEmaBot").addEventListener("click", () => {
   maxDailyLoss = Number($("botMaxLoss").value) || 20;
   activeBotInstance = {
@@ -778,7 +785,6 @@ $("startEmaBot").addEventListener("click", () => {
 });
 $("stopEmaBot").addEventListener("click", () => stopAllAutomatedBots("User Stopped EMA Bot"));
 
-// Start Premium Bot Strategy
 $("startPremiumBot").addEventListener("click", () => {
   maxDailyLoss = Number($("premMaxLoss").value) || 25;
   const stratChoice = $("premiumStrategy").value;
@@ -793,7 +799,6 @@ $("startPremiumBot").addEventListener("click", () => {
 });
 $("stopPremiumBot").addEventListener("click", () => stopAllAutomatedBots("User Stopped Premium Strategy"));
 
-// Start Speed Momentum Bot
 $("speedStart").addEventListener("click", () => {
   maxDailyLoss = Number($("speedMaxLoss").value) || 20;
   activeBotInstance = {
