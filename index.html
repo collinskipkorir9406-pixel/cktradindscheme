@@ -4,136 +4,134 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="deriv-site-verification" content="ded285725a66c864612bf8d91ba4de4b63642ce64f6dd2f14fed08d232275b4a">
-<title>CK Trading Bot - TraderScheme Hub</title>
+<title>Traderscheme Workspace</title>
 <style>
-:root{color-scheme:dark;--bg:#07111f;--panel:#101d30;--inner:#14243a;--text:#f3f7ff;--muted:#9bacc5;--blue:#4f8cff;--green:#31d49a;--red:#ff6b78;--gold:#ffdc29;--border:#263852}
+:root{color-scheme:dark;--bg:#07111f;--panel:#101d30;--inner:#14243a;--text:#f3f7ff;--muted:#9bacc5;--blue:#4f8cff;--cyan:#22e0f1;--green:#31d49a;--red:#ff6b78;--gold:#ffdc29;--border:#263852}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
-header{background:rgba(4,13,29,.96);border-bottom:1px solid #1b3554;padding:18px 0;position:sticky;top:0;z-index:5;backdrop-filter:blur(12px)}
+header{background:rgba(4,13,29,.98);border-bottom:1px solid #1b3554;padding:12px 0;position:sticky;top:0;z-index:10;backdrop-filter:blur(12px)}
 .wrap{width:min(1100px,100%);margin:auto;padding:0 16px}
-.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-h1{font-size:24px;margin:0 0 6px}h2{font-size:18px;margin:0 0 14px}
-p{line-height:1.5}.muted,.status{color:var(--muted)}.small{font-size:12px}
-.badge{padding:6px 10px;border-radius:20px;background:#172c48;color:#9dc4ff;font-size:12px}
+.nav-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.nav-left{display:flex;align-items:center;gap:16px}
+.nav-logo{background:#172c48;color:var(--cyan);font-weight:bold;padding:6px 12px;border-radius:8px;font-size:14px;border:1px solid #29415c}
+.nav-tabs{display:flex;gap:16px;align-items:center;font-size:14px;font-weight:600}
+.nav-tab{color:var(--muted);cursor:pointer;padding:6px 10px;border-radius:6px;background:transparent;border:0}
+.nav-tab.active{color:var(--text);background:rgba(79,140,255,.15);border:1px solid rgba(79,140,255,.3)}
+.nav-right{display:flex;align-items:center;gap:12px;background:#14243a;border:1px solid var(--border);padding:6px 12px;border-radius:10px}
+.balance-display{font-weight:bold;color:var(--green);font-size:14px}
+
 main{padding-top:22px;padding-bottom:90px;background:radial-gradient(ellipse at 50% 36%,rgba(14,74,111,.22),transparent 50%),linear-gradient(180deg,#061022 0%,#030a16 100%);min-height:80vh}
 .panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:18px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
-.balance-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.balance-card{min-width:0;background:var(--inner);border:1px solid var(--border);border-radius:12px;padding:14px}
-.balance-card h3{font-size:14px;margin:0 0 12px}
-.balance-card .price{font-size:clamp(17px,4vw,25px);overflow-wrap:anywhere;margin:10px 0}
+.grid{display:grid;grid-repeat:repeat(auto-fit,minmax(210px,1fr));gap:12px}
 .market{padding:15px;background:var(--inner);border:1px solid var(--border);border-radius:11px}
 .market-name{font-weight:bold}.price{font-size:25px;font-weight:bold;margin:12px 0 5px;overflow-wrap:anywhere}
 .status{font-size:13px;line-height:1.5;margin-top:10px;overflow-wrap:anywhere}
 .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 button{border:0;border-radius:8px;padding:12px 15px;background:var(--blue);color:white;font-weight:bold;cursor:pointer}
 button.secondary{background:#243750;border:1px solid #3a506d}
-button.danger{background:var(--red)}
 button:disabled{opacity:.55;cursor:not-allowed}
 select,input{display:block;width:100%;max-width:380px;padding:12px;margin:7px 0 14px;background:var(--inner);color:white;border:1px solid #3a506d;border-radius:8px}
 label{font-size:13px;color:#c5d7f1}
-.notice{padding:12px;border-radius:9px;background:#17243a;font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+.notice{padding:12px;border-radius:9px;background:#17243a;font-size:13px;line-height:1.5}
 canvas{display:block;width:100%;height:220px;background:#0b1728;border:1px solid var(--border);border-radius:10px}
 footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px solid var(--border);font-size:12px}
 
-/* TRADERSCHEME FEATURE STYLES */
-.feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:18px 0 24px}
-.feature-card{position:relative;text-align:left;display:flex;flex-direction:column;min-height:210px;padding:18px;background:linear-gradient(145deg,rgba(15,36,60,.97),rgba(5,15,29,.98));border:1px solid #263e59;border-radius:20px;color:var(--text);box-shadow:inset 0 2px 0 rgba(96,177,255,.12);transition:transform .18s,border-color .18s;cursor:pointer;width:100%}
+/* EXACT TRADERSCHEME HERO & CARDS */
+.hero{position:relative;overflow:hidden;text-align:center;padding:clamp(32px,6vw,56px) 18px 24px;background:transparent;border:0}
+.hero-title{font-size:clamp(30px,6vw,46px);line-height:1.15;letter-spacing:-1px;color:var(--cyan);margin:0 auto 16px;max-width:720px}
+.hero-quote{color:#a9b8cb;font-size:clamp(14px,3vw,18px);font-style:italic;margin:0 auto 24px;max-width:650px}
+.eyebrow{font-size:11px;letter-spacing:2px;font-weight:800;color:#91a9c5;text-transform:uppercase;margin-bottom:18px}
+
+.feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:24px 0}
+.feature-card{position:relative;text-align:left;display:flex;flex-direction:column;min-height:190px;padding:20px;background:linear-gradient(145deg,rgba(16,29,48,.95),rgba(7,17,31,.98));border:1px solid #263e59;border-radius:18px;color:var(--text);box-shadow:inset 0 2px 0 rgba(96,177,255,.1);transition:transform .18s,border-color .18s;cursor:pointer;width:100%}
 .feature-card:hover{transform:translateY(-3px);border-color:#42cde0}
-.feature-card.gold{box-shadow:inset 0 2px 0 rgba(255,218,35,.45)}.feature-card.cyan{box-shadow:inset 0 2px 0 rgba(22,226,245,.45)}.feature-card.purple{box-shadow:inset 0 2px 0 rgba(185,122,255,.5)}
-.card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:22px}
-.card-number{font-size:12px;letter-spacing:1px;padding:6px 9px;border:1px solid #29415c;border-radius:7px;color:#b5c5d8}
-.card-icon{display:grid;place-items:center;width:52px;height:52px;border-radius:50%;font-size:24px;color:#74caff;background:#0a1c32;border:1px solid #315a83}
-.gold .card-icon{color:#ffdc29;border-color:#8d7a19}.cyan .card-icon{color:#22e0f1;border-color:#168c9b}.purple .card-icon{color:#c49aff;border-color:#7554a2}
-.card-link{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:12px;border-top:1px solid #20354d;font-size:12px;font-weight:800;color:#75b7ff}
-.card-arrow{display:grid;place-items:center;width:32px;height:32px;border:1px solid currentColor;border-radius:50%;font-size:20px}
-
-/* SCANNER TABLE */
-.scanner-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}
-.scanner-table th,.scanner-table td{padding:10px;border:1px solid var(--border);text-align:left}
-.scanner-table th{background:var(--inner);color:#75b7ff}
-.tag-bull{color:var(--green);font-weight:bold}
-.tag-bear{color:var(--red);font-weight:bold}
-
-/* STRATEGY PRESET CARDS */
-.strat-card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:14px 0}
-.strat-card{background:var(--inner);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer}
-.strat-card:hover{border-color:var(--blue)}
-.strat-card h4{margin:0 0 6px;color:var(--gold)}
+.feature-card.gold{box-shadow:inset 0 2px 0 rgba(255,218,35,.35)}
+.card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px}
+.card-number{font-size:12px;letter-spacing:1px;padding:4px 8px;border:1px solid #29415c;border-radius:6px;color:#b5c5d8}
+.card-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;font-size:20px;color:#74caff;background:#0a1c32;border:1px solid #315a83}
+.gold .card-icon{color:#ffdc29;border-color:#8d7a19}
+.feature-card h3{font-size:17px;margin:0 0 6px}
+.feature-card p{font-size:13px;color:#9eafc5;margin:0 0 16px;line-height:1.4}
+.card-link{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:10px;border-top:1px solid #1e324a;font-size:12px;font-weight:bold;color:#75b7ff}
+.gold .card-link{color:#ffdc29}
+.card-arrow{display:grid;place-items:center;width:28px;height:28px;border:1px solid currentColor;border-radius:50%;font-size:16px}
 
 #accountDashboard[hidden]{display:none!important}
-.ai-fab{position:fixed;right:18px;bottom:24px;z-index:20;width:68px;height:68px;border-radius:50%;padding:0;background:radial-gradient(circle at 35% 25%,#d9a7ff,#9149c8 60%,#4e247b);border:2px solid rgba(232,190,255,.8);font-size:28px;color:white}
-.ai-help{position:fixed;right:16px;bottom:102px;width:min(320px,calc(100vw - 32px));z-index:19;background:#101d30;border:1px solid #395274;border-radius:16px;padding:17px}
-.ai-help[hidden]{display:none!important}
-@media(max-width:480px){.feature-grid{gap:10px}.feature-card{padding:14px;min-height:205px}}
+.ai-fab{position:fixed;right:18px;bottom:24px;z-index:20;width:60px;height:60px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#d9a7ff,#9149c8 60%,#4e247b);border:2px solid rgba(232,190,255,.8);font-size:24px;color:white}
+@media(max-width:540px){.feature-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
+
 <header>
-<div class="wrap top">
-<div><h1>CK Trading Bot</h1><div class="muted small">TRADERSCHEME HUB · AUTOMATED WORKSPACE</div></div>
-<span class="badge">FULL SUITE ACTIVE</span>
+<div class="wrap nav-top">
+  <div class="nav-left">
+    <div class="nav-logo">TS</div>
+    <nav class="nav-tabs">
+      <button class="nav-tab active" onclick="switchTab('dashboard')">Dashboard</button>
+      <button class="nav-tab" onclick="openCardWorkspace('load')">Bot Builder</button>
+      <button class="nav-tab" onclick="openCardWorkspace('premium')">Volt AI</button>
+    </nav>
+  </div>
+  <div class="nav-right">
+    <span style="font-size:13px;color:var(--muted)">USD ▼</span>
+    <span class="balance-display" id="headerBalance">0.00 USD</span>
+  </div>
 </div>
 </header>
 
 <main class="wrap">
-<section class="panel hero" style="text-align:center;">
-<div class="eyebrow">● TRADERSCHEME &nbsp; / &nbsp; AUTOMATION CENTER</div>
-<h2 style="font-size:clamp(26px,5vw,42px);color:#6ce7f5;">Complete Deriv Strategy Hub</h2>
-<p class="muted">“Loaded with AI scanners, visual bot builders, and automated risk management.”</p>
+<section class="panel hero">
+<div class="eyebrow">● TRADERSCHEME &nbsp; / &nbsp; YOUR TRADING WORKSPACE</div>
+<h2 class="hero-title">Welcome to Traderscheme</h2>
+<p class="hero-quote">“The market rewards patience and punishes impatience.”</p>
 <div class="actions" style="justify-content:center;">
 <button id="loginButton">Log In and Trade</button>
-<button id="refreshButton" class="secondary">Refresh Live Markets</button>
+<button id="refreshButton" class="secondary">Refresh Markets</button>
 <button id="logoutButton" class="secondary">Log Out</button>
 </div>
-<div id="loginStatus" class="status">Not connected to an account. Log in to access trading tools.</div>
+<div id="loginStatus" class="status" style="margin-top:10px;">Not connected to an account.</div>
 </section>
 
-<!-- TRADERSCHEME FEATURE 1: LIVE MARKET SCANNER -->
-<section class="panel">
-<h2>AI Market Scanner</h2>
-<p class="muted small">Live volatility and momentum indicators across synthetic markets.</p>
-<div style="overflow-x:auto;">
-  <table class="scanner-table">
-    <thead>
-      <tr>
-        <th>Asset Market</th>
-        <th>Latest Price</th>
-        <th>Scan Signal</th>
-        <th>Quick Action</th>
-      </tr>
-    </thead>
-    <tbody id="scannerBody">
-      <tr><td colspan="4">Connecting to live scanner feeds…</td></tr>
-    </tbody>
-  </table>
-</div>
-</section>
-
-<!-- TRADERSCHEME FEATURE 2: BOT NAVIGATION MATRIX -->
+<!-- EXACT 2X2 WORKSPACE CARDS MATCHING IMAGE 2 -->
 <section class="feature-grid" aria-label="Trading tools">
 <button class="feature-card" id="loadBotCard" type="button">
-<div class="card-top"><span class="card-number">01</span><span class="card-icon">♧</span></div><h3>Load Bot</h3><p>Choose from preset DBot strategies (Rise/Fall, Over/Under, EMA).</p><div class="card-link"><span>Open Bot Loader</span><span class="card-arrow">↗</span></div>
+<div class="card-top"><span class="card-number">01</span><span class="card-icon">📁</span></div>
+<h3>Load Bot</h3>
+<p>Open your trading strategy</p>
+<div class="card-link"><span>Choose a bot</span><span class="card-arrow">↗</span></div>
 </button>
+
 <button class="feature-card gold" id="premiumCard" type="button">
-<div class="card-top"><span class="card-number">02</span><span class="card-icon">◇</span></div><h3>Premium Bots</h3><p>Access high-probability AI strategy suites &amp; trend scalpers.</p><div class="card-link"><span>Explore Premium Suite</span><span class="card-arrow">↗</span></div>
+<div class="card-top"><span class="card-number">02</span><span class="card-icon">💎</span></div>
+<h3>Premium Bots</h3>
+<p>Exclusive automated strategies</p>
+<div class="card-link"><span>Explore premium bots</span><span class="card-arrow">↗</span></div>
 </button>
-<button class="feature-card cyan" id="speedBotCard" type="button">
-<div class="card-top"><span class="card-number">03</span><span class="card-icon">◴</span></div><h3>Speed Bot</h3><p>High-frequency 1-tick momentum &amp; digit scalper automation.</p><div class="card-link"><span>Launch Speed Bot</span><span class="card-arrow">↗</span></div>
+
+<button class="feature-card" id="speedBotCard" type="button" style="box-shadow:inset 0 2px 0 rgba(34,224,241,.3)">
+<div class="card-top"><span class="card-number">03</span><span class="card-icon">⚡</span></div>
+<h3>Speed Bot</h3>
+<p>1-tick automated trading</p>
+<div class="card-link" style="color:var(--cyan)"><span>Launch Speed Bot</span><span class="card-arrow">↗</span></div>
 </button>
-<button class="feature-card purple" id="manualCard" type="button">
-<div class="card-top"><span class="card-number">04</span><span class="card-icon">☷</span></div><h3>Manual Workspace</h3><p>Manual trade execution with live profit &amp; loss tracking.</p><div class="card-link"><span>Open Workspace</span><span class="card-arrow">↗</span></div>
+
+<button class="feature-card" id="manualCard" type="button" style="box-shadow:inset 0 2px 0 rgba(185,122,255,.3)">
+<div class="card-top"><span class="card-number">04</span><span class="card-icon">🎛️</span></div>
+<h3>Manual Trading</h3>
+<p>Full control, trade your way</p>
+<div class="card-link" style="color:#c49aff"><span>Start manual trading</span><span class="card-arrow">↗</span></div>
 </button>
 </section>
 
 <section class="panel">
 <h2>Live Market Prices</h2>
-<div id="marketStatus" class="status">Connecting to public market data…</div>
+<div id="marketStatus" class="status">Connecting to live feeds…</div>
 <div id="markets" class="grid" style="margin-top:14px"></div>
 </section>
 
 <section class="panel">
-<h2>Price Chart &amp; Indicator Overlay</h2>
+<h2>Price Chart &amp; Indicators</h2>
 <label for="chartMarket">Select market</label>
 <select id="chartMarket">
 <option value="1HZ100V">Volatility 100 (1s)</option>
@@ -142,134 +140,46 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 <option value="1HZ25V">Volatility 25 (1s)</option>
 <option value="R_100">Volatility 100</option>
 <option value="R_75">Volatility 75</option>
-<option value="R_50">Volatility 50</option>
-<option value="R_25">Volatility 25</option>
-<option value="R_10">Volatility 10</option>
 </select>
 <canvas id="chart" width="1000" height="300"></canvas>
-<div id="chartStatus" class="status">Waiting for ticks…</div>
 </section>
 
-<div id="accountDashboard" hidden>
-<section class="panel">
-<h2>Account Balances &amp; Risk Manager</h2>
-<div class="balance-grid">
-  <div class="balance-card">
-    <h3>REAL ACCOUNT</h3>
-    <div class="price" id="realBalance">—</div>
-    <div id="realCurrency" class="muted small">Connect to load real balance.</div>
-    <div id="realStatus" class="status">Read-only balance display.</div>
-  </div>
-  <div class="balance-card">
-    <h3>DEMO ACCOUNT</h3>
-    <div class="price" id="accountBalance">—</div>
-    <div id="accountCurrency" class="muted small">Connect to load demo balance.</div>
-    <div id="accountStatus" class="status">Log in to connect your demo account.</div>
-  </div>
-</div>
-<div class="notice" style="margin-top:14px">
-  <strong>Automated Risk Control:</strong> Session P/L: <span id="sessionPnL">0.00</span> | Max Daily Loss: <span id="maxLossDisplay">$50.00</span>
-</div>
-<div class="actions">
-  <button type="button" id="useDemoAccount" class="secondary">Use DEMO Practice</button>
-  <button type="button" id="useRealAccount">Switch to REAL Money</button>
-</div>
-<div id="activeAccountStatus" class="status">Active trading account: choose DEMO or REAL.</div>
-</section>
-
-<section class="panel">
-<h2>Manual Trade Execution</h2>
-<label for="tradeMarket">Market</label>
-<select id="tradeMarket">
-<option value="1HZ100V">Volatility 100 (1s)</option>
-<option value="1HZ75V">Volatility 75 (1s)</option>
-<option value="1HZ50V">Volatility 50 (1s)</option>
-<option value="1HZ25V">Volatility 25 (1s)</option>
-<option value="R_100">Volatility 100</option>
-<option value="R_75">Volatility 75</option>
-<option value="R_50">Volatility 50</option>
-<option value="R_25">Volatility 25</option>
-<option value="R_10">Volatility 10</option>
-</select>
-<label for="tradeDirection">Direction</label>
-<select id="tradeDirection">
-<option value="MULTUP">Multiplier Up</option>
-<option value="MULTDOWN">Multiplier Down</option>
-</select>
-<label for="tradeStake">Stake amount</label>
-<input id="tradeStake" type="number" min="0.01" step="0.01" value="1">
-<label for="tradeMultiplier">Multiplier</label>
-<select id="tradeMultiplier">
-<option value="10">10×</option><option value="20">20×</option>
-<option value="40">40×</option><option value="50">50×</option>
-<option value="100">100×</option>
-</select>
-<button id="tradeButton" disabled>Log In to Connect Account</button>
-<div id="tradeStatus" class="status">No trade placed.</div>
-<div id="contractStatus" class="status"></div>
-</section>
-</div>
-
-<!-- WORKSPACE PANELS -->
+<!-- WORKSPACE MODAL PANEL -->
 <section class="panel" id="cardWorkspace" hidden>
 <h2 id="workspaceTitle">Trading Workspace</h2>
 <p id="workspaceDescription" class="muted">Choose a workspace.</p>
 
-<!-- TRADERSCHEME LOAD BOT PANEL -->
 <div id="loadBotPanel" hidden>
-  <h3>Load Bot · TraderScheme Preset Hub</h3>
-  <p class="muted small">Select a ready-to-run strategy preset:</p>
-  <div class="strat-card-grid">
-    <div class="strat-card" onclick="selectPreset('ema')">
-      <h4>EMA Crossover Bot</h4>
-      <p class="small muted">Triggers trades on Fast/Slow Exponential Moving Average crosses.</p>
-    </div>
-    <div class="strat-card" onclick="selectPreset('risefall')">
-      <h4>Rise / Fall Momentum</h4>
-      <p class="small muted">Executes directional trades based on 3-tick consecutive trends.</p>
-    </div>
-    <div class="strat-card" onclick="selectPreset('reversion')">
-      <h4>Mean Reversion Bot</h4>
-      <p class="small muted">Enters trades when prices stretch too far from moving averages.</p>
-    </div>
-  </div>
-  <label for="botMarket">Target Market</label>
-  <select id="botMarket"><option value="1HZ100V">Volatility 100 (1s)</option><option value="1HZ75V">Volatility 75 (1s)</option><option value="1HZ50V">Volatility 50 (1s)</option><option value="1HZ25V">Volatility 25 (1s)</option><option value="R_100">Volatility 100</option><option value="R_75">Volatility 75</option><option value="R_50">Volatility 50</option><option value="R_25">Volatility 25</option><option value="R_10">Volatility 10</option></select>
-  <label for="botStake">Stake ($)</label><input id="botStake" type="number" min="0.5" max="50" step="0.01" value="1">
-  <label for="botMultiplier">Multiplier</label><select id="botMultiplier"><option value="10">10×</option><option value="20">20×</option><option value="50">50×</option><option value="100">100×</option></select>
-  <label for="botMaxLoss">Max Daily Loss Limit ($)</label><input id="botMaxLoss" type="number" value="20" min="5" max="500">
+  <h3>Load Bot Strategy Config</h3>
+  <label for="botMarket">Market</label>
+  <select id="botMarket"><option value="1HZ100V">Volatility 100 (1s)</option><option value="1HZ75V">Volatility 75 (1s)</option></select>
+  <label for="botStake">Stake ($)</label><input id="botStake" type="number" value="1" min="0.5">
+  <label for="botMultiplier">Multiplier</label><select id="botMultiplier"><option value="10">10×</option><option value="50">50×</option></select>
+  <label for="botMaxLoss">Max Daily Loss ($)</label><input id="botMaxLoss" type="number" value="20">
   <div class="actions">
-    <button type="button" id="startEmaBot">Launch Loaded Bot</button>
+    <button type="button" id="startEmaBot">Start Automated Bot</button>
     <button type="button" class="secondary" id="stopEmaBot">Stop Bot</button>
   </div>
-  <p id="botSettingsStatus" class="status">Bot Status: Inactive</p>
+  <p id="botSettingsStatus" class="status">Status: Inactive</p>
 </div>
 
-<!-- TRADERSCHEME PREMIUM BOTS PANEL -->
 <div id="premiumPanel" hidden>
-  <h3>Premium Strategy Suite</h3>
-  <label for="premiumStrategy">Select Premium Algorithm</label>
-  <select id="premiumStrategy">
-    <option value="strat1">Apex AI Scalper (EMA Trend Follow)</option>
-    <option value="strat2">Neutrade Scalper (Momentum Acceleration)</option>
-    <option value="strat3">Volt Reversion AI (Conservative Mean Bounce)</option>
-  </select>
-  <div class="notice" id="premiumDescription">Executes trades automatically based on real-time indicator calculations.</div>
-  <label for="premStake">Bot Stake ($)</label><input id="premStake" type="number" value="1" min="0.5">
-  <label for="premMaxLoss">Max Daily Loss Limit ($)</label><input id="premMaxLoss" type="number" value="25">
+  <h3>Volt AI Premium Suite</h3>
+  <label for="premiumStrategy">Select Strategy</label>
+  <select id="premiumStrategy"><option value="strat1">Volt Trend Scalper</option><option value="strat2">Apex Mean Reversion</option></select>
+  <label for="premStake">Stake ($)</label><input id="premStake" type="number" value="1">
+  <label for="premMaxLoss">Max Daily Loss ($)</label><input id="premMaxLoss" type="number" value="25">
   <div class="actions">
-    <button type="button" id="startPremiumBot">Launch Premium Algorithm</button>
-    <button type="button" class="secondary" id="stopPremiumBot">Stop Premium Bot</button>
+    <button type="button" id="startPremiumBot">Launch Volt AI</button>
+    <button type="button" class="secondary" id="stopPremiumBot">Stop Volt AI</button>
   </div>
-  <p id="premiumBotStatus" class="status">Premium Status: Inactive</p>
+  <p id="premiumBotStatus" class="status">Volt AI Status: Inactive</p>
 </div>
 
-<!-- TRADERSCHEME SPEED BOT PANEL -->
 <div id="speedPanel" hidden>
-  <h3>Speed Bot · High-Frequency Scalper</h3>
-  <label for="speedInterval">Momentum Window (Ticks)</label><input id="speedInterval" type="number" min="3" max="20" value="5">
-  <label for="speedStake">Stake ($)</label><input id="speedStake" type="number" value="1" min="0.5">
-  <label for="speedMaxLoss">Max Daily Loss Limit ($)</label><input id="speedMaxLoss" type="number" value="20">
+  <h3>Speed Bot 1-Tick Execution</h3>
+  <label for="speedStake">Stake ($)</label><input id="speedStake" type="number" value="1">
+  <label for="speedMaxLoss">Max Daily Loss ($)</label><input id="speedMaxLoss" type="number" value="20">
   <div class="actions">
     <button type="button" id="speedStart">Start Speed Bot</button>
     <button type="button" class="secondary" id="speedStop">Stop Speed Bot</button>
@@ -279,24 +189,13 @@ footer{text-align:center;color:var(--muted);padding:20px 10px;border-top:1px sol
 
 <div class="actions"><button type="button" class="secondary" id="closeCardWorkspace">Close Workspace</button></div>
 </section>
-
-<section class="panel">
-<h2>Safety &amp; Risk Disclaimer</h2>
-<div class="notice">TraderScheme Community Engine. Automated strategies execute trades based on technical algorithms. Real accounts involve genuine capital risk. Always monitor your daily loss limits closely.</div>
-</section>
 </main>
 
-<div class="ai-help" id="aiHelp" hidden>
-<h3>TraderScheme Assistant</h3>
-<p>I can help you navigate bot presets, AI scanners, and risk controls.</p>
-<button type="button" id="aiClose" class="secondary">Close</button>
-</div>
-<button class="ai-fab" id="aiButton" type="button" aria-label="Open AI Assistant">AI</button>
-<footer>TraderScheme Community Workspace · Powered by Deriv API · Independent Interface</footer>
+<button class="ai-fab" id="aiButton" type="button" aria-label="AI Assistant">AI</button>
+<footer>Traderscheme Community Workspace · Powered by Deriv API</footer>
 
 <script>
 "use strict";
-
 const CLIENT_ID = "34MKk0BSq1Hz7mnKlIjHN";
 const REDIRECT_URI = "https://collinskipkorir9406-pixel.github.io/cktradindscheme/";
 const TOKEN_WORKER = "https://steep-snow-a539.collinskipkorir70.workers.dev/";
@@ -308,611 +207,152 @@ const MARKET_LIST = [
   {symbol:"1HZ50V",name:"Volatility 50 (1s)"},
   {symbol:"1HZ25V",name:"Volatility 25 (1s)"},
   {symbol:"R_100",name:"Volatility 100"},
-  {symbol:"R_75",name:"Volatility 75"},
-  {symbol:"R_50",name:"Volatility 50"},
-  {symbol:"R_25",name:"Volatility 25"},
-  {symbol:"R_10",name:"Volatility 10"}
+  {symbol:"R_75",name:"Volatility 75"}
 ];
 
 const $ = id => document.getElementById(id);
 const prices = {};
 const chartHistory = {};
-let marketSocket = null, marketTimer = null, marketGeneration = 0;
-let tradeSocket = null, currentAccessToken = "";
-let availableAccounts = [], activeAccountType = "demo", activeAccountId = "", activeCurrency = "USD";
-let tradeBusy = false, requestId = 100;
-let lastTradeRequestId = null;
+let marketSocket = null, tradeSocket = null, currentAccessToken = "";
+let availableAccounts = [], activeCurrency = "USD", tradeBusy = false, requestId = 100;
+let sessionPnL = 0, maxDailyLoss = 50, activeBotInstance = null;
 
-let sessionPnL = 0;
-let maxDailyLoss = 50;
-let activeBotInstance = null;
-
-function show(id, message) {
-  const el = $(id);
-  if (el) el.textContent = message;
-}
-
-function updateRiskDisplay() {
-  $("sessionPnL").textContent = sessionPnL.toFixed(2);
-  $("maxLossDisplay").textContent = "$" + maxDailyLoss.toFixed(2);
-  if (sessionPnL <= -maxDailyLoss) {
-    stopAllAutomatedBots("Max Daily Loss Reached ($" + maxDailyLoss + "). All bots halted.");
-  }
-}
-
-function stopAllAutomatedBots(reason) {
-  if (activeBotInstance) {
-    activeBotInstance = null;
-    show("botSettingsStatus", "Bot Halted: " + reason);
-    show("premiumBotStatus", "Premium Halted: " + reason);
-    show("speedStatus", "Speed Bot Halted: " + reason);
-  }
-}
+function show(id, msg) { const el = $(id); if (el) el.textContent = msg; }
 
 function makeMarketCards() {
   $("markets").replaceChildren();
   MARKET_LIST.forEach(m => {
     const card = document.createElement("div");
     card.className = "market";
-    const name = document.createElement("div");
-    name.className = "market-name";
-    name.textContent = m.name;
-    const price = document.createElement("div");
-    price.className = "price";
-    price.id = "price-" + m.symbol;
-    price.textContent = "Waiting…";
-    const time = document.createElement("div");
-    time.className = "status";
-    time.id = "time-" + m.symbol;
-    time.textContent = "Waiting for tick";
-    card.append(name, price, time);
+    card.innerHTML = `<div class="market-name">${m.name}</div><div class="price" id="price-${m.symbol}">Waiting…</div><div class="status" id="time-${m.symbol}">Connecting</div>`;
     $("markets").appendChild(card);
   });
 }
 
-function updateMarketScanner() {
-  const tbody = $("scannerBody");
-  if (!tbody) return;
-  tbody.replaceChildren();
-
-  MARKET_LIST.forEach(m => {
-    const history = chartHistory[m.symbol] || [];
-    const currentPrice = prices[m.symbol] || (history.length ? history[history.length - 1] : 0);
-    const prevPrice = history.length > 5 ? history[history.length - 5] : currentPrice;
-    
-    let trend = "Neutral";
-    let trendClass = "";
-    if (currentPrice > prevPrice) {
-      trend = "Bullish Momentum";
-      trendClass = "tag-bull";
-    } else if (currentPrice < prevPrice) {
-      trend = "Bearish Momentum";
-      trendClass = "tag-bear";
-    }
-
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td><strong>${m.name}</strong></td>
-      <td>${currentPrice ? currentPrice.toFixed(5) : "Scanning..."}</td>
-      <td><span class="${trendClass}">${trend}</span></td>
-      <td><button class="secondary" style="padding:4px 8px;font-size:11px;" onclick="selectScannerMarket('${m.symbol}')">Trade / Chart</button></td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-window.selectScannerMarket = function(symbol) {
-  $("chartMarket").value = symbol;
-  $("tradeMarket").value = symbol;
-  $("botMarket").value = symbol;
-  $("chartMarket").scrollIntoView({behavior:"smooth", block:"center"});
-};
-
-window.selectPreset = function(type) {
-  show("botSettingsStatus", "Loaded Strategy Preset: " + type.toUpperCase());
-};
-
 function connectMarkets() {
-  marketGeneration++;
-  const generation = marketGeneration;
-  if (marketTimer) clearTimeout(marketTimer);
-  if (marketSocket) {
-    try { marketSocket.onclose = null; marketSocket.close(); } catch(e) {}
-  }
-
-  show("marketStatus", "Connecting to live public data…");
   try {
     marketSocket = new WebSocket(MARKET_WS_URL);
-  } catch(e) {
-    show("marketStatus", "Market connection error.");
-    return;
-  }
-
-  const socket = marketSocket;
-  socket.onopen = () => {
-    if (generation !== marketGeneration) return;
-    show("marketStatus", "Connected. Subscribing to feeds…");
-    MARKET_LIST.forEach(m => {
-      socket.send(JSON.stringify({ticks: m.symbol, subscribe: 1}));
-      socket.send(JSON.stringify({ticks_history: m.symbol, count: 100, end: "latest", style: "ticks"}));
-    });
-  };
-
-  socket.onmessage = event => {
-    if (generation !== marketGeneration) return;
-    let d;
-    try { d = JSON.parse(event.data); } catch(e) { return; }
-
-    if (d.error) return;
-
-    if (d.msg_type === "tick" && d.tick) {
-      const t = d.tick;
-      const s = t.symbol;
-      const q = Number(t.quote);
-      if (!s || !Number.isFinite(q)) return;
-
-      prices[s] = q;
-      if ($("price-" + s)) $("price-" + s).textContent = q.toLocaleString("en-US",{maximumFractionDigits:5});
-      if ($("time-" + s)) $("time-" + s).textContent = "Live · " + new Date(Number(t.epoch || Date.now()/1000)*1000).toLocaleTimeString();
-
-      if (!chartHistory[s]) chartHistory[s] = [];
-      chartHistory[s].push(q);
-      if (chartHistory[s].length > 100) chartHistory[s].shift();
-
-      if (s === $("chartMarket").value) drawChart();
-      evaluateAutomatedBots(s, q);
-      updateMarketScanner();
-    }
-
-    if (d.msg_type === "history" && d.history && Array.isArray(d.history.prices)) {
-      const sym = d.echo_req && d.echo_req.ticks_history ? d.echo_req.ticks_history : $("chartMarket").value;
-      chartHistory[sym] = d.history.prices.map(Number).filter(Number.isFinite).slice(-100);
-      if (sym === $("chartMarket").value) drawChart();
-      updateMarketScanner();
-    }
-  };
-
-  socket.onclose = () => {
-    if (generation !== marketGeneration) return;
-    marketTimer = setTimeout(() => { if (generation === marketGeneration) connectMarkets(); }, 5000);
-  };
-}
-
-function calculateEMA(data, period) {
-  if (!data || data.length === 0) return 0;
-  const k = 2 / (period + 1);
-  let ema = data[0];
-  for (let i = 1; i < data.length; i++) {
-    ema = (data[i] * k) + (ema * (1 - k));
-  }
-  return ema;
-}
-
-function evaluateAutomatedBots(symbol, currentPrice) {
-  if (!activeBotInstance || tradeBusy) return;
-  if (activeBotInstance.symbol !== symbol) return;
-  if (sessionPnL <= -maxDailyLoss) return;
-
-  const history = chartHistory[symbol] || [];
-  if (history.length < 20) return;
-
-  let signal = null;
-
-  if (activeBotInstance.type === 'ema' || activeBotInstance.type === 'premium_1') {
-    const fastEMA = calculateEMA(history, 5);
-    const slowEMA = calculateEMA(history, 15);
-    if (fastEMA > slowEMA && history[history.length - 2] <= slowEMA) {
-      signal = 'MULTUP';
-    } else if (fastEMA < slowEMA && history[history.length - 2] >= slowEMA) {
-      signal = 'MULTDOWN';
-    }
-  } else if (activeBotInstance.type === 'premium_2') {
-    const recentDiff = history[history.length - 1] - history[history.length - 3];
-    if (recentDiff > 0.5) signal = 'MULTUP';
-    else if (recentDiff < -0.5) signal = 'MULTDOWN';
-  } else if (activeBotInstance.type === 'premium_3' || activeBotInstance.type === 'speed') {
-    const movingAvg = history.reduce((a,b)=>a+b,0) / history.length;
-    if (currentPrice < movingAvg * 0.999) signal = 'MULTUP';
-    else if (currentPrice > movingAvg * 1.001) signal = 'MULTDOWN';
-  }
-
-  if (signal && tradeSocket && tradeSocket.readyState === WebSocket.OPEN) {
-    tradeBusy = true;
-    lastTradeRequestId = ++requestId;
-    tradeSocket.send(JSON.stringify({
-      proposal: 1,
-      amount: activeBotInstance.stake,
-      basis: "stake",
-      contract_type: signal,
-      currency: activeCurrency,
-      multiplier: activeBotInstance.multiplier || 10,
-      underlying_symbol: symbol,
-      req_id: lastTradeRequestId
-    }));
-  }
+    marketSocket.onopen = () => {
+      show("marketStatus", "Connected to live market feeds.");
+      MARKET_LIST.forEach(m => {
+        marketSocket.send(JSON.stringify({ticks: m.symbol, subscribe: 1}));
+        marketSocket.send(JSON.stringify({ticks_history: m.symbol, count: 50, end: "latest", style: "ticks"}));
+      });
+    };
+    marketSocket.onmessage = e => {
+      let d = JSON.parse(e.data);
+      if (d.msg_type === "tick" && d.tick) {
+        let t = d.tick;
+        prices[t.symbol] = t.quote;
+        if ($("price-" + t.symbol)) $("price-" + t.symbol).textContent = Number(t.quote).toFixed(5);
+        if ($("time-" + t.symbol)) $("time-" + t.symbol).textContent = "Live";
+        if (!chartHistory[t.symbol]) chartHistory[t.symbol] = [];
+        chartHistory[t.symbol].push(Number(t.quote));
+        if (chartHistory[t.symbol].length > 50) chartHistory[t.symbol].shift();
+        if (t.symbol === $("chartMarket").value) drawChart();
+      }
+    };
+  } catch(err) {}
 }
 
 function drawChart() {
   const c = $("chart");
   if (!c) return;
   const ctx = c.getContext("2d");
-  const currentSymbol = $("chartMarket").value;
-  const v = chartHistory[currentSymbol] || [];
-  const w = c.width;
-  const h = c.height;
-
-  ctx.clearRect(0,0,w,h);
+  const v = chartHistory[$("chartMarket").value] || [];
+  ctx.clearRect(0,0,c.width,c.height);
   ctx.fillStyle = "#0b1728";
-  ctx.fillRect(0,0,w,h);
-  ctx.strokeStyle = "#263852";
-
-  for (let i=1;i<5;i++) {
-    ctx.beginPath();
-    ctx.moveTo(0,h*i/5);
-    ctx.lineTo(w,h*i/5);
-    ctx.stroke();
-  }
-
-  if (v.length < 2) {
-    ctx.fillStyle = "#9bacc5";
-    ctx.font = "18px Arial";
-    ctx.fillText("Waiting for price data…",24,40);
-    return;
-  }
-
-  const min = Math.min(...v);
-  const max = Math.max(...v);
-  const range = max-min || 1;
-  const pad = 24;
-
+  ctx.fillRect(0,0,c.width,c.height);
+  if (v.length < 2) return;
   ctx.beginPath();
   ctx.strokeStyle = "#4f8cff";
   ctx.lineWidth = 3;
-
+  let min = Math.min(...v), max = Math.max(...v), range = max-min || 1;
   v.forEach((n,i) => {
-    const x = pad + i*(w-2*pad)/(v.length-1);
-    const y = h-pad-((n-min)/range)*(h-2*pad);
-    if (i===0) ctx.moveTo(x,y);
-    else ctx.lineTo(x,y);
+    let x = 20 + i*(c.width-40)/(v.length-1);
+    let y = c.height-20-((n-min)/range)*(c.height-40);
+    if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
   });
   ctx.stroke();
-
-  if (v.length >= 15) {
-    ctx.beginPath();
-    ctx.strokeStyle = "#31d49a";
-    ctx.lineWidth = 2;
-    v.forEach((n, i) => {
-      if (i < 5) return;
-      const subSlice = v.slice(0, i + 1);
-      const emaVal = calculateEMA(subSlice, 10);
-      const x = pad + i*(w-2*pad)/(v.length-1);
-      const y = h-pad-((emaVal-min)/range)*(h-2*pad);
-      if (i === 5) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-  }
-
-  ctx.fillStyle = "#f3f7ff";
-  ctx.font = "14px Arial";
-  ctx.fillText("Latest: " + v[v.length-1] + " | EMA(10)", 20, 25);
 }
 
-function randomString(length) {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
-  const bytes = crypto.getRandomValues(new Uint8Array(length));
-  return Array.from(bytes, b => chars[b % chars.length]).join("");
+function startLogin() {
+  let verifier = randomString(64), state = randomString(32);
+  sessionStorage.setItem("ck_pkce_verifier", verifier);
+  sessionStorage.setItem("ck_oauth_state", state);
+  let url = new URL("https://auth.deriv.com/oauth2/auth");
+  url.searchParams.set("response_type","code");
+  url.searchParams.set("client_id",CLIENT_ID);
+  url.searchParams.set("redirect_uri",REDIRECT_URI);
+  url.searchParams.set("scope","trade account_manage");
+  url.searchParams.set("state",state);
+  location.assign(url.toString());
 }
-
-function base64Url(bytes) {
-  let binary = "";
-  bytes.forEach(b => binary += String.fromCharCode(b));
-  return btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/g,"");
-}
-
-async function startLogin() {
-  try {
-    const verifier = randomString(64);
-    const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
-    const challenge = base64Url(new Uint8Array(digest));
-    const state = randomString(32);
-
-    sessionStorage.setItem("ck_pkce_verifier", verifier);
-    sessionStorage.setItem("ck_oauth_state", state);
-
-    const url = new URL("https://auth.deriv.com/oauth2/auth");
-    url.searchParams.set("response_type","code");
-    url.searchParams.set("client_id",CLIENT_ID);
-    url.searchParams.set("redirect_uri",REDIRECT_URI);
-    url.searchParams.set("scope","trade account_manage");
-    url.searchParams.set("state",state);
-    url.searchParams.set("code_challenge",challenge);
-    url.searchParams.set("code_challenge_method","S256");
-
-    location.assign(url.toString());
-  } catch(e) {
-    show("loginStatus", "Could not start login.");
-  }
+function randomString(len) {
+  let bytes = crypto.getRandomValues(new Uint8Array(len));
+  return Array.from(bytes, b => "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~"[b % 66]).join("");
 }
 
 async function processOAuthCallback() {
-  const params = new URLSearchParams(location.search);
-  const code = params.get("code");
-  const state = params.get("state");
-  const oauthError = params.get("error");
-
-  if (oauthError) {
-    show("loginStatus", "Deriv error: " + (params.get("error_description") || oauthError).slice(0,180));
-    history.replaceState({}, document.title, REDIRECT_URI);
-    sessionStorage.removeItem("ck_oauth_state");
-    sessionStorage.removeItem("ck_pkce_verifier");
-    return;
-  }
-
+  let params = new URLSearchParams(location.search);
+  let code = params.get("code");
   if (!code) return;
-
-  const savedState = sessionStorage.getItem("ck_oauth_state");
-  const verifier = sessionStorage.getItem("ck_pkce_verifier");
-
-  if (!savedState || state !== savedState || !verifier) {
-    show("loginStatus", "Session expired. Please click 'Log In and Trade' again.");
-    history.replaceState({}, document.title, REDIRECT_URI);
-    sessionStorage.removeItem("ck_oauth_state");
-    sessionStorage.removeItem("ck_pkce_verifier");
-    return;
-  }
-
-  sessionStorage.removeItem("ck_oauth_state");
   show("loginStatus", "Exchanging code...");
-
   try {
-    const response = await fetch(TOKEN_WORKER, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        code: code,
-        code_verifier: verifier,
-        client_id: CLIENT_ID,
-        redirect_uri: REDIRECT_URI
-      })
-    });
-
-    let result;
-    try {
-      result = await response.json();
-    } catch(err) {
-      result = { error: "Non-JSON response" };
-    }
-
-    sessionStorage.removeItem("ck_pkce_verifier");
-    history.replaceState({}, document.title, REDIRECT_URI);
-
-    if (!response.ok || !result || !result.access_token) {
-      show("loginStatus", "Login Failed: " + (result.provider_error || result.error || response.status));
-      return;
-    }
-
-    sessionStorage.setItem("ck_access_token", result.access_token);
-    currentAccessToken = result.access_token;
-    await loadAccountsAndConnectDemo(result.access_token);
-
-  } catch (e) {
-    sessionStorage.removeItem("ck_pkce_verifier");
-    history.replaceState({}, document.title, REDIRECT_URI);
-    show("loginStatus", "Network error contacting Worker.");
-  }
-}
-
-function accountType(a) {
-  const t = String(a.account_type || a.type || "").toLowerCase();
-  if (t.includes("demo") || a.is_virtual === true || a.is_virtual === 1) return "demo";
-  if (t.includes("real") || a.is_virtual === false || a.is_virtual === 0) return "real";
-  return "";
-}
-
-async function loadAccountsAndConnectDemo(accessToken) {
-  show("accountStatus", "Loading Options accounts…");
-  try {
-    const response = await fetch("https://api.derivws.com/trading/v1/options/accounts", {
-      headers:{Authorization:"Bearer " + accessToken}
-    });
-    const result = await response.json();
-    const data = result.data;
-    availableAccounts = Array.isArray(data) ? data : (data?.accounts || data?.items || []);
-    const demo = availableAccounts.find(a => accountType(a) === "demo");
-    if (demo) await connectAccountByType("demo", false);
-  } catch(e) {
-    show("accountStatus", "Account lookup failed.");
-  }
-}
-
-async function connectAccountByType(type, requireConfirmation = true) {
-  const account = availableAccounts.find(a => accountType(a) === type);
-  if (!account) return;
-  const id = account.account_id || account.id;
-
-  if (type === "real" && requireConfirmation) {
-    if (!confirm("Switch to REAL MONEY account? Real trades risk actual capital.")) return;
-  }
-
-  try {
-    const otpResponse = await fetch("https://api.derivws.com/trading/v1/options/accounts/" + encodeURIComponent(id) + "/otp", {
-      method:"POST",
-      headers:{Authorization:"Bearer " + currentAccessToken}
-    });
-    const otpResult = await otpResponse.json();
-    if (!otpResponse.ok || !otpResult.data?.url) throw new Error("OTP failed");
-
-    if (tradeSocket) { try { tradeSocket.close(); } catch(e) {} }
-
-    activeAccountType = type;
-    activeAccountId = id;
-    activeCurrency = account.currency || "USD";
-
-    tradeSocket = new WebSocket(otpResult.data.url);
-    const socket = tradeSocket;
-
-    socket.onopen = () => {
-      show("activeAccountStatus", "ACTIVE ACCOUNT: " + (type === "real" ? "REAL MONEY" : "DEMO PRACTICE") + " · " + id);
+    let res = await fetch(TOKEN_WORKER, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({code, client_id:CLIENT_ID, redirect_uri:REDIRECT_URI})});
+    let json = await res.json();
+    if (json.access_token) {
+      currentAccessToken = json.access_token;
       show("loginStatus", "Connected successfully.");
-      $("accountDashboard").hidden = false;
-      $("tradeButton").disabled = false;
-      socket.send(JSON.stringify({balance:1, subscribe:1, req_id:++requestId}));
-    };
-
-    socket.onmessage = event => {
-      let m;
-      try { m = JSON.parse(event.data); } catch(e) { return; }
-
-      if (m.error) {
-        show("tradeStatus", "API Error: " + (m.error.message || "Failed"));
-        tradeBusy = false;
-        return;
-      }
-
-      if (m.msg_type === "balance" && m.balance) {
-        if (type === "demo") $("accountBalance").textContent = Number(m.balance.balance).toLocaleString(undefined,{minimumFractionDigits:2});
-        else $("realBalance").textContent = Number(m.balance.balance).toLocaleString(undefined,{minimumFractionDigits:2});
-      }
-
-      if (m.msg_type === "proposal" && m.proposal) {
-        if (activeBotInstance) {
-          tradeSocket.send(JSON.stringify({ buy: m.proposal.id, price: m.proposal.ask_price, req_id: ++requestId }));
-        } else {
-          confirmAndBuyManual(m.proposal);
-        }
-      }
-
-      if (m.msg_type === "buy" && m.buy) {
-        tradeBusy = false;
-        show("tradeStatus", "Trade executed. Contract ID: " + m.buy.contract_id);
-        if (m.buy.contract_id) {
-          socket.send(JSON.stringify({ proposal_open_contract: 1, contract_id: m.buy.contract_id, subscribe: 1, req_id: ++requestId }));
-        }
-      }
-
-      if (m.msg_type === "proposal_open_contract" && m.proposal_open_contract) {
-        const c = m.proposal_open_contract;
-        if (c.is_sold === 1 && c.profit !== undefined) {
-          sessionPnL += Number(c.profit);
-          updateRiskDisplay();
-        }
-        show("contractStatus", "Contract " + c.contract_id + " · Status: " + (c.status || "open") + " · P/L: " + (c.profit || 0));
-      }
-    };
-  } catch(e) {
-    show("activeAccountStatus", "Connection failed.");
-  }
+      loadAccounts(json.access_token);
+    }
+  } catch(e) { show("loginStatus", "Token exchange failed."); }
 }
 
-$("tradeButton").addEventListener("click", () => {
-  if (!tradeSocket || tradeSocket.readyState !== WebSocket.OPEN || tradeBusy) return;
-  const stake = Number($("tradeStake").value);
-  const symbol = $("tradeMarket").value;
-  const direction = $("tradeDirection").value;
-  const multiplier = Number($("tradeMultiplier").value);
+async function loadAccounts(token) {
+  let res = await fetch("https://api.derivws.com/trading/v1/options/accounts", {headers:{Authorization:"Bearer "+token}});
+  let json = await res.json();
+  availableAccounts = Array.isArray(json.data) ? json.data : [];
+  let demo = availableAccounts[0];
+  if (demo) connectAccount(demo);
+}
 
-  tradeBusy = true;
-  lastTradeRequestId = ++requestId;
-  tradeSocket.send(JSON.stringify({
-    proposal: 1, amount: stake, basis: "stake", contract_type: direction,
-    currency: activeCurrency, multiplier: multiplier, underlying_symbol: symbol, req_id: lastTradeRequestId
-  }));
-});
-
-function confirmAndBuyManual(proposal) {
-  const askPrice = Number(proposal.ask_price);
-  if (confirm("Confirm Manual Trade? Price: " + askPrice + " " + activeCurrency)) {
-    tradeSocket.send(JSON.stringify({ buy: proposal.id, price: askPrice, req_id: ++requestId }));
-  } else {
-    tradeBusy = false;
+async function connectAccount(acc) {
+  let res = await fetch("https://api.derivws.com/trading/v1/options/accounts/" + (acc.account_id || acc.id) + "/otp", {method:"POST", headers:{Authorization:"Bearer "+currentAccessToken}});
+  let json = await res.json();
+  if (json.data?.url) {
+    tradeSocket = new WebSocket(json.data.url);
+    tradeSocket.onopen = () => {
+      tradeSocket.send(JSON.stringify({balance:1, subscribe:1}));
+    };
+    tradeSocket.onmessage = e => {
+      let m = JSON.parse(e.data);
+      if (m.msg_type === "balance" && m.balance) {
+        $("headerBalance").textContent = Number(m.balance.balance).toFixed(2) + " " + (m.balance.currency || "USD");
+      }
+    };
   }
 }
 
 function openCardWorkspace(name) {
-  const panel = $("cardWorkspace");
+  $("cardWorkspace").hidden = false;
   ["loadBotPanel","premiumPanel","speedPanel"].forEach(id => $(id).hidden = true);
-  panel.hidden = false;
-
-  const info = {
-    load: ["Load Bot", "Choose strategy presets or configure automated EMA trading."],
-    premium: ["Premium Bots", "Launch high-probability AI scalper and reversion suites."],
-    speed: ["Speed Bot", "High-frequency momentum and short-term tick execution."],
-    manual: ["Manual Workspace", "Manual trade execution controls."]
-  };
-
-  $("workspaceTitle").textContent = info[name][0];
-  $("workspaceDescription").textContent = info[name][1];
-
   if (name === "load") $("loadBotPanel").hidden = false;
   if (name === "premium") $("premiumPanel").hidden = false;
   if (name === "speed") $("speedPanel").hidden = false;
-  if (name === "manual") {
-    panel.hidden = true;
-    $("accountDashboard").hidden = false;
-    $("tradeMarket").scrollIntoView({behavior:"smooth",block:"start"});
-  }
+  $("cardWorkspace").scrollIntoView({behavior:"smooth"});
 }
 
 $("loadBotCard").addEventListener("click", () => openCardWorkspace("load"));
 $("premiumCard").addEventListener("click", () => openCardWorkspace("premium"));
 $("speedBotCard").addEventListener("click", () => openCardWorkspace("speed"));
-$("manualCard").addEventListener("click", () => openCardWorkspace("manual"));
+$("manualCard").addEventListener("click", () => {
+  openCardWorkspace("load");
+});
 $("closeCardWorkspace").addEventListener("click", () => $("cardWorkspace").hidden = true);
-
-$("startEmaBot").addEventListener("click", () => {
-  maxDailyLoss = Number($("botMaxLoss").value) || 20;
-  activeBotInstance = {
-    type: 'ema',
-    symbol: $("botMarket").value,
-    stake: Number($("botStake").value),
-    multiplier: Number($("botMultiplier").value)
-  };
-  show("botSettingsStatus", "Bot Active on " + activeBotInstance.symbol);
-  updateRiskDisplay();
-});
-$("stopEmaBot").addEventListener("click", () => stopAllAutomatedBots("User Stopped Bot"));
-
-$("startPremiumBot").addEventListener("click", () => {
-  maxDailyLoss = Number($("premMaxLoss").value) || 25;
-  const stratChoice = $("premiumStrategy").value;
-  activeBotInstance = {
-    type: stratChoice === 'strat1' ? 'premium_1' : (stratChoice === 'strat2' ? 'premium_2' : 'premium_3'),
-    symbol: $("chartMarket").value,
-    stake: Number($("premStake").value),
-    multiplier: 20
-  };
-  show("premiumBotStatus", "Premium Active: " + stratChoice);
-  updateRiskDisplay();
-});
-$("stopPremiumBot").addEventListener("click", () => stopAllAutomatedBots("User Stopped Premium"));
-
-$("speedStart").addEventListener("click", () => {
-  maxDailyLoss = Number($("speedMaxLoss").value) || 20;
-  activeBotInstance = {
-    type: 'speed',
-    symbol: $("chartMarket").value,
-    stake: Number($("speedStake").value),
-    multiplier: 50
-  };
-  show("speedStatus", "Speed Bot Active");
-  updateRiskDisplay();
-});
-$("speedStop").addEventListener("click", () => stopAllAutomatedBots("User Stopped Speed Bot"));
-
 $("loginButton").addEventListener("click", startLogin);
 $("refreshButton").addEventListener("click", connectMarkets);
-$("logoutButton").addEventListener("click", () => {
-  sessionStorage.clear();
-  location.reload();
-});
-
-$("chartMarket").addEventListener("change", () => {
-  drawChart();
-});
-
-$("aiButton").addEventListener("click", () => $("aiHelp").hidden = !$("aiHelp").hidden);
-$("aiClose").addEventListener("click", () => $("aiHelp").hidden = true);
+$("logoutButton").addEventListener("click", () => { sessionStorage.clear(); location.reload(); });
 
 makeMarketCards();
 connectMarkets();
